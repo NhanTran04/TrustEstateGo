@@ -2,6 +2,7 @@ package com.tln.trustestatego.dto.request;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -20,6 +21,7 @@ public class UserUpdateRequest {
     String address;
     String phone;
     String password;
-    String avatar;
+    MultipartFile avatar;
     Boolean isActive;
+    int role;
 }

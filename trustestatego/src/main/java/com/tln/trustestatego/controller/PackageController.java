@@ -3,12 +3,13 @@ package com.tln.trustestatego.controller;
 import com.tln.trustestatego.dto.request.PackageRequest;
 import com.tln.trustestatego.dto.response.ApiResponse;
 import com.tln.trustestatego.dto.response.PackageResponse;
-import com.tln.trustestatego.entity.Package;
-import com.tln.trustestatego.repository.PackageRepository;
+import com.tln.trustestatego.service.Impl.PackageServiceImpl;
 import com.tln.trustestatego.service.PackageService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,29 +22,64 @@ public class PackageController {
      PackageService packageService;
 
     @GetMapping
-    ApiResponse<List<PackageResponse>> getPackages(){
-        return ApiResponse.<List<PackageResponse>>builder()
-                .result(packageService.getPackages())
-                .build();
+    public ResponseEntity<ApiResponse<List<PackageResponse>>> getPackages(){
+        return ResponseEntity.ok(
+                ApiResponse.<List<PackageResponse>>builder()
+                        .result(packageService.getPackages())
+                        .build()
+        );
     }
 
     @PostMapping
-    ApiResponse<PackageResponse> createPackage(@RequestBody PackageRequest packageRequest){
-        return ApiResponse.<PackageResponse>builder()
-                .result(packageService.createPackage(packageRequest))
-                .build();
+    public ResponseEntity<ApiResponse<PackageResponse>> createPackage(@RequestBody PackageRequest packageRequest) {
+        try {
+            PackageResponse createdPackage = packageService.createPackage(packageRequest);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(ApiResponse.<PackageResponse>builder()
+                            .result(createdPackage)
+                            .message("Package created successfully")
+                            .build());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.<PackageResponse>builder()
+                            .message("Failed to create package: " + e.getMessage())
+                            .build());
+        }
     }
 
     @PutMapping("/{packageId}")
-    ApiResponse<PackageResponse> updatePackage(@PathVariable int packageId, @RequestBody PackageRequest packageRequest){
-        return ApiResponse.<PackageResponse>builder()
-                .result(packageService.updatePackage(packageId, packageRequest))
-                .build();
+    public ResponseEntity<ApiResponse<PackageResponse>> updatePackage(
+            @PathVariable int packageId,
+            @RequestBody PackageRequest packageRequest) {
+        try {
+            PackageResponse updatedPackage = packageService.updatePackage(packageId, packageRequest);
+            return ResponseEntity.ok(
+                    ApiResponse.<PackageResponse>builder()
+                            .result(updatedPackage)
+                            .message("Package updated successfully")
+                            .build());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.<PackageResponse>builder()
+                            .message("Failed to update package: " + e.getMessage())
+                            .build());
+        }
     }
 
     @DeleteMapping("/{packageId}")
-    void deletePackage(@PathVariable int packageId){
-        packageService.deletePackage(packageId);
+    public ResponseEntity<ApiResponse<Void>> deletePackage(@PathVariable int packageId) {
+        try {
+            packageService.deletePackage(packageId);
+            return ResponseEntity.ok(
+                    ApiResponse.<Void>builder()
+                            .message("Package deleted successfully")
+                            .build());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.<Void>builder()
+                            .message("Failed to delete package: " + e.getMessage())
+                            .build());
+        }
     }
 
 }

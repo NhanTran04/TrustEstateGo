@@ -1,0 +1,50 @@
+package com.tln.trustestatego.service.Impl;
+
+import com.tln.trustestatego.dto.request.RoleRequest;
+import com.tln.trustestatego.dto.response.RoleResponse;
+import com.tln.trustestatego.entity.Role;
+import com.tln.trustestatego.mapper.RoleMapper;
+import com.tln.trustestatego.repository.RoleRepository;
+import com.tln.trustestatego.service.RoleService;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+public class RoleServiceImpl implements RoleService {
+    RoleRepository roleRepository;
+    RoleMapper roleMapper;
+
+    public List<RoleResponse> getRoles(){
+        return roleRepository.findAll()
+                .stream()
+                .map(roleMapper::toRoleResponse)
+                .toList();
+    }
+
+    public RoleResponse createRole(RoleRequest request){
+        Role role = roleMapper.toRole(request);
+
+//        var permissions = permissionRepository.findAllById(request.getPermissions());
+//        role.setPermissions(new HashSet<>(permissions));
+        role = roleRepository.save(role);
+        return roleMapper.toRoleResponse(role);
+
+    }
+
+    public RoleResponse updateRole(int roleId,RoleRequest roleRequest){
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+
+        roleMapper.update(role, roleRequest);
+        return roleMapper.toRoleResponse(roleRepository.save(role));
+
+    }
+}

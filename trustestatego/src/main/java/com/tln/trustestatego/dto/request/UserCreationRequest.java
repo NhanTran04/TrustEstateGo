@@ -5,6 +5,7 @@ import jakarta.persistence.Lob;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.ColumnDefault;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -25,7 +26,7 @@ public class UserCreationRequest {
     String phone;
     String username;
     String password;
-    String avatar;
+    MultipartFile avatar;
     Boolean isActive;
     int role;
 }

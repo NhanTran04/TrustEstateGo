@@ -1,96 +1,99 @@
 package com.tln.trustestatego.controller;
 
-import com.tln.trustestatego.dto.request.PropertyRequest;
+import com.tln.trustestatego.dto.request.UserCreationRequest;
+import com.tln.trustestatego.dto.request.UserUpdateRequest;
 import com.tln.trustestatego.dto.response.ApiResponse;
-import com.tln.trustestatego.dto.response.PropertyResponse;
-import com.tln.trustestatego.service.Impl.PropertyServiceImpl;
-import com.tln.trustestatego.service.PropertyService;
+import com.tln.trustestatego.dto.response.UserResponse;
+import com.tln.trustestatego.service.Impl.UserServiceImpl;
+import com.tln.trustestatego.service.UserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RequestMapping("/properties")
+@RequestMapping("/users")
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class PropertyController {
-    PropertyService propertyService;
+public class UserController {
+    UserService userService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<PropertyResponse>>> getProperties() {
+    public ResponseEntity<ApiResponse<List<UserResponse>>> getUsers() {
         try {
             return ResponseEntity.ok(
-                    ApiResponse.<List<PropertyResponse>>builder()
-                            .result(propertyService.getProperties())
+                    ApiResponse.<List<UserResponse>>builder()
+                            .result(userService.getUsers())
                             .build()
             );
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResponse.<List<PropertyResponse>>builder()
-                            .message("Lỗi khi lấy danh sách bất động sản: " + e.getMessage())
+                    .body(ApiResponse.<List<UserResponse>>builder()
+                            .message("Lỗi khi lấy danh sách user: " + e.getMessage())
                             .build());
         }
     }
 
-    @GetMapping("/{propertyId}")
-    public ResponseEntity<ApiResponse<PropertyResponse>> getPropertyById(@PathVariable int propertyId) {
+    @GetMapping("/{userId}")
+    public ResponseEntity<ApiResponse<UserResponse>> getUserById(@PathVariable int userId) {
         try {
             return ResponseEntity.ok(
-                    ApiResponse.<PropertyResponse>builder()
-                            .result(propertyService.getPropertyById(propertyId))
+                    ApiResponse.<UserResponse>builder()
+                            .result(userService.getUserById(userId))
                             .build()
             );
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ApiResponse.<PropertyResponse>builder()
-                            .message("Không tìm thấy bất động sản ID: " + propertyId)
+                    .body(ApiResponse.<UserResponse>builder()
+                            .message("Không tìm thấy user Id: " + userId)
                             .build());
         }
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<PropertyResponse>> createProperty(@RequestBody PropertyRequest propertyRequest) {
+    public ResponseEntity<ApiResponse<UserResponse>> createProperty(@RequestBody UserCreationRequest userCreationRequest) {
         try {
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(ApiResponse.<PropertyResponse>builder()
-                            .result(propertyService.createProperty(propertyRequest))
+                    .body(ApiResponse.<UserResponse>builder()
+                            .result(userService.createUser(userCreationRequest))
                             .message("Tạo bất động sản thành công")
                             .build());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(ApiResponse.<PropertyResponse>builder()
+                    .body(ApiResponse.<UserResponse>builder()
                             .message("Lỗi khi tạo bất động sản: " + e.getMessage())
                             .build());
         }
     }
 
-    @PutMapping("/{propertyId}")
-    public ResponseEntity<ApiResponse<PropertyResponse>> updateProperty(
-            @PathVariable int propertyId,
-            @RequestBody PropertyRequest propertyRequest) {
+    @PutMapping("/{userId}")
+    public ResponseEntity<ApiResponse<UserResponse>> updateProperty(
+            @PathVariable int userId,
+            @RequestBody UserUpdateRequest userUpdateRequest) {
         try {
             return ResponseEntity.ok(
-                    ApiResponse.<PropertyResponse>builder()
-                            .result(propertyService.updateProperty(propertyId, propertyRequest))
+                    ApiResponse.<UserResponse>builder()
+                            .result(userService.updateUser(userId, userUpdateRequest))
                             .message("Cập nhật bất động sản thành công")
                             .build());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(ApiResponse.<PropertyResponse>builder()
+                    .body(ApiResponse.<UserResponse>builder()
                             .message("Lỗi khi cập nhật bất động sản: " + e.getMessage())
                             .build());
         }
     }
 
-    @DeleteMapping("/{propertyId}")
-    public ResponseEntity<ApiResponse<Void>> deleteProperty(@PathVariable int propertyId) {
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<ApiResponse<Void>> deleteProperty(@PathVariable int userId) {
         try {
-            propertyService.deleteProperty(propertyId);
+            userService.deleteUser(userId);
             return ResponseEntity.ok(
                     ApiResponse.<Void>builder()
                             .message("Xóa bất động sản thành công")
