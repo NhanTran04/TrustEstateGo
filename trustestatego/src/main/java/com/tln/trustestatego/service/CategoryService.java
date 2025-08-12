@@ -6,8 +6,8 @@ import com.tln.trustestatego.dto.response.CategoryResponse;
 import java.util.List;
 
 public interface CategoryService {
-    public List<CategoryResponse> getCategories();
-    public CategoryResponse createCategory(CategoryRequest categoryRequest);
-    public CategoryResponse updateCategory(int cateId, CategoryRequest categoryRequest);
-    public void deleteCategory(int cateId);
+    List<CategoryResponse> getCategories();
+    CategoryResponse createCategory(CategoryRequest categoryRequest);
+    CategoryResponse updateCategory(int cateId, CategoryRequest categoryRequest);
+    void deleteCategory(int cateId);
 }

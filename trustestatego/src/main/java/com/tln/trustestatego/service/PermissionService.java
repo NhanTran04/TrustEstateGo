@@ -6,8 +6,8 @@ import com.tln.trustestatego.dto.response.PermissionResponse;
 import java.util.List;
 
 public interface PermissionService {
-    public List<PermissionResponse> getPermissions();
-    public PermissionResponse createPermission(PermissionRequest request);
-    public PermissionResponse updatePermission(int permissionId,PermissionRequest request);
-    public void deletePermission(int permissionId);
+    List<PermissionResponse> getPermissions();
+    PermissionResponse createPermission(PermissionRequest request);
+    PermissionResponse updatePermission(int permissionId,PermissionRequest request);
+    void deletePermission(int permissionId);
 }

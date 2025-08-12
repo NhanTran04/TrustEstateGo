@@ -39,7 +39,7 @@ public class Report {
 
     @Lob
     @Column(name = "status")
-    private String status;
+    private boolean status;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

@@ -1,0 +1,17 @@
+package com.tln.trustestatego.dto.request;
+
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class ReviewRequest {
+    int rating;
+    String comment;
+    int buyerId;
+    int sellerId;
+    int propertyId;
+}

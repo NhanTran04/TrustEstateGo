@@ -23,5 +23,5 @@ public class UserUpdateRequest {
     String password;
     MultipartFile avatar;
     Boolean isActive;
-    int role;
+    int roleId;
 }

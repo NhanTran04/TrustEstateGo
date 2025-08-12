@@ -7,9 +7,9 @@ import com.tln.trustestatego.dto.response.UserResponse;
 import java.util.List;
 
 public interface UserService {
-    public List<UserResponse> getUsers();
-    public UserResponse getUserById(int userId);
-    public UserResponse createUser(UserCreationRequest userCreationRequest);
-    public UserResponse updateUser(int userId, UserUpdateRequest userUpdateRequest);
-    public void deleteUser(int userId);
+    List<UserResponse> getUsers();
+    UserResponse getUserById(int userId);
+    UserResponse createUser(UserCreationRequest userCreationRequest);
+    UserResponse updateUser(int userId, UserUpdateRequest userUpdateRequest);
+    void deleteUser(int userId);
 }

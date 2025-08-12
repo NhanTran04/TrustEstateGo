@@ -28,5 +28,5 @@ public class UserCreationRequest {
     String password;
     MultipartFile avatar;
     Boolean isActive;
-    int role;
+    int roleId;
 }
