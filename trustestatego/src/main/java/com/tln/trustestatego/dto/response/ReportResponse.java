@@ -1,7 +1,10 @@
 package com.tln.trustestatego.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -11,8 +14,10 @@ import lombok.experimental.FieldDefaults;
 public class ReportResponse {
     int userId;
     int propertyId;
-    String propertyName;
-    //String propertyImage;
+    String propertyTitle;
+    String propertyImage;
     String reason;
     String status;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    LocalDateTime createdAt;
 }

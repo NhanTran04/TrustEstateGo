@@ -9,7 +9,10 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PropertySaveResponse {
-    private int id;
-    private int userId;
-    private PropertyResponse propertyResponse;
+    int id;
+    int userId;
+    int propertyId;
+    int propertyTitle;
+    String propertyImage;
+
 }

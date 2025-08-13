@@ -20,6 +20,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Transactional
 public class UserServiceImpl implements UserService {
     UserRepository userRepository;
     UserMapper userMapper;
@@ -62,7 +64,7 @@ public class UserServiceImpl implements UserService {
         user.setAvatar(upload(userCreationRequest.getAvatar()));
         user = userRepository.save(user);
 
-        Role role = roleRepository.findById(userCreationRequest.getRole())
+        Role role = roleRepository.findById(userCreationRequest.getRoleId())
                 .orElseThrow(() -> new RuntimeException("Role not found"));
 
         UserRole userRole = new UserRole();
@@ -84,11 +86,11 @@ public class UserServiceImpl implements UserService {
         if(image != null)
             user.setAvatar(image);
 
-        if (userUpdateRequest.getRole() > 0) {
-            Role role = roleRepository.findById(userUpdateRequest.getRole())
+        if (userUpdateRequest.getRoleId() > 0) {
+            Role role = roleRepository.findById(userUpdateRequest.getRoleId())
                     .orElseThrow(() -> new RuntimeException("Role not found"));
 
-            boolean hasRole = userRoleRepository.existsByUserIdAndRoleId(userId, userUpdateRequest.getRole());
+            boolean hasRole = userRoleRepository.existsByUserIdAndRoleId(userId, userUpdateRequest.getRoleId());
             if(!hasRole){
                 UserRole userRole = new UserRole();
                 userRole.setUser(user);

@@ -1,5 +1,6 @@
 package com.tln.trustestatego.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -17,5 +18,8 @@ public class ReviewResponse {
     int buyerId;
     int sellerId;
     int propertyId;
+    String propertyTitle;
+    String propertyImage;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     LocalDateTime createdAt;
 }

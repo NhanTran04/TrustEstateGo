@@ -12,12 +12,14 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.time.LocalDateTime;
 
 @Service
 @Slf4j
@@ -31,26 +33,37 @@ public class ReportServiceImpl implements ReportService {
     PropertyRepository propertyRepository;
 
     @Override
-    public List<ReportResponse> getReports() {
-        return reportRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"))
-                .stream()
-                .map(reportMapper::toReportResponse)
-                .collect(Collectors.toList());
+    public Page<ReportResponse> getReports(String keyword, Pageable pageable) {
+        Pageable sortPage = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by(Sort.Direction.DESC, "createdAt")
+        );
+        return reportRepository.findByProperty_NameContainingIgnoreCase(keyword,sortPage)
+                .map(reportMapper::toReportResponse);
+    }
+
+    @Override
+    public Page<ReportResponse> getReportByUserId(int userId, Pageable pageable) {
+        return reportRepository.findByUserId(userId, pageable).map(reportMapper::toReportResponse);
     }
 
     @Override
     public ReportResponse createReport(ReportUserRequest reportUserRequest) {
-        boolean exists = reportRepository.existsByUserIdAndPostId(
+        boolean exists = reportRepository.existsByUserIdAndPropertyId(
                 reportUserRequest.getUserId(), reportUserRequest.getPropertyId());
         if (exists) {
             throw new IllegalStateException("Bạn đã report bài này rồi");
         }
 
-        Report report = new Report();
+        Report report = reportMapper.toReport(reportUserRequest);
+
         report.setUser(userRepository.findById(reportUserRequest.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found")));
         report.setProperty(propertyRepository.findById(reportUserRequest.getPropertyId())
                 .orElseThrow(() -> new RuntimeException("Property not found")));
+        report.setCreatedAt(LocalDateTime.now());
+
         reportRepository.save(report);
 
         return reportMapper.toReportResponse(report);
@@ -58,10 +71,13 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public ReportResponse updateReport(int reportId) {
+
         Report report = reportRepository.findById(reportId)
                 .orElseThrow(() -> new RuntimeException("Report not found"));
         report.setStatus(true);
+
         reportRepository.save(report);
+
         return reportMapper.toReportResponse(report);
     }
 
