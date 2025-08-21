@@ -17,10 +17,16 @@ spring:
     web:
       pageable:
         default-page-size: 10         # số record mặc định mỗi trang
-
         one-indexed-parameters: true  # page=1 sẽ là trang đầu (mặc định Spring là page=0)
+  elasticsearch:
+    uris: http://localhost:9200
+#    username: elastic
+#    password: NQbLpkuruBK5c0*80vba
 
 cloudinary:
   cloud-name: diimcwvs5
   api-key: 225587137214427
   api-secret: Y1xcUA7_9U-DB3usTuz2JK1jGME
+
+jwt:
+  signer-key: "0Q6WIzJCAQu7xzibeabCKqV5huSJXjFxsVyxxp5ShhlxP1V88NDUgghB8ZHNwhre"

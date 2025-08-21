@@ -13,11 +13,10 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 public interface PropertySaveMapper {
     PropertySave toPropertySave(PropertySaveRequest propertySaveRequest);
-    @Mapping(source = "user.id", target = "userId")
     @Mapping(source = "property.title", target = "propertyTitle")
     @Mapping(target = "propertyImage",
-        expression = "java(propertySave.getProperty().getPropertyImages().isEmpty() ? null \" +\n" +
-                "                \": propertySave.getProperty().getPropertyImages().iterator().next().getImageUrl())"
+            expression = "java(propertySave.getProperty().getPropertyImages().isEmpty() ? null : propertySave.getProperty().getPropertyImages().iterator().next().getImageUrl())"
     )
+
     PropertySaveResponse toPropertySaveResponse(PropertySave propertySave);
 }

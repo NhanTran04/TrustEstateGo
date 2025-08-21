@@ -45,7 +45,7 @@ public class PropertySaveServiceImpl implements PropertySaveService {
     }
 
     @Override
-    public void saveProperty(PropertySaveRequest propertySaveRequest) {
+    public void createProperty(PropertySaveRequest propertySaveRequest) {
         Optional<PropertySave> existingSave = propertySaveRepository
                 .findByUserIdAndPropertyId(propertySaveRequest.getUserId(), propertySaveRequest.getPropertyId());
 

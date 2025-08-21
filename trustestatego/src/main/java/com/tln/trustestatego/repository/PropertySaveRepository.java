@@ -9,5 +9,5 @@ import java.util.Optional;
 public interface PropertySaveRepository extends JpaRepository<PropertySave, Integer> {
     List<PropertySave> findByUserId(int userId);
     Optional<PropertySave> findByUserIdAndPropertyId(int userId, int propertyId);
-    boolean existByUserIdAndPropertyId(int userId, int propertyId);
+    //boolean existByUserIdAndPropertyId(int userId, int propertyId);
 }

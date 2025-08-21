@@ -15,8 +15,8 @@ public class ReviewResponse {
     int id;
     int rating;
     String comment;
-    int buyerId;
-    int sellerId;
+//    int buyerId;
+//    int sellerId;
     int propertyId;
     String propertyTitle;
     String propertyImage;

@@ -18,6 +18,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,11 +42,12 @@ public class UserServiceImpl implements UserService {
     UserRoleRepository userRoleRepository;
     Cloudinary cloudinary;
 
-    public List<UserResponse> getUsers(){
-        return userRepository.findAll()
-                .stream()
-                .map(userMapper::toUserResponse)
-                .collect(Collectors.toList());
+    public Page<UserResponse> getUsers(String kw, Pageable pageable){
+        if(kw != null && !kw.isEmpty())
+            return userRepository.findByUsernameContainingIgnoreCase(kw, pageable)
+                    .map(userMapper::toUserResponse);
+        return userRepository.findAll(pageable)
+                .map(userMapper::toUserResponse);
     }
 
     public UserResponse getUserById(int userId) {

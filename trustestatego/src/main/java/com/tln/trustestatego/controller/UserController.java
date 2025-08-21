@@ -4,15 +4,14 @@ import com.tln.trustestatego.dto.request.UserCreationRequest;
 import com.tln.trustestatego.dto.request.UserUpdateRequest;
 import com.tln.trustestatego.dto.response.ApiResponse;
 import com.tln.trustestatego.dto.response.UserResponse;
-import com.tln.trustestatego.service.Impl.UserServiceImpl;
 import com.tln.trustestatego.service.UserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,17 +24,17 @@ public class UserController {
     UserService userService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<UserResponse>>> getUsers() {
+    public ResponseEntity<ApiResponse<Page<UserResponse>>> getUsers(@RequestParam String kw, Pageable pageable) {
         try {
             return ResponseEntity.ok(
-                    ApiResponse.<List<UserResponse>>builder()
-                            .result(userService.getUsers())
+                    ApiResponse.<Page<UserResponse>>builder()
+                            .result(userService.getUsers(kw, pageable))
                             .build()
             );
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResponse.<List<UserResponse>>builder()
-                            .message("Lỗi khi lấy danh sách user: " + e.getMessage())
+                    .body(ApiResponse.<Page<UserResponse>>builder()
+                            .message(e.getMessage())
                             .build());
         }
     }
@@ -57,51 +56,48 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<UserResponse>> createProperty(@RequestBody UserCreationRequest userCreationRequest) {
+    public ResponseEntity<ApiResponse<UserResponse>> createUser(@RequestBody UserCreationRequest userCreationRequest) {
         try {
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(ApiResponse.<UserResponse>builder()
                             .result(userService.createUser(userCreationRequest))
-                            .message("Tạo bất động sản thành công")
                             .build());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(ApiResponse.<UserResponse>builder()
-                            .message("Lỗi khi tạo bất động sản: " + e.getMessage())
+                            .message(e.getMessage())
                             .build());
         }
     }
 
     @PutMapping("/{userId}")
-    public ResponseEntity<ApiResponse<UserResponse>> updateProperty(
+    public ResponseEntity<ApiResponse<UserResponse>> updateUser(
             @PathVariable int userId,
             @RequestBody UserUpdateRequest userUpdateRequest) {
         try {
             return ResponseEntity.ok(
                     ApiResponse.<UserResponse>builder()
                             .result(userService.updateUser(userId, userUpdateRequest))
-                            .message("Cập nhật bất động sản thành công")
                             .build());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResponse.<UserResponse>builder()
-                            .message("Lỗi khi cập nhật bất động sản: " + e.getMessage())
+                            .message(e.getMessage())
                             .build());
         }
     }
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity<ApiResponse<Void>> deleteProperty(@PathVariable int userId) {
+    public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable int userId) {
         try {
             userService.deleteUser(userId);
             return ResponseEntity.ok(
                     ApiResponse.<Void>builder()
-                            .message("Xóa bất động sản thành công")
                             .build());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(ApiResponse.<Void>builder()
-                            .message("Lỗi khi xóa bất động sản: " + e.getMessage())
+                            .message(e.getMessage())
                             .build());
         }
     }

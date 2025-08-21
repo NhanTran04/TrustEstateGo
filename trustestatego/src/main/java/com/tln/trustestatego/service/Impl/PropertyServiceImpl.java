@@ -1,7 +1,9 @@
 package com.tln.trustestatego.service.Impl;
 
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.tln.trustestatego.document.PropertyDocument;
 import com.tln.trustestatego.dto.request.PropertyRequest;
 import com.tln.trustestatego.dto.response.PropertyResponse;
 import com.tln.trustestatego.entity.Property;
@@ -9,15 +11,26 @@ import com.tln.trustestatego.entity.PropertyImage;
 import com.tln.trustestatego.mapper.PropertyMapper;
 import com.tln.trustestatego.repository.CategoryRepository;
 import com.tln.trustestatego.repository.PropertyRepository;
+import com.tln.trustestatego.repository.PropertySearchRepository;
 import com.tln.trustestatego.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.SearchHit;
+import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.query.Criteria;
+import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -39,12 +52,14 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
 
     Cloudinary cloudinary;
 
+    ElasticsearchOperations elasticsearchOperations;
+
+    PropertySearchRepository propertySearchRepository;
+
     @Override
-    public List<PropertyResponse> getProperties(){
-        return propertyRepository.findAll()
-                .stream()
-                .map(propertyMapper::toPropertyResponse)
-                .collect(Collectors.toList());
+    public Page<PropertyResponse> getProperties(Pageable pageable){
+        Page<Property> propertiesPage = propertyRepository.findAll(pageable);
+        return propertiesPage.map(propertyMapper::toPropertyResponse);
     }
 
     @Override
@@ -90,6 +105,38 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
         }
 
         return propertyMapper.toPropertyResponse(propertyRepository.save(property));
+    }
+
+    @Override
+    public Page<PropertyDocument> searchProperty(Map<String,String> params, Pageable pageable) {
+        Criteria criteria = new Criteria();
+
+        String keyword = params.get("keyword");
+        if(keyword != null && !keyword.isEmpty())
+            criteria = criteria.and(new Criteria("title").matches(keyword));
+
+        String minPriceStr = params.get("minPrice");
+        String maxPriceStr = params.get("maxPrice");
+        if(minPriceStr != null && maxPriceStr != null)
+        {
+            BigDecimal minPrice = minPriceStr != null ? new BigDecimal(minPriceStr) : BigDecimal.ZERO;
+            BigDecimal maxPrice = maxPriceStr != null ? new BigDecimal(maxPriceStr) : new BigDecimal(Double.MAX_VALUE);
+            criteria = criteria.and(new Criteria("price").between(minPrice,maxPrice));
+        }
+
+        String propertyType = params.get("propertyType");
+        if (propertyType != null && !propertyType.isEmpty()) {
+            criteria = criteria.and(new Criteria("propertyType").is(propertyType));
+        }
+
+        CriteriaQuery query = new CriteriaQuery(criteria).setPageable(pageable);
+        SearchHits<PropertyDocument> hits = elasticsearchOperations.search(query, PropertyDocument.class);
+
+        List<PropertyDocument> docs = hits.getSearchHits().stream()
+                .map(SearchHit::getContent)
+                .toList();
+        return new PageImpl<>(docs, pageable, hits.getTotalHits());
+
     }
 
     private Set<PropertyImage> uploadPropertyImages(MultipartFile[] images, Property property) {

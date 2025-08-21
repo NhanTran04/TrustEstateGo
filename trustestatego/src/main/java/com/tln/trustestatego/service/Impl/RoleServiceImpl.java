@@ -10,6 +10,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,11 +26,9 @@ public class RoleServiceImpl implements RoleService {
     RoleRepository roleRepository;
     RoleMapper roleMapper;
 
-    public List<RoleResponse> getRoles(){
-        return roleRepository.findAll()
-                .stream()
-                .map(roleMapper::toRoleResponse)
-                .toList();
+    public Page<RoleResponse> getRoles(Pageable pageable){
+        return roleRepository.findAll(pageable)
+                .map(roleMapper::toRoleResponse);
     }
 
     public RoleResponse createRole(RoleRequest request){
@@ -48,5 +48,10 @@ public class RoleServiceImpl implements RoleService {
         roleMapper.update(role, roleRequest);
         return roleMapper.toRoleResponse(roleRepository.save(role));
 
+    }
+
+    @Override
+    public void deleteRole(int roleId) {
+        roleRepository.deleteById(roleId);
     }
 }

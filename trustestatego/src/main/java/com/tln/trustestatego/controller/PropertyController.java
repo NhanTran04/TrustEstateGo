@@ -3,16 +3,15 @@ package com.tln.trustestatego.controller;
 import com.tln.trustestatego.dto.request.PropertyRequest;
 import com.tln.trustestatego.dto.response.ApiResponse;
 import com.tln.trustestatego.dto.response.PropertyResponse;
-import com.tln.trustestatego.service.Impl.PropertyServiceImpl;
 import com.tln.trustestatego.service.PropertyService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RequestMapping("/properties")
 @RestController
@@ -22,18 +21,19 @@ public class PropertyController {
     PropertyService propertyService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<PropertyResponse>>> getProperties() {
+    public ResponseEntity<ApiResponse<Page<PropertyResponse>>> getProperties(Pageable pageable) {
         try {
-            return ResponseEntity.ok(
-                    ApiResponse.<List<PropertyResponse>>builder()
-                            .result(propertyService.getProperties())
-                            .build()
-            );
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResponse.<List<PropertyResponse>>builder()
-                            .message("Lỗi khi lấy danh sách bất động sản: " + e.getMessage())
-                            .build());
+                return ResponseEntity.ok(
+                        ApiResponse.<Page<PropertyResponse>>builder()
+                                .result(propertyService.getProperties(pageable))
+                                .build()
+                );
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(ApiResponse.<Page<PropertyResponse>>builder()
+                                .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                                .message(e.getMessage())
+                                .build());
         }
     }
 
@@ -46,9 +46,10 @@ public class PropertyController {
                             .build()
             );
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResponse.<PropertyResponse>builder()
-                            .message("Không tìm thấy bất động sản ID: " + propertyId)
+                            .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .message(e.getMessage())
                             .build());
         }
     }
@@ -59,12 +60,12 @@ public class PropertyController {
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(ApiResponse.<PropertyResponse>builder()
                             .result(propertyService.createProperty(propertyRequest))
-                            .message("Tạo bất động sản thành công")
                             .build());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(ApiResponse.<PropertyResponse>builder()
-                            .message("Lỗi khi tạo bất động sản: " + e.getMessage())
+                            .code(HttpStatus.BAD_REQUEST.value())
+                            .message(e.getMessage())
                             .build());
         }
     }
@@ -77,12 +78,12 @@ public class PropertyController {
             return ResponseEntity.ok(
                     ApiResponse.<PropertyResponse>builder()
                             .result(propertyService.updateProperty(propertyId, propertyRequest))
-                            .message("Cập nhật bất động sản thành công")
                             .build());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(ApiResponse.<PropertyResponse>builder()
-                            .message("Lỗi khi cập nhật bất động sản: " + e.getMessage())
+                            .code(HttpStatus.BAD_REQUEST.value())
+                            .message(e.getMessage())
                             .build());
         }
     }
@@ -96,9 +97,10 @@ public class PropertyController {
                             .message("Xóa bất động sản thành công")
                             .build());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResponse.<Void>builder()
-                            .message("Lỗi khi xóa bất động sản: " + e.getMessage())
+                            .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .message(e.getMessage())
                             .build());
         }
     }

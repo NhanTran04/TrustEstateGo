@@ -8,11 +8,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class PropertySaveResponse {
-    int id;
-//    int userId;
-    int propertyId;
-    int propertyTitle;
-    String propertyImage;
-
+public class AuthenticationResponse {
+    String token;
+    boolean authenticated;
 }

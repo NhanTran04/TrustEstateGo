@@ -39,13 +39,13 @@ public class ReportServiceImpl implements ReportService {
                 pageable.getPageSize(),
                 Sort.by(Sort.Direction.DESC, "createdAt")
         );
-        return reportRepository.findByProperty_NameContainingIgnoreCase(keyword,sortPage)
+        return reportRepository.findByProperty_TitleContainingIgnoreCase(keyword,sortPage)
                 .map(reportMapper::toReportResponse);
     }
 
     @Override
     public Page<ReportResponse> getReportByUserId(int userId, Pageable pageable) {
-        return reportRepository.findByUserId(userId, pageable).map(reportMapper::toReportResponse);
+        return reportRepository.findByUser_Id(userId, pageable).map(reportMapper::toReportResponse);
     }
 
     @Override

@@ -7,6 +7,8 @@ import com.tln.trustestatego.service.PermissionService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,23 +21,54 @@ public class PermissionController {
     PermissionService permissionService;
 
     @PostMapping
-    ApiResponse<PermissionResponse> create(@RequestBody PermissionRequest request){
-        return ApiResponse.<PermissionResponse>builder()
-                .result(permissionService.createPermission(request))
-                .build();
+    ResponseEntity<ApiResponse<PermissionResponse>> create(@RequestBody PermissionRequest request){
+        try {
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(ApiResponse.<PermissionResponse>builder()
+                            .result(permissionService.createPermission(request))
+                            .build());
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(ApiResponse.<PermissionResponse>builder()
+                            .code(HttpStatus.BAD_REQUEST.value())
+                            .message(e.getMessage())
+                            .build());
+
+        }
     }
 
     @GetMapping
-    ApiResponse<List<PermissionResponse>> getPermissions(){
-        return ApiResponse.<List<PermissionResponse>>builder()
-                .result(permissionService.getPermissions())
-                .build();
+    ResponseEntity<ApiResponse<List<PermissionResponse>>> getPermissions(){
+        try {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(ApiResponse.<List<PermissionResponse>>builder()
+                            .result(permissionService.getPermissions())
+                            .build());
+        }catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(ApiResponse.<List<PermissionResponse>>builder()
+                            .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .message(e.getMessage())
+                            .build());
+        }
     }
 
     @DeleteMapping("/{permissionId}")
-    ApiResponse<Void> delete(@PathVariable int permissionId){
-        permissionService.deletePermission(permissionId);
-        return ApiResponse.<Void>builder().build();
-
+    ResponseEntity<ApiResponse<Void>> delete(@PathVariable int permissionId){
+        try{
+            permissionService.deletePermission(permissionId);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                    .body(ApiResponse.<Void>builder()
+                            .result(null).build());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.<Void>builder()
+                            .code(HttpStatus.BAD_REQUEST.value())
+                            .message(e.getMessage())
+                            .build());
+        }
     }
+
+
 }

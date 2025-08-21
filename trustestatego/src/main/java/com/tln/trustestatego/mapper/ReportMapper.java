@@ -9,7 +9,6 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface ReportMapper {
     Report toReport(ReportUserRequest reportUserRequest);
-    @Mapping(source = "user.id", target = "userId")
     @Mapping(source = "property.id", target = "propertyId")
     @Mapping(source = "property.title", target = "propertyTitle")
     @Mapping(target = "propertyImage",

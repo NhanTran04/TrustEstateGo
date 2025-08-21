@@ -40,19 +40,19 @@ public class ReviewServiceImpl implements ReviewService {
                 Sort.by(Sort.Direction.DESC, "createdAt")
         );
 
-        return reviewRepository.findBySellerId(sellerId, sortPage)
+        return reviewRepository.findBySeller_Id(sellerId, sortPage)
                 .map(reviewMapper::toReviewResponse);
     }
 
     @Override
-    public Page<ReviewResponse> getReviewByUserId(int userId, String keyword, Pageable pageable) {
+    public Page<ReviewResponse> getReviewByUserId(int buyerId, Pageable pageable) {
         Pageable sortPage = PageRequest.of(
                 pageable.getPageNumber(),
                 pageable.getPageSize(),
                 Sort.by(Sort.Direction.DESC, "createdAt")
         );
 
-        return reviewRepository.findByUserId(userId, keyword, sortPage)
+        return reviewRepository.findByBuyer_Id(buyerId, sortPage)
                 .map(reviewMapper::toReviewResponse);
     }
 
@@ -66,12 +66,18 @@ public class ReviewServiceImpl implements ReviewService {
                 .orElseThrow(() -> new RuntimeException("Seller not found"));
         Property property = propertyRepository.findById(reviewRequest.getPropertyId())
                 .orElseThrow(() -> new RuntimeException("Property not found"));
-
+//        User seller = userRepository.findById(property.getUser().getId())
+//                .orElseThrow(() -> new RuntimeException("Seller not found"));
         review.setBuyer(buyer);
         review.setSeller(seller);
         review.setProperty(property);
         reviewRepository.save(review);
 
         return reviewMapper.toReviewResponse(review);
+    }
+
+    @Override
+    public void deleteReview(int reviewId) {
+        reviewRepository.deleteById(reviewId);
     }
 }

@@ -4,7 +4,6 @@ import com.tln.trustestatego.dto.request.CategoryRequest;
 import com.tln.trustestatego.dto.response.ApiResponse;
 import com.tln.trustestatego.dto.response.CategoryResponse;
 import com.tln.trustestatego.service.CategoryService;
-import com.tln.trustestatego.service.Impl.CategoryServiceImpl;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -33,7 +32,7 @@ public class CategoryController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
                     ApiResponse.<List<CategoryResponse>>builder()
                             .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                            .message("Lỗi khi lấy danh sách categories: " + e.getMessage())
+                            .message(e.getMessage())
                             .build()
             );
         }
@@ -51,7 +50,7 @@ public class CategoryController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                     ApiResponse.<CategoryResponse>builder()
                             .code(HttpStatus.BAD_REQUEST.value())
-                            .message("Lỗi khi tạo category: " + e.getMessage())
+                            .message(e.getMessage())
                             .build()
             );
         }
@@ -71,7 +70,7 @@ public class CategoryController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                     ApiResponse.<CategoryResponse>builder()
                             .code(HttpStatus.BAD_REQUEST.value())
-                            .message("Lỗi khi cập nhật category: " + e.getMessage())
+                            .message(e.getMessage())
                             .build()
             );
         }
@@ -90,7 +89,7 @@ public class CategoryController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                     ApiResponse.<Void>builder()
                             .code(HttpStatus.BAD_REQUEST.value())
-                            .message("Lỗi khi xóa category: " + e.getMessage())
+                            .message(e.getMessage())
                             .build()
             );
         }

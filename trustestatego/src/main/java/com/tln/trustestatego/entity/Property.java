@@ -1,5 +1,6 @@
 package com.tln.trustestatego.entity;
 
+import com.tln.trustestatego.elasticsearch.PropertyElasticListener;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,6 +14,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
+@EntityListeners(PropertyElasticListener.class)
 @Table(name = "property", indexes = {
         @Index(name = "category_id", columnList = "category_id"),
         @Index(name = "user_id", columnList = "user_id")

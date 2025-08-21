@@ -3,7 +3,6 @@ package com.tln.trustestatego.controller;
 import com.tln.trustestatego.dto.request.PackageRequest;
 import com.tln.trustestatego.dto.response.ApiResponse;
 import com.tln.trustestatego.dto.response.PackageResponse;
-import com.tln.trustestatego.service.Impl.PackageServiceImpl;
 import com.tln.trustestatego.service.PackageService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -23,11 +22,20 @@ public class PackageController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<PackageResponse>>> getPackages(){
+        try{
         return ResponseEntity.ok(
                 ApiResponse.<List<PackageResponse>>builder()
                         .result(packageService.getPackages())
                         .build()
         );
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.<List<PackageResponse>>builder()
+                            .code(HttpStatus.BAD_REQUEST.value())
+                            .message(e.getMessage())
+                            .build());
+        }
+
     }
 
     @PostMapping
@@ -40,10 +48,7 @@ public class PackageController {
                             .message("Package created successfully")
                             .build());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(ApiResponse.<PackageResponse>builder()
-                            .message("Failed to create package: " + e.getMessage())
-                            .build());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 

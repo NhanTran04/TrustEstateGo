@@ -9,8 +9,8 @@ import java.util.List;
 
 public interface ReviewService {
     Page<ReviewResponse> getReviewBySellerId(int sellerId, Pageable pageable);
-    Page<ReviewResponse> getReviewByUserId(int userId, String keyword, Pageable pageable);
+    Page<ReviewResponse> getReviewByUserId(int userId, Pageable pageable);
     ReviewResponse createReview(ReviewRequest reviewRequest);
     //ReviewResponse updateReview(int reviewId, ReviewRequest reviewRequest);
-    //void deleteReview(int reviewId);
+    void deleteReview(int reviewId);
 }
