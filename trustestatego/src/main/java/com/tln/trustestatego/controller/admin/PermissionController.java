@@ -1,4 +1,4 @@
-package com.tln.trustestatego.controller;
+package com.tln.trustestatego.controller.admin;
 
 import com.tln.trustestatego.dto.request.PermissionRequest;
 import com.tln.trustestatego.dto.response.ApiResponse;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RequestMapping("/permissions")
+@RequestMapping("/api/admin/permissions")
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)

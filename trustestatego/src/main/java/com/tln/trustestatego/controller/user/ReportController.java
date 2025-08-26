@@ -1,19 +1,19 @@
-package com.tln.trustestatego.controller;
+package com.tln.trustestatego.controller.user;
 
 import com.tln.trustestatego.dto.request.ReportUserRequest;
 import com.tln.trustestatego.dto.response.ApiResponse;
+import com.tln.trustestatego.dto.response.PageResponse;
 import com.tln.trustestatego.dto.response.ReportResponse;
 import com.tln.trustestatego.service.ReportService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/user/reports")
+@RequestMapping("/api/reports")
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -21,44 +21,47 @@ public class ReportController {
     ReportService reportService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<ReportResponse>>> getReports(@RequestParam String kw
+    public ResponseEntity<ApiResponse<PageResponse<ReportResponse>>> getReports(@RequestParam(defaultValue = "") String kw
             , Pageable pageable){
         try{
             return ResponseEntity.ok()
-                    .body(ApiResponse.<Page<ReportResponse>>builder()
+                    .body(ApiResponse.<PageResponse<ReportResponse>>builder()
                             .result(reportService.getReports(kw, pageable))
                             .build());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResponse.<Page<ReportResponse>>builder()
+                    .body(ApiResponse.<PageResponse<ReportResponse>>builder()
                             .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
                             .message(e.getMessage())
                             .build());
         }
     }
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<ApiResponse<Page<ReportResponse>>> getReportByUserId(@PathVariable int userId, Pageable pageable){
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<ApiResponse<PageResponse<ReportResponse>>> getReportByUserId(@PathVariable int userId, Pageable pageable){
         try{
             return ResponseEntity.ok()
-                    .body(ApiResponse.<Page<ReportResponse>>builder()
+                    .body(ApiResponse.<PageResponse<ReportResponse>>builder()
                             .result(reportService.getReportByUserId(userId, pageable))
                             .build());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResponse.<Page<ReportResponse>>builder()
+                    .body(ApiResponse.<PageResponse<ReportResponse>>builder()
                             .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
                             .message(e.getMessage())
                             .build());
         }
     }
 
-    @PostMapping
-    public ResponseEntity<ApiResponse<ReportResponse>> createReport(@RequestBody ReportUserRequest reportUserRequest){
+    @PostMapping("/{propertyId}/users/{userId}")
+    public ResponseEntity<ApiResponse<ReportResponse>> createReport(
+            @RequestBody ReportUserRequest reportUserRequest,
+            @PathVariable(value = "propertyId") int propertyId,
+            @PathVariable(value = "userId") int userId){
         try{
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(ApiResponse.<ReportResponse>builder()
-                            .result(reportService.createReport(reportUserRequest))
+                            .result(reportService.createReport(reportUserRequest, userId, propertyId))
                             .build());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

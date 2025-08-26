@@ -1,6 +1,5 @@
-package com.tln.trustestatego.controller;
+package com.tln.trustestatego.controller.admin;
 
-import com.tln.trustestatego.dto.request.PropertySaveRequest;
 import com.tln.trustestatego.dto.response.ApiResponse;
 import com.tln.trustestatego.dto.response.PropertySaveResponse;
 import com.tln.trustestatego.service.PropertySaveService;
@@ -14,13 +13,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/property_save")
+@RequestMapping("/api/admin/property_save")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PropertySaveController {
     PropertySaveService proSaveService;
 
-    @GetMapping
+    @GetMapping("/users/{userId}")
     ResponseEntity<ApiResponse<List<PropertySaveResponse>>> getPropertySaves(@PathVariable int userId){
         try{
 //            int userId = getCurrentUserIdFromSecurityContext ();
@@ -38,10 +37,10 @@ public class PropertySaveController {
         }
     }
 
-    @PostMapping
-    ResponseEntity<ApiResponse<Void>> createPropertySave(@RequestBody PropertySaveRequest propertySaveRequest) {
+    @PostMapping("/{propertyId}/users/{userId}")
+    ResponseEntity<ApiResponse<Void>> createPropertySave(@PathVariable(value = "propertyId") int propertyId, @PathVariable(value = "userId") int userId) {
         try {
-            proSaveService.createProperty(propertySaveRequest);
+            proSaveService.togglePropertySave(userId, propertyId);
             return ResponseEntity.status(HttpStatus.CREATED).body(
                     ApiResponse.<Void>builder()
                             .result(null) // vì không có dữ liệu trả về
@@ -56,22 +55,22 @@ public class PropertySaveController {
         }
     }
 
-    @DeleteMapping("/{proSaveId}")
-    ResponseEntity<ApiResponse<Void>> deletePropertySaves(@PathVariable int proSaveId) {
-        try {
-            proSaveService.deleteById(proSaveId);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(
-                    ApiResponse.<Void>builder()
-                            .result(null) // vì không có dữ liệu trả về
-                            .build()
-            );
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResponse.<Void>builder()
-                            .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                            .message(e.getMessage())
-                            .build());
-        }
-    }
+//    @DeleteMapping("/{proSaveId}")
+//    ResponseEntity<ApiResponse<Void>> deletePropertySaves(@PathVariable int proSaveId) {
+//        try {
+//            proSaveService.deleteById(proSaveId);
+//            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(
+//                    ApiResponse.<Void>builder()
+//                            .result(null) // vì không có dữ liệu trả về
+//                            .build()
+//            );
+//        } catch (RuntimeException e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body(ApiResponse.<Void>builder()
+//                            .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
+//                            .message(e.getMessage())
+//                            .build());
+//        }
+//    }
 
 }

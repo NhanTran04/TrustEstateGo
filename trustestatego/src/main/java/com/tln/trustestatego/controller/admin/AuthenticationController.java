@@ -1,19 +1,13 @@
-package com.tln.trustestatego.controller;
+package com.tln.trustestatego.controller.admin;
 
-import com.tln.trustestatego.dto.request.AuthenticationRequest;
-import com.tln.trustestatego.dto.response.ApiResponse;
-import com.tln.trustestatego.dto.response.AuthenticationResponse;
 import com.tln.trustestatego.service.AuthenticationService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)

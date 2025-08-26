@@ -1,4 +1,4 @@
-package com.tln.trustestatego.controller;
+package com.tln.trustestatego.controller.user;
 
 import com.tln.trustestatego.dto.request.CategoryRequest;
 import com.tln.trustestatego.dto.response.ApiResponse;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RequestMapping("/categories")
+@RequestMapping("/api/categories")
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)

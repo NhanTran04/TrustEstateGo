@@ -1,13 +1,19 @@
 package com.tln.trustestatego.service.Impl;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.Operator;
+import co.elastic.clients.elasticsearch._types.query_dsl.RangeQuery;
+import co.elastic.clients.elasticsearch.core.search.SuggestFuzziness;
+import co.elastic.clients.json.JsonData;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.tln.trustestatego.document.PropertyDocument;
 import com.tln.trustestatego.dto.request.PropertyRequest;
+import com.tln.trustestatego.dto.response.PageResponse;
 import com.tln.trustestatego.dto.response.PropertyResponse;
 import com.tln.trustestatego.entity.Property;
 import com.tln.trustestatego.entity.PropertyImage;
+import com.tln.trustestatego.mapper.PageMapper;
 import com.tln.trustestatego.mapper.PropertyMapper;
 import com.tln.trustestatego.repository.CategoryRepository;
 import com.tln.trustestatego.repository.PropertyRepository;
@@ -20,12 +26,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
+
 import org.springframework.data.elasticsearch.core.query.Criteria;
 import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
+import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,7 +41,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -54,12 +61,21 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
 
     ElasticsearchOperations elasticsearchOperations;
 
+    PageMapper pageMapper;
+
     PropertySearchRepository propertySearchRepository;
 
     @Override
-    public Page<PropertyResponse> getProperties(Pageable pageable){
-        Page<Property> propertiesPage = propertyRepository.findAll(pageable);
-        return propertiesPage.map(propertyMapper::toPropertyResponse);
+    public PageResponse<PropertyResponse> getProperties(Pageable pageable){
+        Page<PropertyResponse> propertiesPage = propertyRepository.findAll(pageable).map(propertyMapper::toPropertyResponse);
+        return  pageMapper.toPageResponse(propertiesPage);
+    }
+
+
+    @Override
+    public PageResponse<PropertyResponse> getPropertyByUserId(int userId, Pageable pageable) {
+        Page<PropertyResponse> propertiesPage = propertyRepository.findByUser_Id(userId, pageable).map(propertyMapper::toPropertyResponse);
+        return pageMapper.toPageResponse(propertiesPage);
     }
 
     @Override
@@ -108,25 +124,53 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
     }
 
     @Override
-    public Page<PropertyDocument> searchProperty(Map<String,String> params, Pageable pageable) {
+    public PageResponse<PropertyDocument> searchProperty(Map<String,String> params, Pageable pageable) {
         Criteria criteria = new Criteria();
 
+        // Tìm kiếm keyword
         String keyword = params.get("keyword");
-        if(keyword != null && !keyword.isEmpty())
-            criteria = criteria.and(new Criteria("title").matches(keyword));
-
-        String minPriceStr = params.get("minPrice");
-        String maxPriceStr = params.get("maxPrice");
-        if(minPriceStr != null && maxPriceStr != null)
-        {
-            BigDecimal minPrice = minPriceStr != null ? new BigDecimal(minPriceStr) : BigDecimal.ZERO;
-            BigDecimal maxPrice = maxPriceStr != null ? new BigDecimal(maxPriceStr) : new BigDecimal(Double.MAX_VALUE);
-            criteria = criteria.and(new Criteria("price").between(minPrice,maxPrice));
+        if(keyword != null && !keyword.trim().isEmpty()) {
+            // Sử dụng contains() thay vì matches() để tìm kiếm partial match
+//            criteria = criteria.and(new Criteria("title").contains(keyword.trim().toLowerCase()));
+            criteria = criteria.and(new Criteria("title").contains(keyword.trim().toLowerCase()));
         }
 
+
+
+        // Xử lý price range với exception handling
+        try {
+            String minPriceStr = params.get("minPrice");
+            String maxPriceStr = params.get("maxPrice");
+
+            BigDecimal minPrice = null;
+            BigDecimal maxPrice = null;
+
+            if(minPriceStr != null && !minPriceStr.trim().isEmpty()) {
+                minPrice = new BigDecimal(minPriceStr.trim());
+            }
+
+            if(maxPriceStr != null && !maxPriceStr.trim().isEmpty()) {
+                maxPrice = new BigDecimal(maxPriceStr.trim());
+            }
+
+            // Xử lý các trường hợp khác nhau
+            if(minPrice != null && maxPrice != null) {
+                criteria = criteria.and(new Criteria("price").between(minPrice, maxPrice));
+            } else if(minPrice != null) {
+                criteria = criteria.and(new Criteria("price").greaterThanEqual(minPrice));
+            } else if(maxPrice != null) {
+                criteria = criteria.and(new Criteria("price").lessThanEqual(maxPrice));
+            }
+
+        } catch (NumberFormatException e) {
+            // Log error hoặc throw custom exception
+            throw new IllegalArgumentException("Invalid price format", e);
+        }
+
+        // Property type
         String propertyType = params.get("propertyType");
-        if (propertyType != null && !propertyType.isEmpty()) {
-            criteria = criteria.and(new Criteria("propertyType").is(propertyType));
+        if (propertyType != null && !propertyType.trim().isEmpty()) {
+            criteria = criteria.and(new Criteria("propertyType").is(propertyType.trim()));
         }
 
         CriteriaQuery query = new CriteriaQuery(criteria).setPageable(pageable);
@@ -135,8 +179,10 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
         List<PropertyDocument> docs = hits.getSearchHits().stream()
                 .map(SearchHit::getContent)
                 .toList();
-        return new PageImpl<>(docs, pageable, hits.getTotalHits());
 
+        Page<PropertyDocument> page = new PageImpl<>(docs, pageable, hits.getTotalHits());
+        System.out.println(query.getCriteria().toString());
+        return pageMapper.toPageResponse(page);
     }
 
     private Set<PropertyImage> uploadPropertyImages(MultipartFile[] images, Property property) {

@@ -1,8 +1,10 @@
 package com.tln.trustestatego.service.Impl;
 
 import com.tln.trustestatego.dto.request.RoleRequest;
+import com.tln.trustestatego.dto.response.PageResponse;
 import com.tln.trustestatego.dto.response.RoleResponse;
 import com.tln.trustestatego.entity.Role;
+import com.tln.trustestatego.mapper.PageMapper;
 import com.tln.trustestatego.mapper.RoleMapper;
 import com.tln.trustestatego.repository.RoleRepository;
 import com.tln.trustestatego.service.RoleService;
@@ -25,10 +27,12 @@ import java.util.List;
 public class RoleServiceImpl implements RoleService {
     RoleRepository roleRepository;
     RoleMapper roleMapper;
+    PageMapper pageMapper;
 
-    public Page<RoleResponse> getRoles(Pageable pageable){
-        return roleRepository.findAll(pageable)
+    public PageResponse<RoleResponse> getRoles(Pageable pageable){
+        Page<RoleResponse> rolePage =  roleRepository.findAll(pageable)
                 .map(roleMapper::toRoleResponse);
+        return pageMapper.toPageResponse(rolePage);
     }
 
     public RoleResponse createRole(RoleRequest request){

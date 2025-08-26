@@ -38,26 +38,25 @@ public class PropertySaveServiceImpl implements PropertySaveService {
 
     @Override
     public List<PropertySaveResponse> getPropertyByUserId(int userId) {
-        return propertySaveRepository.findByUserId(userId)
+        return propertySaveRepository.findByUser_Id(userId)
                 .stream()
                 .map(propertySaveMapper::toPropertySaveResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public void createProperty(PropertySaveRequest propertySaveRequest) {
-        Optional<PropertySave> existingSave = propertySaveRepository
-                .findByUserIdAndPropertyId(propertySaveRequest.getUserId(), propertySaveRequest.getPropertyId());
+    public boolean togglePropertySave(int userId, int propertyId) {
+        Optional<PropertySave> existingSave = propertySaveRepository.findByUser_IdAndProperty_Id(userId, propertyId);
 
         if (existingSave.isPresent()) {
             propertySaveRepository.delete(existingSave.get());
+            return false; // đã bỏ lưu
         } else {
             PropertySave save = new PropertySave();
-            save.setUser(userRepository.findById(propertySaveRequest.getUserId())
-                    .orElseThrow(() -> new RuntimeException("User not found")));
-            save.setProperty(propertyRepository.findById(propertySaveRequest.getPropertyId())
-                    .orElseThrow(() -> new RuntimeException("Property not found")));
+            save.setUser(userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found")));
+            save.setProperty(propertyRepository.findById(propertyId).orElseThrow(() -> new RuntimeException("Property not found")));
             propertySaveRepository.save(save);
+            return true; // đã lưu
         }
     }
 

@@ -1,19 +1,19 @@
-package com.tln.trustestatego.controller;
+package com.tln.trustestatego.controller.admin;
 
 import com.tln.trustestatego.dto.request.RoleRequest;
 import com.tln.trustestatego.dto.response.ApiResponse;
+import com.tln.trustestatego.dto.response.PageResponse;
 import com.tln.trustestatego.dto.response.RoleResponse;
 import com.tln.trustestatego.service.RoleService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/roles")
+@RequestMapping("/api/admin/roles")
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -21,16 +21,16 @@ public class RoleController {
     RoleService roleService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<RoleResponse>>> getRoles(@RequestParam String kw
+    public ResponseEntity<ApiResponse<PageResponse<RoleResponse>>> getRoles(@RequestParam(defaultValue = "") String kw
             , Pageable pageable){
         try{
             return ResponseEntity.ok()
-                    .body(ApiResponse.<Page<RoleResponse>>builder()
+                    .body(ApiResponse.<PageResponse<RoleResponse>>builder()
                             .result(roleService.getRoles(pageable))
                             .build());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResponse.<Page<RoleResponse>>builder()
+                    .body(ApiResponse.<PageResponse<RoleResponse>>builder()
                             .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
                             .message(e.getMessage())
                             .build());

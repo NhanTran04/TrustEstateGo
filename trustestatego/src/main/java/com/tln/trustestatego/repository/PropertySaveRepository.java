@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PropertySaveRepository extends JpaRepository<PropertySave, Integer> {
-    List<PropertySave> findByUserId(int userId);
-    Optional<PropertySave> findByUserIdAndPropertyId(int userId, int propertyId);
+    List<PropertySave> findByUser_Id(int userId);
+    Optional<PropertySave> findByUser_IdAndProperty_Id(int userId, int propertyId);
     //boolean existByUserIdAndPropertyId(int userId, int propertyId);
 }

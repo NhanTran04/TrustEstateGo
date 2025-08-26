@@ -1,8 +1,10 @@
 package com.tln.trustestatego.service.Impl;
 
 import com.tln.trustestatego.dto.request.ReportUserRequest;
+import com.tln.trustestatego.dto.response.PageResponse;
 import com.tln.trustestatego.dto.response.ReportResponse;
 import com.tln.trustestatego.entity.Report;
+import com.tln.trustestatego.mapper.PageMapper;
 import com.tln.trustestatego.mapper.ReportMapper;
 import com.tln.trustestatego.repository.PropertyRepository;
 import com.tln.trustestatego.repository.ReportRepository;
@@ -31,36 +33,43 @@ public class ReportServiceImpl implements ReportService {
     ReportMapper reportMapper;
     UserRepository userRepository;
     PropertyRepository propertyRepository;
+    PageMapper pageMapper;
 
     @Override
-    public Page<ReportResponse> getReports(String keyword, Pageable pageable) {
+    public PageResponse<ReportResponse> getReports(String keyword, Pageable pageable) {
         Pageable sortPage = PageRequest.of(
                 pageable.getPageNumber(),
                 pageable.getPageSize(),
                 Sort.by(Sort.Direction.DESC, "createdAt")
         );
-        return reportRepository.findByProperty_TitleContainingIgnoreCase(keyword,sortPage)
+        if(keyword != null && !keyword.isEmpty()) {
+            Page<ReportResponse> reportPage = reportRepository.findByProperty_TitleContainingIgnoreCase(keyword, sortPage)
+                    .map(reportMapper::toReportResponse);
+        }
+        Page<ReportResponse> reportPage = reportRepository.findAll(sortPage)
                 .map(reportMapper::toReportResponse);
+        return pageMapper.toPageResponse(reportPage);
     }
 
     @Override
-    public Page<ReportResponse> getReportByUserId(int userId, Pageable pageable) {
-        return reportRepository.findByUser_Id(userId, pageable).map(reportMapper::toReportResponse);
+    public PageResponse<ReportResponse> getReportByUserId(int userId, Pageable pageable) {
+        Page<ReportResponse> reportPage = reportRepository.findByUser_Id(userId, pageable).map(reportMapper::toReportResponse);
+        return pageMapper.toPageResponse(reportPage);
     }
 
     @Override
-    public ReportResponse createReport(ReportUserRequest reportUserRequest) {
+    public ReportResponse createReport(ReportUserRequest reportUserRequest, int userId, int propertyId) {
         boolean exists = reportRepository.existsByUserIdAndPropertyId(
-                reportUserRequest.getUserId(), reportUserRequest.getPropertyId());
+                userId, propertyId);
         if (exists) {
-            throw new IllegalStateException("Bạn đã report bài này rồi");
+            throw new IllegalStateException("You reported this property");
         }
 
         Report report = reportMapper.toReport(reportUserRequest);
 
-        report.setUser(userRepository.findById(reportUserRequest.getUserId())
+        report.setUser(userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found")));
-        report.setProperty(propertyRepository.findById(reportUserRequest.getPropertyId())
+        report.setProperty(propertyRepository.findById(propertyId)
                 .orElseThrow(() -> new RuntimeException("Property not found")));
         report.setCreatedAt(LocalDateTime.now());
 

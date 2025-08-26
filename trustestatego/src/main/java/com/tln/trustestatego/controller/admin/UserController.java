@@ -1,22 +1,21 @@
-package com.tln.trustestatego.controller;
+package com.tln.trustestatego.controller.admin;
 
 import com.tln.trustestatego.dto.request.UserCreationRequest;
 import com.tln.trustestatego.dto.request.UserUpdateRequest;
 import com.tln.trustestatego.dto.response.ApiResponse;
+import com.tln.trustestatego.dto.response.PageResponse;
 import com.tln.trustestatego.dto.response.UserResponse;
 import com.tln.trustestatego.service.UserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
-@RequestMapping("/users")
+@RequestMapping("/api/admin/users")
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -24,16 +23,16 @@ public class UserController {
     UserService userService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<UserResponse>>> getUsers(@RequestParam String kw, Pageable pageable) {
+    public ResponseEntity<ApiResponse<PageResponse<UserResponse>>> getUsers(@RequestParam(defaultValue = "") String kw, Pageable pageable) {
         try {
             return ResponseEntity.ok(
-                    ApiResponse.<Page<UserResponse>>builder()
+                    ApiResponse.<PageResponse<UserResponse>>builder()
                             .result(userService.getUsers(kw, pageable))
                             .build()
             );
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResponse.<Page<UserResponse>>builder()
+                    .body(ApiResponse.<PageResponse<UserResponse>>builder()
                             .message(e.getMessage())
                             .build());
         }
@@ -55,8 +54,8 @@ public class UserController {
         }
     }
 
-    @PostMapping
-    public ResponseEntity<ApiResponse<UserResponse>> createUser(@RequestBody UserCreationRequest userCreationRequest) {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<UserResponse>> createUser(@ModelAttribute UserCreationRequest userCreationRequest) {
         try {
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(ApiResponse.<UserResponse>builder()
@@ -70,10 +69,10 @@ public class UserController {
         }
     }
 
-    @PutMapping("/{userId}")
+    @PutMapping(path = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<UserResponse>> updateUser(
             @PathVariable int userId,
-            @RequestBody UserUpdateRequest userUpdateRequest) {
+            @ModelAttribute UserUpdateRequest userUpdateRequest) {
         try {
             return ResponseEntity.ok(
                     ApiResponse.<UserResponse>builder()

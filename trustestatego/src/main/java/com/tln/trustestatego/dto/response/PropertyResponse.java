@@ -16,6 +16,7 @@ import java.util.List;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PropertyResponse {
+    int id;
     int categoryId;
     int userId;
     String title;

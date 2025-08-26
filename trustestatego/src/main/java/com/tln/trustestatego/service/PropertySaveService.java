@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface PropertySaveService {
     List<PropertySaveResponse> getPropertyByUserId(int userId);
-    void createProperty(PropertySaveRequest propertySaveRequest);
+    boolean togglePropertySave(int userId, int propertyId);
     void deleteById(int propertySaveId);
 }

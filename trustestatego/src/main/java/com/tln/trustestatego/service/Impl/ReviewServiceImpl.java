@@ -1,10 +1,12 @@
 package com.tln.trustestatego.service.Impl;
 
 import com.tln.trustestatego.dto.request.ReviewRequest;
+import com.tln.trustestatego.dto.response.PageResponse;
 import com.tln.trustestatego.dto.response.ReviewResponse;
 import com.tln.trustestatego.entity.Property;
 import com.tln.trustestatego.entity.Review;
 import com.tln.trustestatego.entity.User;
+import com.tln.trustestatego.mapper.PageMapper;
 import com.tln.trustestatego.mapper.ReviewMapper;
 import com.tln.trustestatego.repository.PropertyRepository;
 import com.tln.trustestatego.repository.ReviewRepository;
@@ -21,6 +23,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -31,29 +35,32 @@ public class ReviewServiceImpl implements ReviewService {
     ReviewMapper reviewMapper;
     UserRepository userRepository;
     PropertyRepository propertyRepository;
+    PageMapper pageMapper;
 
     @Override
-    public Page<ReviewResponse> getReviewBySellerId(int sellerId, Pageable pageable) {
+    public PageResponse<ReviewResponse> getReviewBySellerId(int sellerId, Pageable pageable) {
         Pageable sortPage = PageRequest.of(
                 pageable.getPageNumber(),
                 pageable.getPageSize(),
                 Sort.by(Sort.Direction.DESC, "createdAt")
         );
 
-        return reviewRepository.findBySeller_Id(sellerId, sortPage)
+        Page<ReviewResponse> reviewPage = reviewRepository.findBySeller_Id(sellerId, sortPage)
                 .map(reviewMapper::toReviewResponse);
+        return pageMapper.toPageResponse(reviewPage);
     }
 
     @Override
-    public Page<ReviewResponse> getReviewByUserId(int buyerId, Pageable pageable) {
+    public PageResponse<ReviewResponse> getReviewByUserId(int buyerId, Pageable pageable) {
         Pageable sortPage = PageRequest.of(
                 pageable.getPageNumber(),
                 pageable.getPageSize(),
                 Sort.by(Sort.Direction.DESC, "createdAt")
         );
 
-        return reviewRepository.findByBuyer_Id(buyerId, sortPage)
+        Page<ReviewResponse> reviewPage =  reviewRepository.findByBuyer_Id(buyerId, sortPage)
                 .map(reviewMapper::toReviewResponse);
+        return pageMapper.toPageResponse(reviewPage);
     }
 
     @Override
@@ -66,8 +73,8 @@ public class ReviewServiceImpl implements ReviewService {
                 .orElseThrow(() -> new RuntimeException("Seller not found"));
         Property property = propertyRepository.findById(reviewRequest.getPropertyId())
                 .orElseThrow(() -> new RuntimeException("Property not found"));
-//        User seller = userRepository.findById(property.getUser().getId())
-//                .orElseThrow(() -> new RuntimeException("Seller not found"));
+
+        review.setCreatedAt(LocalDateTime.now());
         review.setBuyer(buyer);
         review.setSeller(seller);
         review.setProperty(property);

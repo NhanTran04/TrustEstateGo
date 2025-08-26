@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ReportResponse {
+    int id;
     int propertyId;
     String propertyTitle;
     String propertyImage;

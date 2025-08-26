@@ -9,7 +9,7 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ReportUserRequest {
-    int userId;
-    int propertyId;
+//    int userId;
+//    int propertyId;
     String reason;
 }

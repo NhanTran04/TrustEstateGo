@@ -4,11 +4,13 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.tln.trustestatego.dto.request.UserCreationRequest;
 import com.tln.trustestatego.dto.request.UserUpdateRequest;
+import com.tln.trustestatego.dto.response.PageResponse;
 import com.tln.trustestatego.dto.response.UserResponse;
 import com.tln.trustestatego.entity.PropertyImage;
 import com.tln.trustestatego.entity.Role;
 import com.tln.trustestatego.entity.User;
 import com.tln.trustestatego.entity.UserRole;
+import com.tln.trustestatego.mapper.PageMapper;
 import com.tln.trustestatego.mapper.UserMapper;
 import com.tln.trustestatego.repository.RoleRepository;
 import com.tln.trustestatego.repository.UserRepository;
@@ -41,13 +43,17 @@ public class UserServiceImpl implements UserService {
     PasswordEncoder passwordEncoder;
     UserRoleRepository userRoleRepository;
     Cloudinary cloudinary;
+    PageMapper pageMapper;
 
-    public Page<UserResponse> getUsers(String kw, Pageable pageable){
-        if(kw != null && !kw.isEmpty())
-            return userRepository.findByUsernameContainingIgnoreCase(kw, pageable)
+    public PageResponse<UserResponse> getUsers(String kw, Pageable pageable){
+        if(kw != null && !kw.isEmpty()) {
+            Page<UserResponse> userPage =  userRepository.findByUsernameContainingIgnoreCase(kw, pageable)
                     .map(userMapper::toUserResponse);
-        return userRepository.findAll(pageable)
+            return pageMapper.toPageResponse(userPage);
+        }
+        Page<UserResponse> userPage = userRepository.findAll(pageable)
                 .map(userMapper::toUserResponse);
+        return pageMapper.toPageResponse(userPage);
     }
 
     public UserResponse getUserById(int userId) {
