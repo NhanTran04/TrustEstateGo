@@ -17,8 +17,10 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -53,8 +55,8 @@ public class PropertySaveServiceImpl implements PropertySaveService {
             return false; // đã bỏ lưu
         } else {
             PropertySave save = new PropertySave();
-            save.setUser(userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found")));
-            save.setProperty(propertyRepository.findById(propertyId).orElseThrow(() -> new RuntimeException("Property not found")));
+            save.setUser(userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")));
+            save.setProperty(propertyRepository.findById(propertyId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Property not found")));
             propertySaveRepository.save(save);
             return true; // đã lưu
         }

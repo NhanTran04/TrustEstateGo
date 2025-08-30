@@ -10,8 +10,10 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,6 +38,13 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
+    public PermissionResponse getPermissionById(int perId) {
+        return permissionRepository.findById(perId)
+                .map(permissionMapper::toPermissionResponse)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Permission not found"));
+    }
+
+    @Override
     public PermissionResponse createPermission(PermissionRequest request) {
         Permission permission = permissionMapper.toPermission(request);
         permission =  permissionRepository.save(permission);
@@ -45,7 +54,7 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public PermissionResponse updatePermission(int permissionId,PermissionRequest request) {
         Permission permission = permissionRepository.findById(permissionId)
-                .orElseThrow(() -> new RuntimeException("Permission not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Permission not found"));
         permissionMapper.update(permission, request);
         return permissionMapper.toPermissionResponse(permissionRepository.save(permission));
     }

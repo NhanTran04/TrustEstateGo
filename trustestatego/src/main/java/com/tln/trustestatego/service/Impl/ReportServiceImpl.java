@@ -18,8 +18,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 
@@ -68,9 +70,9 @@ public class ReportServiceImpl implements ReportService {
         Report report = reportMapper.toReport(reportUserRequest);
 
         report.setUser(userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found")));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")));
         report.setProperty(propertyRepository.findById(propertyId)
-                .orElseThrow(() -> new RuntimeException("Property not found")));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Property not found")));
         report.setCreatedAt(LocalDateTime.now());
 
         reportRepository.save(report);
@@ -82,7 +84,7 @@ public class ReportServiceImpl implements ReportService {
     public ReportResponse updateReport(int reportId) {
 
         Report report = reportRepository.findById(reportId)
-                .orElseThrow(() -> new RuntimeException("Report not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Report not found"));
         report.setStatus(true);
 
         reportRepository.save(report);

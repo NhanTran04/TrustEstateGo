@@ -12,6 +12,7 @@ import java.util.Map;
 
 public interface PropertyService {
     PageResponse<PropertyResponse> getProperties(Pageable pageable);
+    PageResponse<PropertyResponse> getPropertyFromAdmin(Map<String, String> params,Pageable pageable);
     PageResponse<PropertyResponse> getPropertyByUserId(int userId,Pageable pageable);
     PropertyResponse getPropertyById(int propertyId);
     PropertyResponse createProperty(PropertyRequest propertyRequest);

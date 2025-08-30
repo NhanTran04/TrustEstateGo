@@ -1,12 +1,12 @@
 package com.tln.trustestatego.controller.admin;
 
 import com.tln.trustestatego.dto.request.CategoryRequest;
-import com.tln.trustestatego.dto.response.ApiResponse;
 import com.tln.trustestatego.dto.response.CategoryResponse;
 import com.tln.trustestatego.service.CategoryService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,10 +19,48 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class CategoryController {
+public class AdminCategoryController {
     CategoryService categoryService;
 
-//    @GetMapping
+
+    @GetMapping
+    public ResponseEntity<List<CategoryResponse>> getCategories() {
+        List<CategoryResponse> categories = categoryService.getCategories();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Range", "categories 0-" + (categories.size() - 1) + "/" + categories.size());
+        headers.add("Access-Control-Expose-Headers", "Content-Range");
+
+        return new ResponseEntity<>(categories, headers, HttpStatus.OK);
+    }
+
+    @GetMapping("/{cateId}")
+    public ResponseEntity<CategoryResponse> getCategoryById(@PathVariable int cateId) {
+        CategoryResponse category = categoryService.getCategoryById(cateId);
+        return ResponseEntity.status(HttpStatus.OK).body(category);
+    }
+
+    @PostMapping
+    public ResponseEntity<CategoryResponse> createCategory(@RequestBody CategoryRequest categoryRequest) {
+        CategoryResponse category = categoryService.createCategory(categoryRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(category);
+    }
+
+    @PutMapping("/{cateId}")
+    public ResponseEntity<CategoryResponse> updateCategory(
+            @PathVariable int cateId,
+            @RequestBody CategoryRequest categoryRequest) {
+        CategoryResponse category = categoryService.updateCategory(cateId, categoryRequest);
+        return ResponseEntity.ok(category);
+    }
+
+    @DeleteMapping("/{cateId}")
+    public ResponseEntity<Void> deleteCategory(@PathVariable int cateId) {
+        categoryService.deleteCategory(cateId);
+        return ResponseEntity.ok().build();
+    }
+
+    //    @GetMapping
 //    public ResponseEntity<ApiResponse<List<CategoryResponse>>> getCategories() {
 //        try {
 //            return ResponseEntity.ok(
@@ -39,15 +77,6 @@ public class CategoryController {
 //            );
 //        }
 //    }
-
-    @GetMapping
-    public Map<String, Object> getCategories() {
-        List<CategoryResponse> categories = categoryService.getCategories();
-        Map<String, Object> response = new HashMap<>();
-        response.put("data", categories);
-        response.put("total", categories.size());
-        return response;
-    }
 
 //    @PostMapping
 //    public ResponseEntity<ApiResponse<CategoryResponse>> createCategory(@RequestBody CategoryRequest categoryRequest) {
@@ -106,47 +135,4 @@ public class CategoryController {
 //        }
 //    }
 
-    @PostMapping
-    public ResponseEntity<Map<String, Object>> createCategory(@RequestBody CategoryRequest categoryRequest) {
-        try {
-            CategoryResponse category = categoryService.createCategory(categoryRequest);
-            Map<String, Object> response = new HashMap<>();
-            response.put("data", category);
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        } catch (Exception e) {
-            Map<String, Object> error = new HashMap<>();
-            error.put("error", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
-        }
-    }
-
-    @PutMapping("/{cateId}")
-    public ResponseEntity<Map<String, Object>> updateCategory(
-            @PathVariable int cateId,
-            @RequestBody CategoryRequest categoryRequest) {
-        try {
-            CategoryResponse category = categoryService.updateCategory(cateId, categoryRequest);
-            Map<String, Object> response = new HashMap<>();
-            response.put("data", category);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            Map<String, Object> error = new HashMap<>();
-            error.put("error", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
-        }
-    }
-
-    @DeleteMapping("/{cateId}")
-    public ResponseEntity<Map<String, Object>> deleteCategory(@PathVariable int cateId) {
-        try {
-            categoryService.deleteCategory(cateId);
-            Map<String, Object> response = new HashMap<>();
-            response.put("data", Map.of("id", cateId));
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            Map<String, Object> error = new HashMap<>();
-            error.put("error", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
-        }
-    }
 }

@@ -34,9 +34,12 @@ import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.query.Criteria;
 import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
 import org.springframework.data.elasticsearch.core.query.Query;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -67,21 +70,75 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
 
     @Override
     public PageResponse<PropertyResponse> getProperties(Pageable pageable){
-        Page<PropertyResponse> propertiesPage = propertyRepository.findAll(pageable).map(propertyMapper::toPropertyResponse);
-        return  pageMapper.toPageResponse(propertiesPage);
-    }
-
-
-    @Override
-    public PageResponse<PropertyResponse> getPropertyByUserId(int userId, Pageable pageable) {
-        Page<PropertyResponse> propertiesPage = propertyRepository.findByUser_Id(userId, pageable).map(propertyMapper::toPropertyResponse);
+        Page<PropertyResponse> propertiesPage = propertyRepository
+                .findAll(pageable).map(propertyMapper::toPropertyResponse);
         return pageMapper.toPageResponse(propertiesPage);
     }
 
     @Override
+    public PageResponse<PropertyResponse> getPropertyFromAdmin(Map<String, String> filters, Pageable pageable) {
+        // Lấy params từ React-Admin
+        String keyword   = filters.getOrDefault("q", null);
+        String location  = filters.getOrDefault("location", null);
+        Integer fromPrice = filters.containsKey("fromPrice") ? Integer.valueOf(filters.get("fromPrice")) : null;
+        Integer toPrice   = filters.containsKey("toPrice") ? Integer.valueOf(filters.get("toPrice")) : null;
+
+        // Specification để build query động
+        Specification<Property> spec = Specification.allOf();
+
+        if (keyword != null && !keyword.isBlank()) {
+            spec = spec.and((root, query, cb) ->
+                    cb.like(cb.lower(root.get("title")), "%" + keyword.toLowerCase() + "%"));
+        }
+
+        if (location != null && !location.isBlank()) {
+            spec = spec.and((root, query, cb) ->
+                    cb.like(cb.lower(root.get("location")), "%" + location.toLowerCase() + "%"));
+        }
+
+        if (fromPrice != null) {
+            spec = spec.and((root, query, cb) ->
+                    cb.greaterThanOrEqualTo(root.get("price"), fromPrice));
+        }
+
+        if (toPrice != null) {
+            spec = spec.and((root, query, cb) ->
+                    cb.lessThanOrEqualTo(root.get("price"), toPrice));
+        }
+
+        // Query DB
+        Page<Property> page = propertyRepository.findAll(spec, pageable);
+
+        // Map sang DTO
+        List<PropertyResponse> content = page.getContent()
+                .stream()
+                .map(propertyMapper::toPropertyResponse) // dùng MapStruct
+                .toList();
+
+        return new PageResponse<>(
+                content,
+                page.getSize(),
+                page.getNumber(),
+                page.getTotalPages(),
+                page.getTotalElements()
+        );
+    }
+
+
+
+    @Override
+    public PageResponse<PropertyResponse> getPropertyByUserId(int userId, Pageable pageable) {
+        Page<PropertyResponse> propertiesPage = propertyRepository
+                .findByUser_Id(userId, pageable).map(propertyMapper::toPropertyResponse);
+        return pageMapper.toPageResponse(propertiesPage);
+    }
+
+
+
+    @Override
     public PropertyResponse getPropertyById(int propertyId){
         Property property = propertyRepository.findById(propertyId)
-                .orElseThrow(() -> new RuntimeException("Property not found "));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Property not found "));
         return propertyMapper.toPropertyResponse(property);
     }
 
@@ -90,9 +147,9 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
         Property property = propertyMapper.toProperty(propertyRequest);
 
         property.setCategory(categoryRepository.findById(propertyRequest.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Category not found")));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found")));
         property.setUser(userRepository.findById(propertyRequest.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found")));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")));
         property.setCreatedAt(LocalDateTime.now());
 
         // Xử lý ảnh
@@ -107,7 +164,7 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
     @Override
     public PropertyResponse updateProperty(int propertyId, PropertyRequest propertyRequest) {
         Property property = propertyRepository.findById(propertyId)
-                .orElseThrow(() -> new RuntimeException("Property not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Property not found"));
 
         propertyMapper.update(property, propertyRequest);
 
@@ -122,6 +179,8 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
 
         return propertyMapper.toPropertyResponse(propertyRepository.save(property));
     }
+
+
 
     @Override
     public PageResponse<PropertyDocument> searchProperty(Map<String,String> params, Pageable pageable) {

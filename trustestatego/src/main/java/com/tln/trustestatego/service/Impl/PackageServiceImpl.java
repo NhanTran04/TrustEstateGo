@@ -9,8 +9,10 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -36,6 +38,14 @@ public class PackageServiceImpl implements com.tln.trustestatego.service.Package
     }
 
     @Override
+    public PackageResponse getPackageById(int packageId) {
+        return packageRepository.findById(packageId)
+                .map(packageMapper::toPackageResponse)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND
+                                                                , "Package not found"));
+    }
+
+    @Override
     public PackageResponse createPackage(PackageRequest packageRequest){
         Package pack = packageMapper.toPackage(packageRequest);
         pack.setCreatedAt(LocalDateTime.now());
@@ -45,7 +55,7 @@ public class PackageServiceImpl implements com.tln.trustestatego.service.Package
     @Override
     public PackageResponse updatePackage(int packId, PackageRequest packageRequest){
         Package pack = packageRepository.findById(packId)
-                .orElseThrow(() ->new RuntimeException("User not found"));
+                .orElseThrow(() ->new ResponseStatusException(HttpStatus.NOT_FOUND,"User not found"));
         packageMapper.update(pack,packageRequest);
         return packageMapper.toPackageResponse(packageRepository.save(pack));
     }

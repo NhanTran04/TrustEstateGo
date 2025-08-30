@@ -20,8 +20,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 
@@ -68,11 +70,11 @@ public class ReviewServiceImpl implements ReviewService {
         Review review = reviewMapper.toReview(reviewRequest);
 
         User buyer = userRepository.findById(reviewRequest.getBuyerId())
-                .orElseThrow(() -> new RuntimeException("Buyer not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Buyer not found"));
         User seller = userRepository.findById(reviewRequest.getSellerId())
-                .orElseThrow(() -> new RuntimeException("Seller not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Seller not found"));
         Property property = propertyRepository.findById(reviewRequest.getPropertyId())
-                .orElseThrow(() -> new RuntimeException("Property not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Property not found"));
 
         review.setCreatedAt(LocalDateTime.now());
         review.setBuyer(buyer);

@@ -8,8 +8,10 @@ import com.tln.trustestatego.repository.CategoryRepository;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,6 +36,15 @@ public class CategoryServiceImpl implements com.tln.trustestatego.service.Catego
     }
 
     @Override
+    public CategoryResponse getCategoryById(int cateId) {
+        return categoryRepository.findById(cateId)
+                .map(categoryMapper::toCategoryResponse)
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found")
+                );
+    }
+
+    @Override
     public CategoryResponse createCategory(CategoryRequest categoryRequest){
         Category cate = categoryMapper.toCategory(categoryRequest);
         return categoryMapper.toCategoryResponse(categoryRepository.save(cate));
@@ -41,7 +52,7 @@ public class CategoryServiceImpl implements com.tln.trustestatego.service.Catego
 
     @Override
     public CategoryResponse updateCategory(int cateId, CategoryRequest categoryRequest){
-        Category cate = categoryRepository.findById(cateId).orElseThrow(() ->new RuntimeException("User not found"));
+        Category cate = categoryRepository.findById(cateId).orElseThrow(() ->new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         categoryMapper.update(cate,categoryRequest);
         return categoryMapper.toCategoryResponse(categoryRepository.save(cate));
     }

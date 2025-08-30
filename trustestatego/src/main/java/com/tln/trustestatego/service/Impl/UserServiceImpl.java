@@ -22,10 +22,12 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Map;
@@ -58,7 +60,7 @@ public class UserServiceImpl implements UserService {
 
     public UserResponse getUserById(int userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         return userMapper.toUserResponse(user);
     }
@@ -74,7 +76,7 @@ public class UserServiceImpl implements UserService {
         user = userRepository.save(user);
 
         Role role = roleRepository.findById(userCreationRequest.getRoleId())
-                .orElseThrow(() -> new RuntimeException("Role not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found"));
 
         UserRole userRole = new UserRole();
         userRole.setUser(user);
@@ -86,7 +88,7 @@ public class UserServiceImpl implements UserService {
 
     public UserResponse updateUser(int userId, UserUpdateRequest userUpdateRequest){
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         userMapper.update(user, userUpdateRequest);
 
         if(userUpdateRequest.getPassword() != null && !userUpdateRequest.getPassword().isBlank())
@@ -97,7 +99,7 @@ public class UserServiceImpl implements UserService {
 
         if (userUpdateRequest.getRoleId() > 0) {
             Role role = roleRepository.findById(userUpdateRequest.getRoleId())
-                    .orElseThrow(() -> new RuntimeException("Role not found"));
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found"));
 
             boolean hasRole = userRoleRepository.existsByUserIdAndRoleId(userId, userUpdateRequest.getRoleId());
             if(!hasRole){
