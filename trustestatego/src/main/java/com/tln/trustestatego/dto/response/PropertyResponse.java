@@ -19,6 +19,7 @@ public class PropertyResponse {
     int id;
     int categoryId;
     int userId;
+    String categoryName;
     String title;
     String description;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")

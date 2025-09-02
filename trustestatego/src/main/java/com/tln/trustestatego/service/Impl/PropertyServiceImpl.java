@@ -80,15 +80,32 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
         // Lấy params từ React-Admin
         String keyword   = filters.getOrDefault("q", null);
         String location  = filters.getOrDefault("location", null);
-        Integer fromPrice = filters.containsKey("fromPrice") ? Integer.valueOf(filters.get("fromPrice")) : null;
-        Integer toPrice   = filters.containsKey("toPrice") ? Integer.valueOf(filters.get("toPrice")) : null;
+        BigDecimal fromPrice = filters.containsKey("minPrice") ? new BigDecimal(filters.get("minPrice")) : null;
+        BigDecimal toPrice   = filters.containsKey("maxPrice") ? new  BigDecimal(filters.get("maxPrice")) : null;
+        String userIdStr = filters.get("userId");
+        Integer userId = null;
 
         // Specification để build query động
         Specification<Property> spec = Specification.allOf();
 
+        if (userIdStr != null && !userIdStr.isBlank()) {
+            try {
+                userId = Integer.parseInt(userIdStr);
+            } catch (NumberFormatException e) {
+                // có thể log lỗi hoặc bỏ qua
+                userId = null;
+            }
+        }
+
         if (keyword != null && !keyword.isBlank()) {
             spec = spec.and((root, query, cb) ->
                     cb.like(cb.lower(root.get("title")), "%" + keyword.toLowerCase() + "%"));
+        }
+
+        if (userId != null) { // 👈 filter theo userId
+            Integer finalUserId = userId;
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(root.get("user").get("id"), finalUserId)); // root.get("user").get("id") nếu Property có relation User
         }
 
         if (location != null && !location.isBlank()) {

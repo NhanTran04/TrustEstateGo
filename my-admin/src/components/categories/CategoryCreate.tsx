@@ -1,8 +1,13 @@
 import { Box, Typography } from "@mui/material";
-import { Create, minLength, required, SimpleForm, TextInput } from "react-admin";
+import { Create, minLength, RecordContextProvider, required, SimpleForm, TextInput } from "react-admin";
+import BreadcrumbTitle from "../Breadcrumb";
 
 export const CategoryCreate: React.FC = () => (
-  <Create>
+  <Create title={
+    <RecordContextProvider value={{ name: "Tạo" }}>
+      <BreadcrumbTitle base="Danh mục" basePath="/categories" />
+    </RecordContextProvider>
+  }>
     <SimpleForm>
       <Box sx={{ maxWidth: 600 }}>
         <Typography variant="h6" gutterBottom color="primary">Tạo danh mục mới</Typography>

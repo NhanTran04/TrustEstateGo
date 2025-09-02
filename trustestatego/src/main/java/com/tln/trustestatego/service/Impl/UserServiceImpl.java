@@ -58,6 +58,8 @@ public class UserServiceImpl implements UserService {
         return pageMapper.toPageResponse(userPage);
     }
 
+
+
     public UserResponse getUserById(int userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));

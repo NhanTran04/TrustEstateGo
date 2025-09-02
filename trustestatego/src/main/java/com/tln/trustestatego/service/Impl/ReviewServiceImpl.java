@@ -3,11 +3,13 @@ package com.tln.trustestatego.service.Impl;
 import com.tln.trustestatego.dto.request.ReviewRequest;
 import com.tln.trustestatego.dto.response.PageResponse;
 import com.tln.trustestatego.dto.response.ReviewResponse;
+import com.tln.trustestatego.dto.response.UserResponse;
 import com.tln.trustestatego.entity.Property;
 import com.tln.trustestatego.entity.Review;
 import com.tln.trustestatego.entity.User;
 import com.tln.trustestatego.mapper.PageMapper;
 import com.tln.trustestatego.mapper.ReviewMapper;
+import com.tln.trustestatego.mapper.UserMapper;
 import com.tln.trustestatego.repository.PropertyRepository;
 import com.tln.trustestatego.repository.ReviewRepository;
 import com.tln.trustestatego.repository.UserRepository;
@@ -38,6 +40,7 @@ public class ReviewServiceImpl implements ReviewService {
     UserRepository userRepository;
     PropertyRepository propertyRepository;
     PageMapper pageMapper;
+    UserMapper userMapper;
 
     @Override
     public PageResponse<ReviewResponse> getReviewBySellerId(int sellerId, Pageable pageable) {
@@ -63,6 +66,16 @@ public class ReviewServiceImpl implements ReviewService {
         Page<ReviewResponse> reviewPage =  reviewRepository.findByBuyer_Id(buyerId, sortPage)
                 .map(reviewMapper::toReviewResponse);
         return pageMapper.toPageResponse(reviewPage);
+    }
+
+    @Override
+    public PageResponse<UserResponse> getUserByRoleSeller(String kw, Pageable pageable) {
+        if (kw == null || kw.isBlank()) {
+            kw = "";
+        }
+        Page<UserResponse> userPage = userRepository.findSellersByName(kw, pageable)
+                .map(userMapper::toUserResponse);
+        return pageMapper.toPageResponse(userPage);
     }
 
     @Override

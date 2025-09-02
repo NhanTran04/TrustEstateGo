@@ -1,5 +1,6 @@
 import {
   Admin,
+  CustomRoutes,
   Resource,
 } from "react-admin";
 import { dataProvider } from "./dataProvider";
@@ -9,11 +10,17 @@ import { CategoryShow } from "./components/categories/CategoryShow";
 import { CategoryEdit } from "./components/categories/CategoryEdit";
 import { createTheme } from "@mui/material";
 import { deepPurple, grey, pink } from "@mui/material/colors";
-import { Category } from "@mui/icons-material";
+import { Category, PlaylistAddCheckSharp, PostAdd } from "@mui/icons-material";
 import { PackageList } from "./components/packages/PackageList";
 import { PackageEdit } from "./components/packages/PackageEdit";
 import { PackageShow } from "./components/packages/PackageShow";
 import { PackageCreate } from "./components/packages/PackageCreate";
+import { PropertyList } from "./components/properties/PropertyList";
+import { PropertyEdit } from "./components/properties/PropertyEdit";
+import { PropertyCreate } from "./components/properties/PropertyCreate";
+import { PropertyShow } from "./components/properties/PropertyShow";
+import { Route } from "react-router";
+import { UserPropertiesList } from "./components/properties/UserPropertiesList";
 
 const theme = createTheme({
   palette: {
@@ -73,6 +80,9 @@ export const App = () => (
       edit={EditGuesser}
       show={ShowGuesser}
     /> */}
+    <CustomRoutes>
+      <Route path="/user-properties/:userId" element={<UserPropertiesList />} />
+    </CustomRoutes>
     <Resource
       name="categories"
       list={CategoryList}
@@ -82,15 +92,25 @@ export const App = () => (
       icon={Category}
       options={{ label: 'Danh mục' }}
     />
-    {<Resource
+    <Resource
       name="packages"
       list={PackageList}
       edit={PackageEdit}
       show={PackageShow}
       create={PackageCreate}
+      icon={PlaylistAddCheckSharp}
       options={{ label: 'Gói' }}
     />
-    /*<Resource
+    <Resource
+      name="properties"
+      list={PropertyList}
+      edit={PropertyEdit}
+      create={PropertyCreate}
+      show={PropertyShow}
+      options={{ label: 'Bài đăng' }}
+      icon={PostAdd}
+    />
+    {/*<Resource
       name="payments"
       list={ListGuesser}
       edit={EditGuesser}
@@ -102,12 +122,7 @@ export const App = () => (
       edit={EditGuesser}
       show={ShowGuesser}
     />
-    <Resource
-      name="properties"
-      list={ListGuesser}
-      edit={EditGuesser}
-      show={ShowGuesser}
-    />
+    
     <Resource
       name="roles"
       list={ListGuesser}

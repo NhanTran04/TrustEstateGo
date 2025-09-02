@@ -1,10 +1,11 @@
 import { Box } from "@mui/material";
-import { FunctionField, Show, SimpleShowLayout, TextField } from "react-admin";
+import { FunctionField, Show, SimpleShowLayout, TextField, useRecordContext } from "react-admin";
 import { Category } from "./CategoryBadge";
 import CategoryCard from "./CategoryCard";
+import BreadcrumbTitle from "../Breadcrumb";
 
 export const CategoryShow: React.FC = () => (
-    <Show>
+    <Show title={<BreadcrumbTitle base="Danh mục" basePath="/categories" />}>
         <SimpleShowLayout>
             <Box sx={{ mb: 3 }}>
                 <FunctionField<Category> render={record => <CategoryCard record={record} />} label="" />

@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 @Mapper(componentModel = "spring")
 public interface PropertyMapper {
     Property toProperty(PropertyRequest propertyRequest);
-
+    @Mapping(source = "category.name", target = "categoryName")
     @Mapping(source = "category.id", target = "categoryId")
     @Mapping(source = "user.id", target = "userId")
     @Mapping(target = "images", expression = "java(mapImages(property.getPropertyImages()))")

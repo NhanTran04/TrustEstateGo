@@ -1,8 +1,9 @@
 import React from "react";
 import { Show, SimpleShowLayout, TextField, NumberField, DateField } from "react-admin";
+import BreadcrumbTitle from "../Breadcrumb";
 
 export const PackageShow: React.FC = () => (
-    <Show>
+    <Show title={<BreadcrumbTitle base="Gói" basePath="/packages" />}>
         <SimpleShowLayout>
             <TextField source="id" label="ID" />
             <TextField source="name" label="Tên gói" />
