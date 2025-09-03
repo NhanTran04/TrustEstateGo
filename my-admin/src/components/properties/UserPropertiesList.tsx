@@ -4,7 +4,6 @@ import {
     Datagrid,
     DateField,
     DeleteButton,
-    EditButton,
     ExportButton,
     FilterButton,
     FunctionField,

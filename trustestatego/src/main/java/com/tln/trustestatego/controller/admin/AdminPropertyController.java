@@ -53,7 +53,6 @@ public class AdminPropertyController {
 
         ObjectMapper mapper = new ObjectMapper();
 
-        // Parse filter JSON (vd: {"title":"abc"})
         Map<String, String> filters = new HashMap<>();
         if (filter != null && !filter.equals("{}")) {
             filters = mapper.readValue(filter, new TypeReference<Map<String, String>>() {});

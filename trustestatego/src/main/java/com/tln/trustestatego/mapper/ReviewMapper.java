@@ -11,6 +11,8 @@ public interface ReviewMapper {
     Review toReview(ReviewRequest reviewRequest);
     @Mapping(source = "property.id", target = "propertyId")
     @Mapping(source = "property.title", target = "propertyTitle")
+    @Mapping(target = "sellerName", expression = "java(review.getSeller().getFirstName() + \" \" + review.getSeller().getLastName())")
+    @Mapping(target = "buyerName", expression = "java(review.getBuyer().getFirstName() + \" \" + review.getBuyer().getLastName())")
     @Mapping(target = "propertyImage",
             expression = "java(review.getProperty().getPropertyImages().isEmpty() ? null : " +
                     "review.getProperty().getPropertyImages().iterator().next().getImageUrl())"

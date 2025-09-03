@@ -15,11 +15,14 @@ public class ReviewResponse {
     int id;
     int rating;
     String comment;
-//    int buyerId;
-//    int sellerId;
+    int buyerId;
+    String buyerName;
+    int sellerId;
+    String sellerName;
     int propertyId;
     String propertyTitle;
     String propertyImage;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     LocalDateTime createdAt;
+
 }

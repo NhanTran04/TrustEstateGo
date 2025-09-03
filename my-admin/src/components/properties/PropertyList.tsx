@@ -11,7 +11,6 @@ import { Link } from "react-router";
 
 export const PropertyList: React.FC = () => (
     <List
-
         filters={PropertyFilter}
         filterDefaultValues={{}}
         actions={

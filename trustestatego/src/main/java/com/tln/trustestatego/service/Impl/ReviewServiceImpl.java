@@ -3,6 +3,7 @@ package com.tln.trustestatego.service.Impl;
 import com.tln.trustestatego.dto.request.ReviewRequest;
 import com.tln.trustestatego.dto.response.PageResponse;
 import com.tln.trustestatego.dto.response.ReviewResponse;
+import com.tln.trustestatego.dto.response.SellerReviewResponse;
 import com.tln.trustestatego.dto.response.UserResponse;
 import com.tln.trustestatego.entity.Property;
 import com.tln.trustestatego.entity.Review;
@@ -69,14 +70,19 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public PageResponse<UserResponse> getUserByRoleSeller(String kw, Pageable pageable) {
-        if (kw == null || kw.isBlank()) {
-            kw = "";
-        }
-        Page<UserResponse> userPage = userRepository.findSellersByName(kw, pageable)
-                .map(userMapper::toUserResponse);
-        return pageMapper.toPageResponse(userPage);
+    public Page<SellerReviewResponse> getSellerReviews(String keyword, Pageable pageable) {
+        return reviewRepository.findSellerReview(keyword, pageable);
     }
+
+//    @Override
+//    public PageResponse<UserResponse> getUserByRoleSeller(String kw, Pageable pageable) {
+//        if (kw == null || kw.isBlank()) {
+//            kw = "";
+//        }
+//        Page<UserResponse> userPage = userRepository.findSellersByName(kw, pageable)
+//                .map(userMapper::toUserResponse);
+//        return pageMapper.toPageResponse(userPage);
+//    }
 
     @Override
     public ReviewResponse createReview(ReviewRequest reviewRequest) {

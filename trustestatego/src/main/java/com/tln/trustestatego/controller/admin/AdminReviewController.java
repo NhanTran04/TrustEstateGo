@@ -5,10 +5,13 @@ import com.tln.trustestatego.dto.request.ReviewRequest;
 import com.tln.trustestatego.dto.response.ApiResponse;
 import com.tln.trustestatego.dto.response.PageResponse;
 import com.tln.trustestatego.dto.response.ReviewResponse;
+import com.tln.trustestatego.dto.response.SellerReviewResponse;
 import com.tln.trustestatego.service.ReviewService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -58,7 +61,25 @@ public class AdminReviewController {
 //        return new ResponseEntity<>(pageResponse.getContent(), headers, HttpStatus.OK);
 //    }
 
-    @GetMapping("/{sellerId}/reviews")
+    @GetMapping("/sellers")
+    public ResponseEntity<List<SellerReviewResponse>> getSellerReviews(
+            @RequestParam(required = false) String keyword,
+            Pageable pageable
+
+    ) {
+        Page<SellerReviewResponse> pageResult = reviewService.getSellerReviews(keyword, pageable);
+
+        int start = pageable.getPageNumber() * pageable.getPageSize();
+        int end   = start + pageResult.getContent().size() - 1;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Range", "sellers " + start + "-" + end + "/" + pageResult.getTotalElements());
+        headers.add("Access-Control-Expose-Headers", "Content-Range");
+
+        return new ResponseEntity<>(pageResult.getContent(), headers, HttpStatus.OK);
+    }
+
+    @GetMapping("/sellers/{sellerId}/reviews")
     public ResponseEntity<List<ReviewResponse>> getReviewBySellerId(
             @PathVariable int sellerId, Pageable pageable) {
         PageResponse<ReviewResponse> pageResponse = reviewService.getReviewBySellerId(sellerId, pageable);
@@ -75,13 +96,13 @@ public class AdminReviewController {
     }
 
 
-    @PostMapping
+    @PostMapping("/sellers/{sellerId}/reviews")
     public ResponseEntity<ReviewResponse> createReview(@RequestBody ReviewRequest reviewRequest) {
         ReviewResponse created = reviewService.createReview(reviewRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    @DeleteMapping("/{reviewId}")
+    @DeleteMapping("/sellers/{sellerId}/reviews/{reviewId}")
     public ResponseEntity<Void> deleteReview(@PathVariable int reviewId) {
         reviewService.deleteReview(reviewId);
         return ResponseEntity.noContent().build();
