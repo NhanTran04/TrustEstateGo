@@ -3,6 +3,8 @@ package com.tln.trustestatego.dto.response;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.Set;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -10,6 +12,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RoleResponse {
     int id;
-    private String name;
-    private String description;
+    String name;
+    String description;
+    Set<PermissionResponse> permissions;
 }

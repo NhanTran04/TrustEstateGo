@@ -24,6 +24,7 @@ public interface UserMapper {
     void update(@MappingTarget User user, UserUpdateRequest userUpdateRequest);
 
     RoleResponse toRoleResponse(Role role);
+
     default Set<RoleResponse> mapRoles(Set<UserRole> userRoles){
         if(userRoles == null)
             return null;

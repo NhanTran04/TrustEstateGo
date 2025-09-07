@@ -25,6 +25,7 @@ export const UserList: React.FC = () => (
             <TextField source="username" label="Tên đăng nhập" />
             <EmailField source="email" label="Email" />
             <TextField source="phone" label="Số điện thoại" />
+
             <FunctionField render={() => <RolesField />} label="Vai trò" />
             <FunctionField render={() => <StatusField />} label="Trạng thái" />
             <EditButton />

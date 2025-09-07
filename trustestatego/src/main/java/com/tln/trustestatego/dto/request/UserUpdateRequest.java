@@ -15,7 +15,7 @@ import java.util.Set;
 public class UserUpdateRequest {
     String firstName;
     String lastName;
-    String gender;
+    Boolean gender;
     LocalDate birthday;
     String email;
     String address;
@@ -23,5 +23,5 @@ public class UserUpdateRequest {
     String password;
     MultipartFile avatar;
     Boolean isActive;
-    int roleId;
+    Set<Integer> roleId;
 }

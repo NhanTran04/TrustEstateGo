@@ -19,7 +19,7 @@ import java.util.Set;
 public class UserCreationRequest {
     String firstName;
     String lastName;
-    String gender;
+    Boolean gender;
     LocalDate birthday;
     String email;
     String address;

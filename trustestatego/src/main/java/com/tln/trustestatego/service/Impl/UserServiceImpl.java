@@ -29,8 +29,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -67,44 +69,96 @@ public class UserServiceImpl implements UserService {
         return userMapper.toUserResponse(user);
     }
 
-    public UserResponse createUser(UserCreationRequest userCreationRequest){
-        if(userRepository.existsByUsername(userCreationRequest.getUsername()))
-            throw new RuntimeException("Username existed");
+    public UserResponse createUser(UserCreationRequest request) {
+        // Check user đã tồn tại chưa
+        Optional<User> optionalUser = userRepository.findByUsername(request.getUsername());
 
-
-        User user = userMapper.toUser(userCreationRequest);
-        user.setPassword(passwordEncoder.encode(userCreationRequest.getPassword()));
-        user.setAvatar(upload(userCreationRequest.getAvatar()));
-        user = userRepository.save(user);
-
-        Role role = roleRepository.findById(userCreationRequest.getRoleId())
+        Role role = roleRepository.findById(request.getRoleId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found"));
 
-        UserRole userRole = new UserRole();
-        userRole.setUser(user);
-        userRole.setRole(role);
-        userRoleRepository.save(userRole);
+        User user;
+        if (optionalUser.isEmpty()) {
+            // User chưa tồn tại -> tạo mới
+            user = userMapper.toUser(request);
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+            user.setAvatar(upload(request.getAvatar()));
+            user.setCreatedAt(LocalDateTime.now());
+            user = userRepository.save(user);
+
+            UserRole userRole = new UserRole();
+            userRole.setUser(user);
+            userRole.setRole(role);
+            userRoleRepository.save(userRole);
+
+        } else {
+            // User đã tồn tại
+            user = optionalUser.get();
+
+            boolean hasRole = userRoleRepository.existsByUserIdAndRoleId(user.getId(), request.getRoleId());
+            if (hasRole) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User existed");
+            }
+
+            // Thêm role mới cho user
+            UserRole userRole = new UserRole();
+            userRole.setUser(user);
+            userRole.setRole(role);
+            userRoleRepository.save(userRole);
+        }
 
         return getUserById(user.getId());
     }
 
-    public UserResponse updateUser(int userId, UserUpdateRequest userUpdateRequest){
+
+//    public UserResponse createUser(UserCreationRequest userCreationRequest){
+//        if(userRepository.existsByUsername(userCreationRequest.getUsername()))
+//            throw new RuntimeException("Username existed");
+//
+//
+//        User user = userMapper.toUser(userCreationRequest);
+//        user.setPassword(passwordEncoder.encode(userCreationRequest.getPassword()));
+//        user.setAvatar(upload(userCreationRequest.getAvatar()));
+//        user.setCreatedAt(LocalDateTime.now());
+//        user = userRepository.save(user);
+//
+//        Role role = roleRepository.findById(userCreationRequest.getRoleId())
+//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found"));
+//
+//        UserRole userRole = new UserRole();
+//        userRole.setUser(user);
+//        userRole.setRole(role);
+//        userRoleRepository.save(userRole);
+//
+//        return getUserById(user.getId());
+//    }
+
+    public UserResponse updateUser(int userId, UserUpdateRequest userUpdateRequest) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        // Map các field cơ bản
         userMapper.update(user, userUpdateRequest);
 
-        if(userUpdateRequest.getPassword() != null && !userUpdateRequest.getPassword().isBlank())
+        // Cập nhật password nếu có
+        if (userUpdateRequest.getPassword() != null && !userUpdateRequest.getPassword().isBlank()) {
             user.setPassword(passwordEncoder.encode(userUpdateRequest.getPassword()));
+        }
+
+        // Cập nhật avatar nếu có
         String image = upload(userUpdateRequest.getAvatar());
-        if(image != null)
+        if (image != null) {
             user.setAvatar(image);
+        }
 
-        if (userUpdateRequest.getRoleId() > 0) {
-            Role role = roleRepository.findById(userUpdateRequest.getRoleId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found"));
+        // Cập nhật roles nếu có truyền
+        if (userUpdateRequest.getRoleId() != null && !userUpdateRequest.getRoleId().isEmpty()) {
+            userRoleRepository.deleteByUserId(userId);
 
-            boolean hasRole = userRoleRepository.existsByUserIdAndRoleId(userId, userUpdateRequest.getRoleId());
-            if(!hasRole){
+            // Gán role mới
+            for (Integer roleId : userUpdateRequest.getRoleId()) {
+                Role role = roleRepository.findById(roleId)
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found"));
+
                 UserRole userRole = new UserRole();
                 userRole.setUser(user);
                 userRole.setRole(role);
@@ -112,7 +166,10 @@ public class UserServiceImpl implements UserService {
             }
         }
 
-        return userMapper.toUserResponse(userRepository.save(user));
+        user.setUpdatedAt(LocalDateTime.now());
+        user = userRepository.save(user);
+
+        return userMapper.toUserResponse(user);
     }
 
     private String upload(MultipartFile file){

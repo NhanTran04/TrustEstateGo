@@ -29,9 +29,8 @@ public class User {
     @Column(name = "lastName", length = 100)
     private String lastName;
 
-    @Lob
     @Column(name = "gender")
-    private String gender;
+    private Boolean gender;
 
     @Column(name = "birthday")
     private LocalDate birthday;

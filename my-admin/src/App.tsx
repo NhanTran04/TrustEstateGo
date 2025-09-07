@@ -10,7 +10,7 @@ import { CategoryShow } from "./components/categories/CategoryShow";
 import { CategoryEdit } from "./components/categories/CategoryEdit";
 import { createTheme } from "@mui/material";
 import { deepPurple, grey, pink } from "@mui/material/colors";
-import { Category, Person, PlaylistAddCheckSharp, PostAdd, Reviews } from "@mui/icons-material";
+import { Category, Person, PlaylistAddCheckSharp, PostAdd, Reviews, RollerShades } from "@mui/icons-material";
 import { PackageList } from "./components/packages/PackageList";
 import { PackageEdit } from "./components/packages/PackageEdit";
 import { PackageShow } from "./components/packages/PackageShow";
@@ -29,6 +29,10 @@ import { UserList } from "./components/users/UserList";
 import { UserEdit } from "./components/users/UserEdit";
 import { UserShow } from "./components/users/UserShow";
 import { UserCreate } from "./components/users/UserCreate";
+import { RoleList } from "./components/roles/RoleList";
+import { RoleEdit } from "./components/roles/RoleEdit";
+import { RoleShow } from "./components/roles/RoleShow";
+import { RoleCreate } from "./components/roles/RoleCreate";
 
 const theme = createTheme({
   palette: {
@@ -82,6 +86,12 @@ const theme = createTheme({
 export const App = () => (
   <Admin dataProvider={dataProvider} title="TrustEstate Admin"
     theme={theme}>
+    <CustomRoutes>
+      <Route path="/user-properties/:userId" element={<UserPropertiesList />} />
+      <Route path="/sellers/:sellerId/reviews" element={<ReviewList />} />
+      <Route path="/sellers/:sellerId/reviews/create" element={<ReviewCreate />} />
+      <Route path="/sellers/:sellerId/reviews/:id/show" element={<ReviewShow />} />
+    </CustomRoutes>
     <Resource
       name="users"
       list={UserList}
@@ -91,12 +101,7 @@ export const App = () => (
       icon={Person}
       options={{ label: 'Người dùng' }}
     />
-    <CustomRoutes>
-      <Route path="/user-properties/:userId" element={<UserPropertiesList />} />
-      <Route path="/sellers/:sellerId/reviews" element={<ReviewList />} />
-      <Route path="/sellers/:sellerId/reviews/create" element={<ReviewCreate />} />
-      <Route path="/sellers/:sellerId/reviews/:id/show" element={<ReviewShow />} />
-    </CustomRoutes>
+
     <Resource
       name="categories"
       list={CategoryList}
@@ -134,6 +139,15 @@ export const App = () => (
       options={{ label: 'Đánh giá' }}
       icon={Reviews}
     />
+    <Resource
+      name="roles"
+      list={RoleList}
+      edit={RoleEdit}
+      show={RoleShow}
+      create={RoleCreate}
+      options={{ label: 'Vai trò' }}
+      icon={RollerShades}
+    />
     {/*<Resource
       name="payments"
       list={ListGuesser}
@@ -147,11 +161,6 @@ export const App = () => (
       show={ShowGuesser}
     />
     
-    <Resource
-      name="roles"
-      list={ListGuesser}
-      edit={EditGuesser}
-      show={ShowGuesser}
-    /> */}
+     */}
   </Admin>
 );

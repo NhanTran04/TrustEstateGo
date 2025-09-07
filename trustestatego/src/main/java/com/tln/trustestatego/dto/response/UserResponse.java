@@ -15,13 +15,12 @@ public class UserResponse {
     int id;
     String firstName;
     String lastName;
-    String gender;
+    Boolean gender;
     LocalDate birthday;
     String email;
     String address;
     String phone;
     String username;
-    String password;
     String avatar;
     Boolean isActive;
     Set<RoleResponse> roles;
