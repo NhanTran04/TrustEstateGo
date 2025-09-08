@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 public interface RoleMapper {
     Role toRole(RoleRequest roleRequest);
     @Mapping(target = "permissions", source = "rolePermissions")
-
     RoleResponse toRoleResponse(Role role);
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void update(@MappingTarget Role role, RoleRequest roleRequest);

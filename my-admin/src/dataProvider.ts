@@ -206,7 +206,7 @@ export const dataProvider = {
       };
     }
 
-    if (resource === "users") {
+    if (resource === "users" || resource === "permissions") {
       const { page, perPage } = params.pagination;
       const { field, order } = params.sort;
 
@@ -228,7 +228,7 @@ export const dataProvider = {
         },
       });
 
-      if (!res.ok) throw new Error("Failed to fetch users");
+      if (!res.ok) throw new Error("Failed to fetch");
 
       const json = await res.json();
       const total = parseInt(res.headers.get("Content-Range")?.split("/")?.[1] || "0", 10);

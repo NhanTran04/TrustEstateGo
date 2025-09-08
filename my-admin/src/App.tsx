@@ -1,97 +1,151 @@
+// src/App.tsx
 import {
   Admin,
   CustomRoutes,
   Resource,
+  Layout,
+  MenuItemLink,
 } from "react-admin";
 import { dataProvider } from "./dataProvider";
+import { createTheme, List } from "@mui/material";
+import {
+  Category,
+  Person,
+  PlaylistAddCheckSharp,
+  PostAdd,
+  Reviews,
+  RollerShades,
+  Security,
+} from "@mui/icons-material";
+
 import { CategoryList } from "./components/categories/CategoryList";
 import { CategoryCreate } from "./components/categories/CategoryCreate";
 import { CategoryShow } from "./components/categories/CategoryShow";
 import { CategoryEdit } from "./components/categories/CategoryEdit";
-import { createTheme } from "@mui/material";
-import { deepPurple, grey, pink } from "@mui/material/colors";
-import { Category, Person, PlaylistAddCheckSharp, PostAdd, Reviews, RollerShades } from "@mui/icons-material";
+
 import { PackageList } from "./components/packages/PackageList";
 import { PackageEdit } from "./components/packages/PackageEdit";
 import { PackageShow } from "./components/packages/PackageShow";
 import { PackageCreate } from "./components/packages/PackageCreate";
+
 import { PropertyList } from "./components/properties/PropertyList";
 import { PropertyEdit } from "./components/properties/PropertyEdit";
 import { PropertyCreate } from "./components/properties/PropertyCreate";
 import { PropertyShow } from "./components/properties/PropertyShow";
-import { Route } from "react-router";
 import { UserPropertiesList } from "./components/properties/UserPropertiesList";
+
 import { SellerList } from "./components/reviews/SellerList";
 import { ReviewList } from "./components/reviews/ReviewList";
 import { ReviewCreate } from "./components/reviews/ReviewCreate";
 import { ReviewShow } from "./components/reviews/ReviewShow";
+
 import { UserList } from "./components/users/UserList";
 import { UserEdit } from "./components/users/UserEdit";
 import { UserShow } from "./components/users/UserShow";
 import { UserCreate } from "./components/users/UserCreate";
-import { RoleList } from "./components/roles/RoleList";
+
 import { RoleEdit } from "./components/roles/RoleEdit";
 import { RoleShow } from "./components/roles/RoleShow";
 import { RoleCreate } from "./components/roles/RoleCreate";
+import RoleList from "./components/roles/RoleList";
 
+import { Route } from "react-router";
+import { PermissionList } from "./components/permissions/PermissionList";
+import { PermissionEdit } from "./components/permissions/PermissionEdit";
+import { PermissionCreate } from "./components/permissions/PermissionCreate";
+
+// 🌟 Custom Menu
+const MyMenu = () => (
+  <List sx={{ padding: 2 }}>
+    <MenuItemLink
+      to="/users"
+      primaryText="Người dùng"
+      leftIcon={<Person />}
+      sx={{ mb: 2 }}
+    />
+    <MenuItemLink
+      to="/categories"
+      primaryText="Danh mục"
+      leftIcon={<Category />}
+      sx={{ mb: 2 }}
+    />
+    <MenuItemLink
+      to="/packages"
+      primaryText="Gói"
+      leftIcon={<PlaylistAddCheckSharp />}
+      sx={{ mb: 2 }}
+    />
+    <MenuItemLink
+      to="/properties"
+      primaryText="Bài đăng"
+      leftIcon={<PostAdd />}
+      sx={{ mb: 2 }}
+    />
+    <MenuItemLink
+      to="/sellers"
+      primaryText="Đánh giá"
+      leftIcon={<Reviews />}
+      sx={{ mb: 2 }}
+    />
+    <MenuItemLink
+      to="/roles"
+      primaryText="Vai trò"
+      leftIcon={<RollerShades />}
+      sx={{ mb: 2 }}
+    />
+    <MenuItemLink
+      to="/permissions"
+      primaryText="Quyền"
+      leftIcon={<Security />}
+      sx={{ mb: 2 }}
+    />
+  </List>
+);
+
+// 🌟 Custom Layout
+const MyLayout = (props: any) => <Layout {...props} menu={MyMenu} />;
+
+// 🌟 Theme
 const theme = createTheme({
   palette: {
-    primary: {
-      main: deepPurple[600],
-    },
-    secondary: {
-      main: pink[500],
-    },
-    background: {
-      default: grey[50],
-    },
+    primary: { main: "#5E35B1" },
+    secondary: { main: "#81b5ecff" },
+    background: { default: "#e3eef9ff" },
   },
   typography: {
     fontFamily: '"Inter", "Roboto", "Arial", sans-serif',
-    h6: {
-      fontWeight: 600,
-    },
+    h6: { fontWeight: 600 },
   },
   components: {
     MuiPaper: {
       styleOverrides: {
-        root: {
-          borderRadius: 12,
-          boxShadow: '0 2px 12px rgba(0, 0, 0, 0.08)',
-        },
-      },
-    },
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-          textTransform: 'none',
-          fontWeight: 600,
-        },
-      },
-    },
-    MuiChip: {
-      styleOverrides: {
-        root: {
-          borderRadius: 6,
-          fontWeight: 500,
-        },
+        root: { borderRadius: 12, boxShadow: "0 2px 12px rgba(0,0,0,0.08)" },
       },
     },
   },
 });
 
-
-
+// 🌟 Main App
 export const App = () => (
-  <Admin dataProvider={dataProvider} title="TrustEstate Admin"
-    theme={theme}>
+  <Admin
+    dataProvider={dataProvider}
+    title="TrustEstate Admin"
+    theme={theme}
+    layout={MyLayout} // dùng menu custom
+  >
     <CustomRoutes>
       <Route path="/user-properties/:userId" element={<UserPropertiesList />} />
       <Route path="/sellers/:sellerId/reviews" element={<ReviewList />} />
-      <Route path="/sellers/:sellerId/reviews/create" element={<ReviewCreate />} />
-      <Route path="/sellers/:sellerId/reviews/:id/show" element={<ReviewShow />} />
+      <Route
+        path="/sellers/:sellerId/reviews/create"
+        element={<ReviewCreate />}
+      />
+      <Route
+        path="/sellers/:sellerId/reviews/:id/show"
+        element={<ReviewShow />}
+      />
     </CustomRoutes>
+
     <Resource
       name="users"
       list={UserList}
@@ -99,7 +153,7 @@ export const App = () => (
       show={UserShow}
       create={UserCreate}
       icon={Person}
-      options={{ label: 'Người dùng' }}
+      options={{ label: "Người dùng" }}
     />
 
     <Resource
@@ -109,7 +163,7 @@ export const App = () => (
       show={CategoryShow}
       create={CategoryCreate}
       icon={Category}
-      options={{ label: 'Danh mục' }}
+      options={{ label: "Danh mục" }}
     />
     <Resource
       name="packages"
@@ -118,7 +172,7 @@ export const App = () => (
       show={PackageShow}
       create={PackageCreate}
       icon={PlaylistAddCheckSharp}
-      options={{ label: 'Gói' }}
+      options={{ label: "Gói" }}
     />
     <Resource
       name="properties"
@@ -126,17 +180,13 @@ export const App = () => (
       edit={PropertyEdit}
       create={PropertyCreate}
       show={PropertyShow}
-      options={{ label: 'Bài đăng' }}
+      options={{ label: "Bài đăng" }}
       icon={PostAdd}
     />
     <Resource
       name="sellers"
       list={SellerList}
-
-      // edit={PropertyEdit}
-      // create={PropertyCreate}
-      // show={PropertyShow}
-      options={{ label: 'Đánh giá' }}
+      options={{ label: "Đánh giá" }}
       icon={Reviews}
     />
     <Resource
@@ -145,22 +195,16 @@ export const App = () => (
       edit={RoleEdit}
       show={RoleShow}
       create={RoleCreate}
-      options={{ label: 'Vai trò' }}
+      options={{ label: "Vai trò" }}
       icon={RollerShades}
-    />
-    {/*<Resource
-      name="payments"
-      list={ListGuesser}
-      edit={EditGuesser}
-      show={ShowGuesser}
     />
     <Resource
       name="permissions"
-      list={ListGuesser}
-      edit={EditGuesser}
-      show={ShowGuesser}
+      list={PermissionList}
+      edit={PermissionEdit}
+      create={PermissionCreate}
+      options={{ label: "Quyền" }}
+      icon={Security}
     />
-    
-     */}
   </Admin>
 );

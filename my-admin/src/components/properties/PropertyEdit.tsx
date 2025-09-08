@@ -4,7 +4,7 @@ import { BooleanInput, DateTimeInput, Edit, FileInput, FormTab, ImageField, minL
 import BreadcrumbTitle from "../Breadcrumb";
 
 export const PropertyEdit: React.FC = () => (
-    <Edit title={
+    <Edit redirect="list" title={
         <RecordContextProvider value={{ name: "Chỉnh sửa" }}>
             <BreadcrumbTitle base="Bài đăng" basePath="/properties" />
         </RecordContextProvider>

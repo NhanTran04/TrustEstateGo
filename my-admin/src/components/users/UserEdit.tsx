@@ -7,7 +7,7 @@ import { Box } from '@mui/material';
 import { Person } from '@mui/icons-material';
 
 export const UserEdit: React.FC = () => (
-    <Edit>
+    <Edit redirect="list">
         <TabbedForm>
             <FormTab label="Thông tin cơ bản" icon={<Person />}>
                 <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>

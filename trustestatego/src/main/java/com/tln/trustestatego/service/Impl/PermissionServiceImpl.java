@@ -1,8 +1,10 @@
 package com.tln.trustestatego.service.Impl;
 
 import com.tln.trustestatego.dto.request.PermissionRequest;
+import com.tln.trustestatego.dto.response.PageResponse;
 import com.tln.trustestatego.dto.response.PermissionResponse;
 import com.tln.trustestatego.entity.Permission;
+import com.tln.trustestatego.mapper.PageMapper;
 import com.tln.trustestatego.mapper.PermissionMapper;
 import com.tln.trustestatego.repository.PermissionRepository;
 import com.tln.trustestatego.service.PermissionService;
@@ -10,6 +12,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,12 +33,19 @@ public class PermissionServiceImpl implements PermissionService {
 
     PermissionRepository permissionRepository;
 
+    PageMapper pageMapper;
+
     @Override
-    public List<PermissionResponse> getPermissions() {
-        return permissionRepository.findAll()
-                .stream()
-                .map(permissionMapper::toPermissionResponse)
-                .collect(Collectors.toList());
+    public PageResponse<PermissionResponse> getPermissions(String kw, Pageable pageable) {
+        Page<PermissionResponse> page;
+        if (kw == null || kw.isBlank()) {
+            page = permissionRepository.findAll(pageable)
+                    .map(permissionMapper::toPermissionResponse);
+        } else {
+            page = permissionRepository.findByNameContainingIgnoreCase(kw, pageable).map(permissionMapper::toPermissionResponse);
+        }
+
+        return pageMapper.toPageResponse(page);
     }
 
     @Override

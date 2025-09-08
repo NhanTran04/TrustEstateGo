@@ -3,7 +3,7 @@ import { Edit, SimpleForm, TextInput, NumberInput, DateField } from "react-admin
 import BreadcrumbTitle from "../Breadcrumb";
 
 export const PackageEdit: React.FC = () => (
-    <Edit title={<BreadcrumbTitle base="Gói" basePath="/packages" />}>
+    <Edit redirect="list" title={<BreadcrumbTitle base="Gói" basePath="/packages" />}>
         <SimpleForm>
             <TextInput source="name" label="Tên gói" fullWidth />
             <NumberInput source="price" label="Giá" />

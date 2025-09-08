@@ -24,20 +24,18 @@ public class AdminRoleController {
     RoleService roleService;
 
     @GetMapping
-    public ResponseEntity<List<RoleResponse>> getRoles(@RequestParam(defaultValue = "") String kw,
-                                                       Pageable pageable) {
-        PageResponse<RoleResponse> pageResponse = roleService.getRoles(pageable);
-
-        // Tính start & end dựa trên page hiện tại
-        int start = pageable.getPageNumber() * pageable.getPageSize();
-        int end = start + pageResponse.getContent().size() - 1;
-
+    public ResponseEntity<List<RoleResponse>> getRoles() {
+        List<RoleResponse> roles = roleService.getRoles();
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Range",
-                "roles " + start + "-" + end + "/" + pageResponse.getTotalElements());
+        headers.add("Content-Range", "packages 0" + (roles.size() - 1)  + "/" + roles.size());
         headers.add("Access-Control-Expose-Headers", "Content-Range");
+        return new ResponseEntity<>(roles, headers, HttpStatus.OK);
+    }
 
-        return new ResponseEntity<>(pageResponse.getContent(), headers, HttpStatus.OK);
+    @GetMapping("/{roleId}")
+    public ResponseEntity<RoleResponse> getRoleById(@PathVariable int roleId){
+        RoleResponse role = roleService.getRoleById(roleId);
+        return ResponseEntity.ok().body(role);
     }
 
     @PostMapping

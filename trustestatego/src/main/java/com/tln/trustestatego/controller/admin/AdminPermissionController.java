@@ -2,11 +2,13 @@ package com.tln.trustestatego.controller.admin;
 
 import com.tln.trustestatego.dto.request.PermissionRequest;
 import com.tln.trustestatego.dto.response.ApiResponse;
+import com.tln.trustestatego.dto.response.PageResponse;
 import com.tln.trustestatego.dto.response.PermissionResponse;
 import com.tln.trustestatego.service.PermissionService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,14 +24,19 @@ public class AdminPermissionController {
     PermissionService permissionService;
 
     @GetMapping
-    public ResponseEntity<List<PermissionResponse>> getPermissions() {
-        List<PermissionResponse> permissions = permissionService.getPermissions();
+    public ResponseEntity<List<PermissionResponse>> getPermissions(@RequestParam(defaultValue = "") String kw, Pageable pageable) {
+        PageResponse<PermissionResponse> permissions = permissionService.getPermissions(kw, pageable);
+
+        int start = (int) pageable.getOffset();
+        int end = start + permissions.getContent().size() - 1;
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Range", "permissions 0-" + (permissions.size() - 1) + "/" + permissions.size());
+        headers.add("Content-Range", "permissions " + start + "-" + end + "/" + permissions.getTotalElements());
         headers.add("Access-Control-Expose-Headers", "Content-Range");
 
-        return new ResponseEntity<>(permissions, headers, HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
+                .headers(headers)
+                .body(permissions.getContent());
     }
 
     @GetMapping("/{permissionId}")

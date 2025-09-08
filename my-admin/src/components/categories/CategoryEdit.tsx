@@ -3,7 +3,7 @@ import { Edit, minLength, required, SimpleForm, TextInput } from "react-admin";
 import BreadcrumbTitle from "../Breadcrumb";
 
 export const CategoryEdit: React.FC = () => (
-    <Edit title={<BreadcrumbTitle base="Danh mục" basePath="/categories" />}>
+    <Edit redirect="list" title={<BreadcrumbTitle base="Danh mục" basePath="/categories" />}>
         <SimpleForm>
             <Box sx={{ maxWidth: 600 }}>
                 <Typography variant="h6" gutterBottom color="primary">Chỉnh sửa danh mục</Typography>

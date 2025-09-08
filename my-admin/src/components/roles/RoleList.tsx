@@ -1,24 +1,23 @@
-// components/Roles/RoleList.tsx
 import React from 'react';
 import {
-    List, Datagrid, TextField, EditButton, ShowButton, DeleteButton,
-    FunctionField, TopToolbar, ExportButton, CreateButton, FilterButton,
-    SearchInput, Filter
+    List,
+    Datagrid,
+    TextField,
+    FunctionField,
+    TopToolbar,
+    CreateButton,
+    ExportButton,
+    EditButton,
+    ShowButton,
+    DeleteButton,
 } from 'react-admin';
-// import { RolePreview } from './components/RolePreview';
+import RolePreview from './RolePreview';
 
-// const RoleFilter: React.FC = (props) => (
-//     <Filter {...props}>
-//         <SearchInput source="q" placeholder="Tìm kiếm tên vai trò..." alwaysOn />
-//     </Filter>
-// );
 
-export const RoleList: React.FC = () => (
+const RoleList: React.FC = () => (
     <List
-        // filters={<RoleFilter />}
         actions={
             <TopToolbar>
-                {/* <FilterButton /> */}
                 <CreateButton />
                 <ExportButton />
             </TopToolbar>
@@ -28,11 +27,13 @@ export const RoleList: React.FC = () => (
     >
         <Datagrid rowClick="show" bulkActionButtons={false}>
             <TextField source="id" label="ID" />
-            {/* <FunctionField render={() => <RolePreview />} label="Vai trò" /> */}
-            <TextField source="description" label="Mô tả" sx={{ maxWidth: 300 }} />
+            <FunctionField render={() => <RolePreview />} label="Vai trò" />
+            <TextField source="description" label="Mô tả" />
             <EditButton />
             <ShowButton />
             <DeleteButton />
         </Datagrid>
     </List>
 );
+
+export default RoleList;

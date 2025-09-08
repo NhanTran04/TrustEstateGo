@@ -40,28 +40,73 @@ public class RoleServiceImpl implements RoleService {
     PageMapper pageMapper;
     PermissionRepository permissionRepository;
 
-    public PageResponse<RoleResponse> getRoles(Pageable pageable){
-        Page<RoleResponse> rolePage =  roleRepository.findAll(pageable)
-                .map(roleMapper::toRoleResponse);
-        return pageMapper.toPageResponse(rolePage);
+    public List<RoleResponse> getRoles(){
+        return roleRepository
+                .findAll()
+                .stream()
+                .map(roleMapper::toRoleResponse)
+                .toList();
     }
 
-    private void setRolePermissions(Role role, Set<Integer> permissionIds) {
-        if (permissionIds != null && !permissionIds.isEmpty()) {
-            Set<Permission> permissions = new HashSet<>(permissionRepository.findAllById(permissionIds));
+    @Override
+    public RoleResponse getRoleById(int roleId) {
+        return roleRepository
+                .findById(roleId)
+                .map(roleMapper::toRoleResponse)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found"));
+    }
 
-            Set<RolePermission> rolePermissions = permissions.stream().map(p -> {
+//    private void setRolePermissions(Role role, Set<Integer> permissionIds) {
+//        if (permissionIds != null && !permissionIds.isEmpty()) {
+//            Set<Permission> permissions = new HashSet<>(permissionRepository.findAllById(permissionIds));
+//
+//            Set<RolePermission> rolePermissions = permissions.stream().map(p -> {
+//                RolePermission rp = new RolePermission();
+//                rp.setRole(role);
+//                rp.setPermission(p);
+//                return rp;
+//            }).collect(Collectors.toSet());
+//
+//            role.setRolePermissions(rolePermissions);
+//        } else {
+//            role.setRolePermissions(new HashSet<>()); // clear nếu không truyền gì
+//        }
+//    }
+
+    private void setRolePermissions(Role role, Set<Integer> newPermissionIds) {
+        if (newPermissionIds == null) {
+            newPermissionIds = new HashSet<>();
+        }
+
+        // Lấy danh sách hiện tại trong DB
+        Set<Integer> currentPermissionIds = role.getRolePermissions()
+                .stream()
+                .map(rp -> rp.getPermission().getId())
+                .collect(Collectors.toSet());
+
+        // Tìm permission cần thêm
+        Set<Integer> toAdd = new HashSet<>(newPermissionIds);
+        toAdd.removeAll(currentPermissionIds);
+
+        // Tìm permission cần xóa
+        Set<Integer> toRemove = new HashSet<>(currentPermissionIds);
+        toRemove.removeAll(newPermissionIds);
+
+        // Xóa rolePermission khỏi entity
+        role.getRolePermissions().removeIf(rp -> toRemove.contains(rp.getPermission().getId()));
+
+        // Thêm rolePermission mới
+        if (!toAdd.isEmpty()) {
+            Set<Permission> permissions = new HashSet<>(permissionRepository.findAllById(toAdd));
+            for (Permission p : permissions) {
                 RolePermission rp = new RolePermission();
                 rp.setRole(role);
                 rp.setPermission(p);
-                return rp;
-            }).collect(Collectors.toSet());
-
-            role.setRolePermissions(rolePermissions);
-        } else {
-            role.setRolePermissions(new HashSet<>()); // clear nếu không truyền gì
+                role.getRolePermissions().add(rp);
+            }
         }
     }
+
 
     public RoleResponse createRole(RoleRequest request){
         Role role = roleMapper.toRole(request);
@@ -76,7 +121,8 @@ public class RoleServiceImpl implements RoleService {
 
         roleMapper.update(role, roleRequest);
         setRolePermissions(role, roleRequest.getPermissions());
-        return roleMapper.toRoleResponse(roleRepository.save(role));
+        Role saved = roleRepository.save(role);
+        return roleMapper.toRoleResponse(saved);
     }
 
     @Override

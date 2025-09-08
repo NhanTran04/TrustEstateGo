@@ -3,10 +3,11 @@ import { Create, minLength, RecordContextProvider, required, SimpleForm, TextInp
 import BreadcrumbTitle from "../Breadcrumb";
 
 export const CategoryCreate: React.FC = () => (
-  <Create title={
+  <Create redirect="list" title={
     <RecordContextProvider value={{ name: "Tạo" }}>
       <BreadcrumbTitle base="Danh mục" basePath="/categories" />
     </RecordContextProvider>
+
   }>
     <SimpleForm>
       <Box sx={{ maxWidth: 600 }}>
