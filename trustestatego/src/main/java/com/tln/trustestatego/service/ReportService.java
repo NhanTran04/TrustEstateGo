@@ -10,8 +10,8 @@ import java.util.List;
 
 public interface ReportService {
     PageResponse<ReportResponse> getReports(String keyword, Pageable pageable);
-    PageResponse<ReportResponse> getReportByUserId(int userId, Pageable pageable);
-    ReportResponse createReport(ReportUserRequest reportUserRequest, int userId, int propertyId);
+    PageResponse<ReportResponse> getReportByUserId(Pageable pageable);
+    ReportResponse createReport(ReportUserRequest reportUserRequest, int propertyId);
     ReportResponse updateReport(int reportId);
     void deleteReport(int reportId);
 }

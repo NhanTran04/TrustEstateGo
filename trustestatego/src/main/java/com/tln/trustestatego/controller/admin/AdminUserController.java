@@ -60,7 +60,7 @@ public class AdminUserController {
     public ResponseEntity<UserResponse> updateUser(
             @PathVariable int userId,
             @ModelAttribute UserUpdateRequest userUpdateRequest) {
-        return ResponseEntity.ok(userService.updateUser(userId, userUpdateRequest));
+        return ResponseEntity.ok(userService.updateUserFromAdmin(userId, userUpdateRequest));
     }
 
     @DeleteMapping("/{userId}")

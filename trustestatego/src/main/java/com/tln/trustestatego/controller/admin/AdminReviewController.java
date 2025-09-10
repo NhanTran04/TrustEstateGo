@@ -1,6 +1,7 @@
 package com.tln.trustestatego.controller.admin;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.tln.trustestatego.dto.request.ReviewAdminRequest;
 import com.tln.trustestatego.dto.request.ReviewRequest;
 import com.tln.trustestatego.dto.response.ApiResponse;
 import com.tln.trustestatego.dto.response.PageResponse;
@@ -97,8 +98,8 @@ public class AdminReviewController {
 
 
     @PostMapping("/sellers/{sellerId}/reviews")
-    public ResponseEntity<ReviewResponse> createReview(@RequestBody ReviewRequest reviewRequest) {
-        ReviewResponse created = reviewService.createReview(reviewRequest);
+    public ResponseEntity<ReviewResponse> createReview(@RequestBody ReviewAdminRequest ReviewAdminRequest) {
+        ReviewResponse created = reviewService.createReviewFromAdmin(ReviewAdminRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 

@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,7 +20,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PackageController {
      PackageService packageService;
-
+    @PreAuthorize("hasRole('SELLER')")
     @GetMapping
     public ResponseEntity<ApiResponse<List<PackageResponse>>> getPackages(){
         try{
@@ -37,54 +38,24 @@ public class PackageController {
         }
 
     }
-
-    @PostMapping
-    public ResponseEntity<ApiResponse<PackageResponse>> createPackage(@RequestBody PackageRequest packageRequest) {
-        try {
-            PackageResponse createdPackage = packageService.createPackage(packageRequest);
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(ApiResponse.<PackageResponse>builder()
-                            .result(createdPackage)
-                            .message("Package created successfully")
-                            .build());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-    }
-
-    @PutMapping("/{packageId}")
-    public ResponseEntity<ApiResponse<PackageResponse>> updatePackage(
-            @PathVariable int packageId,
-            @RequestBody PackageRequest packageRequest) {
-        try {
-            PackageResponse updatedPackage = packageService.updatePackage(packageId, packageRequest);
+    @PreAuthorize("hasRole('SELLER')")
+    @GetMapping("/{packageId}")
+    public ResponseEntity<ApiResponse<PackageResponse>> getPackageById(@PathVariable int packId){
+        try{
             return ResponseEntity.ok(
                     ApiResponse.<PackageResponse>builder()
-                            .result(updatedPackage)
-                            .message("Package updated successfully")
-                            .build());
+                            .result(packageService.getPackageById(packId))
+                            .build()
+            );
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResponse.<PackageResponse>builder()
-                            .message("Failed to update package: " + e.getMessage())
+                            .code(HttpStatus.BAD_REQUEST.value())
+                            .message(e.getMessage())
                             .build());
         }
+
     }
 
-    @DeleteMapping("/{packageId}")
-    public ResponseEntity<ApiResponse<Void>> deletePackage(@PathVariable int packageId) {
-        try {
-            packageService.deletePackage(packageId);
-            return ResponseEntity.ok(
-                    ApiResponse.<Void>builder()
-                            .message("Package deleted successfully")
-                            .build());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(ApiResponse.<Void>builder()
-                            .message("Failed to delete package: " + e.getMessage())
-                            .build());
-        }
-    }
 
 }

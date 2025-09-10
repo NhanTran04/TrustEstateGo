@@ -11,7 +11,7 @@ import lombok.experimental.FieldDefaults;
 public class ReviewRequest {
     int rating;
     String comment;
-    int buyerId;
+//    int buyerId;
     int sellerId;
-    int propertyId;
+//    int propertyId;
 }

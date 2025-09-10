@@ -6,7 +6,7 @@ import com.tln.trustestatego.dto.response.PropertySaveResponse;
 import java.util.List;
 
 public interface PropertySaveService {
-    List<PropertySaveResponse> getPropertyByUserId(int userId);
-    boolean togglePropertySave(int userId, int propertyId);
+    List<PropertySaveResponse> getPropertySaveByUserId();
+    boolean togglePropertySave(int propertyId);
     void deleteById(int propertySaveId);
 }

@@ -13,16 +13,22 @@ import { Box, Typography, Stack } from '@mui/material';
 import { Security as SecurityIcon } from '@mui/icons-material';
 import { useRecordContext } from 'react-admin';
 
-// const DebugRole = () => {
-//     const record = useRecordContext();
-//     console.log("Record in Edit form:", record);
-//     return null;
-// };
+const DebugRole = () => {
+    const record = useRecordContext();
+    console.log("Record in Edit form:", record);
+    if (record?.permissions) {
+        console.log("Permissions raw:", record.permissions);
+        record.permissions.forEach((p: any, i: any) =>
+            console.log(`perm[${i}]`, p, "typeof", typeof p)
+        );
+    }
+    return null;
+};
 
 export const RoleEdit: React.FC = () => (
     <Edit redirect="list">
         <SimpleForm>
-            {/* <DebugRole /> */}
+            <DebugRole />
             <Stack direction="row" spacing={4} alignItems="flex-start">
                 {/* Cột trái - Thông tin vai trò */}
                 <Box sx={{ flex: 1, maxWidth: 500 }}>
@@ -68,15 +74,18 @@ export const RoleEdit: React.FC = () => (
                         reference="permissions"
                         format={(value) => {
                             if (!Array.isArray(value)) return [];
-                            // map object -> id
-                            const ids = value.map(p => (typeof p === 'object' ? p.id : p));
-                            // loại bỏ duplicate
-                            return Array.from(new Set(ids));
+                            // object -> id
+                            return value.map((p) => p.id);
                         }}
-                        parse={(value) => value}
+                        parse={(value) => {
+                            if (!Array.isArray(value)) return [];
+                            // gửi về mảng id (integer)
+                            return value.map((id) => Number(id));
+                        }}
                     >
                         <CheckboxGroupInput optionText="name" optionValue="id" />
                     </ReferenceArrayInput>
+
 
                 </Box>
             </Stack>

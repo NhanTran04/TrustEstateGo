@@ -6,11 +6,13 @@ import com.tln.trustestatego.dto.response.PropertyResponse;
 import com.tln.trustestatego.dto.response.PropertySaveResponse;
 import com.tln.trustestatego.entity.Property;
 import com.tln.trustestatego.entity.PropertySave;
+import com.tln.trustestatego.entity.User;
 import com.tln.trustestatego.mapper.PropertyMapper;
 import com.tln.trustestatego.mapper.PropertySaveMapper;
 import com.tln.trustestatego.repository.PropertyRepository;
 import com.tln.trustestatego.repository.PropertySaveRepository;
 import com.tln.trustestatego.repository.UserRepository;
+import com.tln.trustestatego.service.CurrentUserService;
 import com.tln.trustestatego.service.PropertySaveService;
 import com.tln.trustestatego.service.PropertyService;
 import lombok.AccessLevel;
@@ -36,26 +38,28 @@ public class PropertySaveServiceImpl implements PropertySaveService {
     PropertySaveRepository propertySaveRepository;
     UserRepository userRepository;
     PropertyRepository propertyRepository;
-
+    CurrentUserService currentUserService;
 
     @Override
-    public List<PropertySaveResponse> getPropertyByUserId(int userId) {
-        return propertySaveRepository.findByUser_Id(userId)
+    public List<PropertySaveResponse> getPropertySaveByUserId() {
+        User user = currentUserService.getCurrentUser();
+        return propertySaveRepository.findByUser_Id(user.getId())
                 .stream()
                 .map(propertySaveMapper::toPropertySaveResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public boolean togglePropertySave(int userId, int propertyId) {
-        Optional<PropertySave> existingSave = propertySaveRepository.findByUser_IdAndProperty_Id(userId, propertyId);
+    public boolean togglePropertySave(int propertyId) {
+        User user = currentUserService.getCurrentUser();
+        Optional<PropertySave> existingSave = propertySaveRepository.findByUser_IdAndProperty_Id(user.getId(), propertyId);
 
         if (existingSave.isPresent()) {
             propertySaveRepository.delete(existingSave.get());
             return false; // đã bỏ lưu
         } else {
             PropertySave save = new PropertySave();
-            save.setUser(userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")));
+            save.setUser(userRepository.findById(user.getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")));
             save.setProperty(propertyRepository.findById(propertyId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Property not found")));
             propertySaveRepository.save(save);
             return true; // đã lưu

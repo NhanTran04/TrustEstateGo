@@ -1,27 +1,105 @@
 package com.tln.trustestatego.configuration;
 
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import javax.crypto.spec.SecretKeySpec;
+import java.util.List;
 
 @Configuration
+@EnableMethodSecurity
 public class SecurityConfig {
+
+    @Value("${jwt.signer-key}")
+    private String SIGNER_KEY;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Tắt CSRF nếu là API
-                .cors(cors -> {})
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll() // Cho phép tất cả request
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated()
+                )
+                .oauth2ResourceServer(oauth -> oauth
+                        .jwt(jwt -> jwt
+                                .decoder(jwtDecoder())
+                                .jwtAuthenticationConverter(jwtAuthenticationConverter())
+                        )
+                )
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((req, res, e) -> {
+                            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            res.setContentType("application/json");
+                            res.getWriter().write("{\"error\":\"Unauthorized\"}");
+                        })
+                        .accessDeniedHandler((req, res, e) -> {
+                            res.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                            res.setContentType("application/json");
+                            res.getWriter().write("{\"error\":\"Forbidden\"}");
+                        })
                 );
+
         return http.build();
     }
 
-    @Bean//Se duoc goi va dua bien vao application context
-    PasswordEncoder passwordEncoder(){
-        return new BCryptPasswordEncoder(10);
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration corsConfig = new CorsConfiguration();
+        corsConfig.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:3000"));
+        corsConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        corsConfig.setAllowedHeaders(List.of("*"));
+        corsConfig.setExposedHeaders(List.of("Content-Range")); // React Admin cần
+        corsConfig.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", corsConfig);
+        return source;
+    }
+
+    @Bean
+    public JwtDecoder jwtDecoder() {
+        SecretKeySpec secretKeySpec = new SecretKeySpec(SIGNER_KEY.getBytes(), "HmacSHA512");
+        return NimbusJwtDecoder
+                .withSecretKey(secretKeySpec)
+                .macAlgorithm(MacAlgorithm.HS512)
+                .build();
+    }
+
+    @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtGrantedAuthoritiesConverter converter = new JwtGrantedAuthoritiesConverter();
+        converter.setAuthoritiesClaimName("roles");   // claim chứa roles trong JWT
+        converter.setAuthorityPrefix("ROLE_");        // Spring cần prefix ROLE_
+
+        JwtAuthenticationConverter jwtAuthConverter = new JwtAuthenticationConverter();
+        jwtAuthConverter.setJwtGrantedAuthoritiesConverter(converter);
+        return jwtAuthConverter;
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(); // mặc định strength = 10
     }
 }

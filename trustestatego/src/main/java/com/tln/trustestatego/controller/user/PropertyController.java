@@ -12,18 +12,20 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-@RequestMapping("/api/properties")
+@RequestMapping("/api")
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PropertyController {
     PropertyService propertyService;
 
-    @GetMapping
+    @PreAuthorize("hasAnyRole('SELLER', USER)")
+    @GetMapping("/properties")
     public ResponseEntity<ApiResponse<PageResponse<PropertyResponse>>> getProperties(Pageable pageable) {
         try {
                 return ResponseEntity.ok(
@@ -40,12 +42,13 @@ public class PropertyController {
         }
     }
 
-    @GetMapping("/users/{userId}")
-    public ResponseEntity<ApiResponse<PageResponse<PropertyResponse>>> getPropertyByUserId(@PathVariable int userId, Pageable pageable) {
+    @PreAuthorize("hasAnyRole('SELLER', USER)")
+    @GetMapping("/users/properties")
+    public ResponseEntity<ApiResponse<PageResponse<PropertyResponse>>> getPropertyByUserId(Pageable pageable) {
         try {
             return ResponseEntity.ok(
                     ApiResponse.<PageResponse<PropertyResponse>>builder()
-                            .result(propertyService.getPropertyByUserId(userId,pageable))
+                            .result(propertyService.getPropertyByUserId(pageable))
                             .build()
             );
         } catch (Exception e) {
@@ -57,7 +60,26 @@ public class PropertyController {
         }
     }
 
-    @GetMapping("/{propertyId}")
+    @PreAuthorize("hasRole(USER)")
+    @GetMapping("/users/{userId}/properties")
+    public ResponseEntity<ApiResponse<PageResponse<PropertyResponse>>> getPropertyBySellerId(@PathVariable int userId, Pageable pageable) {
+        try {
+            return ResponseEntity.ok(
+                    ApiResponse.<PageResponse<PropertyResponse>>builder()
+                            .result(propertyService.getPropertyByUserId(pageable))
+                            .build()
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.<PageResponse<PropertyResponse>>builder()
+                            .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .message(e.getMessage())
+                            .build());
+        }
+    }
+
+    @PreAuthorize("hasAnyRole('SELLER', USER)")
+    @GetMapping("/properties/{propertyId}")
     public ResponseEntity<ApiResponse<PropertyResponse>> getPropertyById(@PathVariable int propertyId) {
         try {
             return ResponseEntity.ok(
@@ -74,7 +96,8 @@ public class PropertyController {
         }
     }
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('SELLER')")
+    @PostMapping(path = "/properties",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<PropertyResponse>> createProperty(@ModelAttribute PropertyRequest propertyRequest) {
         try {
             return ResponseEntity.status(HttpStatus.CREATED)
@@ -90,7 +113,8 @@ public class PropertyController {
         }
     }
 
-    @PutMapping(path = "/{propertyId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('SELLER')")
+    @PutMapping(path = "/properties/{propertyId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<PropertyResponse>> updateProperty(
             @PathVariable int propertyId,
             @ModelAttribute PropertyRequest propertyRequest) {
@@ -108,7 +132,8 @@ public class PropertyController {
         }
     }
 
-    @GetMapping("/search")
+    @PreAuthorize("hasAnyRole('SELLER', USER)")
+    @GetMapping("/properties/search")
     public ResponseEntity<ApiResponse<PageResponse<?>>> searchProperties(
             @RequestParam Map<String, String> params,
             Pageable pageable
@@ -128,7 +153,8 @@ public class PropertyController {
         }
     }
 
-    @DeleteMapping("/{propertyId}")
+    @PreAuthorize("hasRole('SELLER')")
+    @DeleteMapping("/properties/{propertyId}")
     public ResponseEntity<ApiResponse<Void>> deleteProperty(@PathVariable int propertyId) {
         try {
             propertyService.deleteProperty(propertyId);

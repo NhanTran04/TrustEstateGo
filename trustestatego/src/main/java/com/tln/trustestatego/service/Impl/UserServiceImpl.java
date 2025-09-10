@@ -15,6 +15,7 @@ import com.tln.trustestatego.mapper.UserMapper;
 import com.tln.trustestatego.repository.RoleRepository;
 import com.tln.trustestatego.repository.UserRepository;
 import com.tln.trustestatego.repository.UserRoleRepository;
+import com.tln.trustestatego.service.CurrentUserService;
 import com.tln.trustestatego.service.UserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -48,6 +49,7 @@ public class UserServiceImpl implements UserService {
     UserRoleRepository userRoleRepository;
     Cloudinary cloudinary;
     PageMapper pageMapper;
+    CurrentUserService currentUserService;
 
     public PageResponse<UserResponse> getUsers(String kw, Pageable pageable){
         if(kw != null && !kw.isEmpty()) {
@@ -60,12 +62,15 @@ public class UserServiceImpl implements UserService {
         return pageMapper.toPageResponse(userPage);
     }
 
-
-
     public UserResponse getUserById(int userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
+        return userMapper.toUserResponse(user);
+    }
+
+    public UserResponse getCurrentUser() {
+        User user = currentUserService.getCurrentUser();
         return userMapper.toUserResponse(user);
     }
 
@@ -132,7 +137,7 @@ public class UserServiceImpl implements UserService {
 //        return getUserById(user.getId());
 //    }
 
-    public UserResponse updateUser(int userId, UserUpdateRequest userUpdateRequest) {
+    public UserResponse updateUserFromAdmin(int userId, UserUpdateRequest userUpdateRequest) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
@@ -156,6 +161,54 @@ public class UserServiceImpl implements UserService {
 
             // Gán role mới
             for (Integer roleId : userUpdateRequest.getRoleId()) {
+                if (userUpdateRequest.getGender() != null) user.setGender(userUpdateRequest.getGender());
+                if (userUpdateRequest.getBirthday() != null) user.setBirthday(userUpdateRequest.getBirthday());
+                if (userUpdateRequest.getAvatar() != null && !userUpdateRequest.getAvatar().isEmpty()) {
+                    user.setAvatar(upload(userUpdateRequest.getAvatar()));
+                }
+                Role role = roleRepository.findById(roleId)
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found"));
+
+                UserRole userRole = new UserRole();
+                userRole.setUser(user);
+                userRole.setRole(role);
+                userRoleRepository.save(userRole);
+            }
+        }
+
+        user.setUpdatedAt(LocalDateTime.now());
+        user = userRepository.save(user);
+
+        return userMapper.toUserResponse(user);
+    }
+
+    public UserResponse updateUser(UserUpdateRequest userUpdateRequest) {
+        User user = currentUserService.getCurrentUser();
+        // Map các field cơ bản
+        userMapper.update(user, userUpdateRequest);
+
+        // Cập nhật password nếu có
+        if (userUpdateRequest.getPassword() != null && !userUpdateRequest.getPassword().isBlank()) {
+            user.setPassword(passwordEncoder.encode(userUpdateRequest.getPassword()));
+        }
+
+        // Cập nhật avatar nếu có
+        String image = upload(userUpdateRequest.getAvatar());
+        if (image != null) {
+            user.setAvatar(image);
+        }
+
+        // Cập nhật roles nếu có truyền
+        if (userUpdateRequest.getRoleId() != null && !userUpdateRequest.getRoleId().isEmpty()) {
+            userRoleRepository.deleteByUserId(user.getId());
+
+            // Gán role mới
+            for (Integer roleId : userUpdateRequest.getRoleId()) {
+                if (userUpdateRequest.getGender() != null) user.setGender(userUpdateRequest.getGender());
+                if (userUpdateRequest.getBirthday() != null) user.setBirthday(userUpdateRequest.getBirthday());
+                if (userUpdateRequest.getAvatar() != null && !userUpdateRequest.getAvatar().isEmpty()) {
+                    user.setAvatar(upload(userUpdateRequest.getAvatar()));
+                }
                 Role role = roleRepository.findById(roleId)
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found"));
 

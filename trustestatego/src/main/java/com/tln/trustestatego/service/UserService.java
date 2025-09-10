@@ -12,8 +12,10 @@ import java.util.List;
 public interface UserService {
     PageResponse<UserResponse> getUsers(String kw, Pageable pageable);
     UserResponse getUserById(int userId);
+    UserResponse getCurrentUser();
     UserResponse createUser(UserCreationRequest userCreationRequest);
-    UserResponse updateUser(int userId, UserUpdateRequest userUpdateRequest);
+    UserResponse updateUser(UserUpdateRequest userUpdateRequest);
+    UserResponse updateUserFromAdmin(int userId, UserUpdateRequest userUpdateRequest);
     void deleteUser(int userId);
 }
 

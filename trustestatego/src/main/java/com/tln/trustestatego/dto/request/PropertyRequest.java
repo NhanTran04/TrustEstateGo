@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PropertyRequest {
     int categoryId;
-    int userId;
+//    int userId;
     String title;
     String description;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")

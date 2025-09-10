@@ -1,5 +1,6 @@
 package com.tln.trustestatego.service.Impl;
 
+import com.tln.trustestatego.dto.request.ReviewAdminRequest;
 import com.tln.trustestatego.dto.request.ReviewRequest;
 import com.tln.trustestatego.dto.response.PageResponse;
 import com.tln.trustestatego.dto.response.ReviewResponse;
@@ -14,6 +15,7 @@ import com.tln.trustestatego.mapper.UserMapper;
 import com.tln.trustestatego.repository.PropertyRepository;
 import com.tln.trustestatego.repository.ReviewRepository;
 import com.tln.trustestatego.repository.UserRepository;
+import com.tln.trustestatego.service.CurrentUserService;
 import com.tln.trustestatego.service.ReviewService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +44,7 @@ public class ReviewServiceImpl implements ReviewService {
     PropertyRepository propertyRepository;
     PageMapper pageMapper;
     UserMapper userMapper;
+    CurrentUserService currentUserService;
 
     @Override
     public PageResponse<ReviewResponse> getReviewBySellerId(int sellerId, Pageable pageable) {
@@ -57,14 +60,15 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public PageResponse<ReviewResponse> getReviewByUserId(int buyerId, Pageable pageable) {
+    public PageResponse<ReviewResponse> getReviewByUserId(Pageable pageable) {
+        User user = currentUserService.getCurrentUser();
         Pageable sortPage = PageRequest.of(
                 pageable.getPageNumber(),
                 pageable.getPageSize(),
                 Sort.by(Sort.Direction.DESC, "createdAt")
         );
 
-        Page<ReviewResponse> reviewPage =  reviewRepository.findByBuyer_Id(buyerId, sortPage)
+        Page<ReviewResponse> reviewPage =  reviewRepository.findByBuyer_Id(user.getId(), sortPage)
                 .map(reviewMapper::toReviewResponse);
         return pageMapper.toPageResponse(reviewPage);
     }
@@ -85,14 +89,34 @@ public class ReviewServiceImpl implements ReviewService {
 //    }
 
     @Override
-    public ReviewResponse createReview(ReviewRequest reviewRequest) {
+    public ReviewResponse createReview(ReviewRequest reviewRequest, int propertyId) {
+        User user = currentUserService.getCurrentUser();
         Review review = reviewMapper.toReview(reviewRequest);
 
-        User buyer = userRepository.findById(reviewRequest.getBuyerId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Buyer not found"));
         User seller = userRepository.findById(reviewRequest.getSellerId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Seller not found"));
-        Property property = propertyRepository.findById(reviewRequest.getPropertyId())
+        Property property = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Property not found"));
+
+        review.setCreatedAt(LocalDateTime.now());
+        review.setBuyer(user);
+        review.setSeller(seller);
+        review.setProperty(property);
+        reviewRepository.save(review);
+
+        return reviewMapper.toReviewResponse(review);
+    }
+
+    @Override
+    public ReviewResponse createReviewFromAdmin(ReviewAdminRequest reviewAdminRequest) {
+        User user = currentUserService.getCurrentUser();
+        Review review = reviewMapper.toReview(reviewAdminRequest);
+
+        User buyer = userRepository.findById(user.getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Buyer not found"));
+        User seller = userRepository.findById(reviewAdminRequest.getSellerId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Seller not found"));
+        Property property = propertyRepository.findById(reviewAdminRequest.getPropertyId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Property not found"));
 
         review.setCreatedAt(LocalDateTime.now());

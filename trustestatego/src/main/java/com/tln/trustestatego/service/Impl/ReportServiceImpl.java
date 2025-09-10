@@ -4,11 +4,13 @@ import com.tln.trustestatego.dto.request.ReportUserRequest;
 import com.tln.trustestatego.dto.response.PageResponse;
 import com.tln.trustestatego.dto.response.ReportResponse;
 import com.tln.trustestatego.entity.Report;
+import com.tln.trustestatego.entity.User;
 import com.tln.trustestatego.mapper.PageMapper;
 import com.tln.trustestatego.mapper.ReportMapper;
 import com.tln.trustestatego.repository.PropertyRepository;
 import com.tln.trustestatego.repository.ReportRepository;
 import com.tln.trustestatego.repository.UserRepository;
+import com.tln.trustestatego.service.CurrentUserService;
 import com.tln.trustestatego.service.ReportService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +38,7 @@ public class ReportServiceImpl implements ReportService {
     UserRepository userRepository;
     PropertyRepository propertyRepository;
     PageMapper pageMapper;
+    CurrentUserService currentUserService;
 
     @Override
     public PageResponse<ReportResponse> getReports(String keyword, Pageable pageable) {
@@ -54,22 +57,24 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public PageResponse<ReportResponse> getReportByUserId(int userId, Pageable pageable) {
-        Page<ReportResponse> reportPage = reportRepository.findByUser_Id(userId, pageable).map(reportMapper::toReportResponse);
+    public PageResponse<ReportResponse> getReportByUserId(Pageable pageable) {
+        User user = currentUserService.getCurrentUser();
+        Page<ReportResponse> reportPage = reportRepository.findByUser_Id(user.getId(), pageable).map(reportMapper::toReportResponse);
         return pageMapper.toPageResponse(reportPage);
     }
 
     @Override
-    public ReportResponse createReport(ReportUserRequest reportUserRequest, int userId, int propertyId) {
+    public ReportResponse createReport(ReportUserRequest reportUserRequest, int propertyId) {
+        User user = currentUserService.getCurrentUser();
         boolean exists = reportRepository.existsByUserIdAndPropertyId(
-                userId, propertyId);
+                user.getId(), propertyId);
         if (exists) {
             throw new IllegalStateException("You reported this property");
         }
 
         Report report = reportMapper.toReport(reportUserRequest);
 
-        report.setUser(userRepository.findById(userId)
+        report.setUser(userRepository.findById(user.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")));
         report.setProperty(propertyRepository.findById(propertyId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Property not found")));

@@ -53,6 +53,8 @@ import { Route } from "react-router";
 import { PermissionList } from "./components/permissions/PermissionList";
 import { PermissionEdit } from "./components/permissions/PermissionEdit";
 import { PermissionCreate } from "./components/permissions/PermissionCreate";
+import { authProvider } from "./AuthProvider";
+import LoginPage from "./LoginPage";
 
 // 🌟 Custom Menu
 const MyMenu = () => (
@@ -108,7 +110,7 @@ const MyLayout = (props: any) => <Layout {...props} menu={MyMenu} />;
 // 🌟 Theme
 const theme = createTheme({
   palette: {
-    primary: { main: "#5E35B1" },
+    primary: { main: "#487ff5ff" },
     secondary: { main: "#81b5ecff" },
     background: { default: "#e3eef9ff" },
   },
@@ -128,7 +130,9 @@ const theme = createTheme({
 // 🌟 Main App
 export const App = () => (
   <Admin
+    authProvider={authProvider}
     dataProvider={dataProvider}
+    loginPage={LoginPage}
     title="TrustEstate Admin"
     theme={theme}
     layout={MyLayout} // dùng menu custom

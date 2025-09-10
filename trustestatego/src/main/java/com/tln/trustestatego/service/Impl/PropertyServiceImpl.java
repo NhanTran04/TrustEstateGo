@@ -13,12 +13,14 @@ import com.tln.trustestatego.dto.response.PageResponse;
 import com.tln.trustestatego.dto.response.PropertyResponse;
 import com.tln.trustestatego.entity.Property;
 import com.tln.trustestatego.entity.PropertyImage;
+import com.tln.trustestatego.entity.User;
 import com.tln.trustestatego.mapper.PageMapper;
 import com.tln.trustestatego.mapper.PropertyMapper;
 import com.tln.trustestatego.repository.CategoryRepository;
 import com.tln.trustestatego.repository.PropertyRepository;
 import com.tln.trustestatego.repository.PropertySearchRepository;
 import com.tln.trustestatego.repository.UserRepository;
+import com.tln.trustestatego.service.CurrentUserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -67,6 +69,8 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
     PageMapper pageMapper;
 
     PropertySearchRepository propertySearchRepository;
+
+    CurrentUserService currentUserService;
 
     @Override
     public PageResponse<PropertyResponse> getProperties(Pageable pageable){
@@ -144,7 +148,15 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
 
 
     @Override
-    public PageResponse<PropertyResponse> getPropertyByUserId(int userId, Pageable pageable) {
+    public PageResponse<PropertyResponse> getPropertyByUserId(Pageable pageable) {
+        User user = currentUserService.getCurrentUser();
+        Page<PropertyResponse> propertiesPage = propertyRepository
+                .findByUser_Id(user.getId(), pageable).map(propertyMapper::toPropertyResponse);
+        return pageMapper.toPageResponse(propertiesPage);
+    }
+
+    @Override
+    public PageResponse<PropertyResponse> getPropertyBySellerId(int userId,Pageable pageable) {
         Page<PropertyResponse> propertiesPage = propertyRepository
                 .findByUser_Id(userId, pageable).map(propertyMapper::toPropertyResponse);
         return pageMapper.toPageResponse(propertiesPage);
@@ -162,11 +174,10 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
     @Override
     public PropertyResponse createProperty(PropertyRequest propertyRequest) {
         Property property = propertyMapper.toProperty(propertyRequest);
-
+        User user = currentUserService.getCurrentUser();
         property.setCategory(categoryRepository.findById(propertyRequest.getCategoryId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found")));
-        property.setUser(userRepository.findById(propertyRequest.getUserId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")));
+        property.setUser(user);
         property.setCreatedAt(LocalDateTime.now());
 
         // Xử lý ảnh

@@ -1,5 +1,6 @@
 package com.tln.trustestatego.mapper;
 
+import com.tln.trustestatego.dto.request.ReviewAdminRequest;
 import com.tln.trustestatego.dto.request.ReviewRequest;
 import com.tln.trustestatego.dto.response.ReviewResponse;
 import com.tln.trustestatego.entity.Review;
@@ -9,6 +10,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface ReviewMapper {
     Review toReview(ReviewRequest reviewRequest);
+    Review toReview(ReviewAdminRequest reviewAdminRequest);
     @Mapping(source = "property.id", target = "propertyId")
     @Mapping(source = "property.title", target = "propertyTitle")
     @Mapping(target = "sellerName", expression = "java(review.getSeller().getFirstName() + \" \" + review.getSeller().getLastName())")

@@ -11,22 +11,23 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/reviews")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ReviewController {
     ReviewService reviewService;
 
-    @GetMapping("/users/{buyerId}")
-    public ResponseEntity<ApiResponse<PageResponse<ReviewResponse>>> getReviewByUserId(
-            @PathVariable int buyerId, Pageable pageable){
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/users/reviews")
+    public ResponseEntity<ApiResponse<PageResponse<ReviewResponse>>> getReviewByUserId(Pageable pageable){
         try{
             return ResponseEntity.ok()
                     .body(ApiResponse.<PageResponse<ReviewResponse>>builder()
-                            .result(reviewService.getReviewByUserId(buyerId, pageable))
+                            .result(reviewService.getReviewByUserId(pageable))
                             .build());
         } catch (Exception e) {
             return ResponseEntity.ok()
@@ -37,7 +38,8 @@ public class ReviewController {
         }
     }
 
-    @GetMapping("/{sellerId}")
+    @PreAuthorize("hasAnyRole('SELLER', USER)")
+    @GetMapping("/sellers/{sellerId}/reviews")
     public ResponseEntity<ApiResponse<PageResponse<ReviewResponse>>> getReviewBySellerId(@PathVariable int sellerId, Pageable pageable){
         try{
             return ResponseEntity.ok()
@@ -53,12 +55,13 @@ public class ReviewController {
         }
     }
 
-    @PostMapping
-    public ResponseEntity<ApiResponse<ReviewResponse>> createReview(@RequestBody ReviewRequest reviewRequest){
+    @PreAuthorize("hasRole('USER')")
+    @PostMapping("/properties/{propertyId}/reviews")
+    public ResponseEntity<ApiResponse<ReviewResponse>> createReview(@RequestBody ReviewRequest reviewRequest,@PathVariable int propertyId){
         try{
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(ApiResponse.<ReviewResponse>builder()
-                            .result(reviewService.createReview(reviewRequest))
+                            .result(reviewService.createReview(reviewRequest, propertyId))
                             .build());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -69,20 +72,20 @@ public class ReviewController {
         }
     }
 
-    @DeleteMapping("/{reviewId}")
-    public ResponseEntity<ApiResponse<Void>> deleteReview(@PathVariable int reviewId){
-        try{
-            reviewService.deleteReview(reviewId);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT)
-                    .body(ApiResponse.<Void>builder()
-                            .result(null)
-                            .build());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResponse.<Void>builder()
-                            .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                            .message(e.getMessage())
-                            .build());
-        }
-    }
+//    @DeleteMapping("/{reviewId}")
+//    public ResponseEntity<ApiResponse<Void>> deleteReview(@PathVariable int reviewId){
+//        try{
+//            reviewService.deleteReview(reviewId);
+//            return ResponseEntity.status(HttpStatus.NO_CONTENT)
+//                    .body(ApiResponse.<Void>builder()
+//                            .result(null)
+//                            .build());
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body(ApiResponse.<Void>builder()
+//                            .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
+//                            .message(e.getMessage())
+//                            .build());
+//        }
+//    }
 }

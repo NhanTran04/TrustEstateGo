@@ -1,8 +1,315 @@
-// src/dataProvider.ts
+// // src/dataProvider.ts
+// import simpleRestProvider from "ra-data-simple-rest";
+
+// const apiUrl = import.meta.env.VITE_SIMPLE_REST_URL;
+// const defaultDataProvider = simpleRestProvider(apiUrl);
+
+// export const dataProvider = {
+//   ...defaultDataProvider,
+
+//   // CREATE
+//   create: async (resource: string, params: any) => {
+//     if (resource === "properties") {
+//       const formData = new FormData();
+
+//       Object.entries(params.data).forEach(([key, value]) => {
+//         if (key === "images" && Array.isArray(value)) {
+//           value.forEach((file: any) => {
+//             if (file.rawFile) {
+//               formData.append("images", file.rawFile);
+//             }
+//           });
+//         } else if (value instanceof Date) {
+//           formData.append(key, value.toISOString().slice(0, 19).replace("T", " "));
+//         } else if (value !== null && value !== undefined) {
+//           formData.append(key, String(value));
+//         }
+//       });
+
+//       console.log("Create FormData entries:", Array.from(formData.entries()));
+
+//       const response = await fetch(`${apiUrl}/properties`, {
+//         method: "POST",
+//         body: formData,
+//       });
+
+//       if (!response.ok) {
+//         const text = await response.text();
+//         console.error("Create error:", text);
+//         throw new Error(`Create property failed: ${text}`);
+//       }
+
+//       const data = await response.json();
+//       return { data };
+//     }
+
+//     ///của Create Review
+//     if (resource === "reviews") {
+//       // const sellerId = params.meta?.sellerId;
+//       const { sellerId } = params.meta || {};
+//       if (!sellerId) throw new Error("Missing sellerId in params.meta");
+
+//       const response = await fetch(`${apiUrl}/review-seller/sellers/${sellerId}/reviews`, {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//         body: JSON.stringify(params.data),
+//       });
+
+//       if (!response.ok) {
+//         const text = await response.text();
+//         throw new Error(`Create review failed: ${text}`);
+//       }
+
+//       const data = await response.json();
+//       return { data };
+//     }
+
+//     if (resource === "users") {
+//       const formData = new FormData();
+
+//       Object.entries(params.data).forEach(([key, value]) => {
+//         if (key === "avatar") {
+//           const file = (value as any)?.rawFile;
+//           if (file instanceof File) {
+//             formData.append("avatar", file);
+//           }
+//           return;
+//         }
+
+//         if (key === "birthday" && value instanceof Date) {
+//           formData.append(key, value.toISOString().slice(0, 10)); // yyyy-MM-dd
+//         } else if (value instanceof Date) {
+//           formData.append(key, value.toISOString().slice(0, 19).replace("T", " "));
+//         } else if (value !== null && value !== undefined && value !== "") {
+//           formData.append(key, String(value));
+//         }
+//       });
+
+//       console.log("User FormData entries:", Array.from(formData.entries()));
+
+//       const res = await fetch(`${apiUrl}/users`, {
+//         method: "POST",
+//         body: formData,
+//       });
+
+//       if (!res.ok) throw new Error(await res.text());
+
+//       const data = await res.json();
+//       return { data };
+//     }
+
+//     return defaultDataProvider.create(resource, params);
+//   },
+
+//   update: async (resource: string, params: any) => {
+//     if (resource === "properties") {
+//       console.log("Update params received:", params);
+
+//       // Kiểm tra xem có file mới không
+//       const hasNewImages = params.data.images &&
+//         Array.isArray(params.data.images) &&
+//         params.data.images.some((file: any) => file.rawFile);
+
+//       if (hasNewImages) {
+//         // Có file mới -> dùng FormData và multipart
+//         const formData = new FormData();
+
+//         Object.entries(params.data).forEach(([key, value]) => {
+//           if (key === "images" && Array.isArray(value)) {
+//             value.forEach((file: any) => {
+//               if (file.rawFile) {
+//                 formData.append("images", file.rawFile);
+//               }
+//             });
+//           } else if (value instanceof Date) {
+//             formData.append(key, value.toISOString().slice(0, 19).replace("T", " "));
+//           } else if (value !== null && value !== undefined) {
+//             formData.append(key, String(value));
+//           }
+//         });
+
+//         console.log("Update with FormData entries:", Array.from(formData.entries()));
+
+//         const response = await fetch(`${apiUrl}/properties/${params.id}`, {
+//           method: "PUT",
+//           body: formData,
+//         });
+
+//         if (!response.ok) {
+//           const text = await response.text();
+//           console.error("Update with FormData error:", text);
+//           throw new Error(`Update property failed: ${text}`);
+//         }
+
+//         const data = await response.json();
+//         return { data };
+//       } else {
+//         // Không có file mới -> dùng JSON
+//         const { images, ...dataWithoutImages } = params.data;
+
+//         // Xử lý date fields
+//         Object.keys(dataWithoutImages).forEach(key => {
+//           if (dataWithoutImages[key] instanceof Date) {
+//             dataWithoutImages[key] = dataWithoutImages[key].toISOString().slice(0, 19).replace("T", " ");
+//           }
+//         });
+
+//         console.log("Update without images:", dataWithoutImages);
+
+//         const response = await fetch(`${apiUrl}/properties/${params.id}`, {
+//           method: "PUT",
+//           headers: {
+//             'Content-Type': 'application/json',
+//           },
+//           body: JSON.stringify(dataWithoutImages),
+//         });
+
+//         if (!response.ok) {
+//           const text = await response.text();
+//           console.error("Update without images error:", text);
+//           throw new Error(`Update property failed: ${text}`);
+//         }
+
+//         const data = await response.json();
+//         return { data };
+//       }
+//     }
+
+//     return defaultDataProvider.update(resource, params);
+//   },
+
+//   getList: async (resource: string, params: any) => {
+//     // Sellers list
+//     if (resource === "sellers") {
+//       const query = new URLSearchParams();
+
+//       // keyword search (React-Admin filter gửi trong params.filter)
+//       if (params.filter?.q) {
+//         query.append("keyword", params.filter.q);
+//       }
+
+//       // phân trang
+//       const { page, perPage } = params.pagination;
+//       query.append("page", (page - 1).toString());  // Spring pageable: zero-based
+//       query.append("size", perPage.toString());
+
+//       // // sort
+
+//       // if (params.sort?.field) {
+//       //   query.append("sort", `${params.sort.field},${params.sort.order.toLowerCase()}`);
+//       // }
+
+//       const url = `${apiUrl}/review-seller/sellers?${query.toString()}`;
+
+//       const res = await fetch(url);
+//       if (!res.ok) throw new Error("Failed to fetch sellers");
+
+//       const total = res.headers.get("Content-Range")?.split("/").pop() || "0";
+//       const data = await res.json();
+
+//       return {
+//         data,
+//         total: parseInt(total, 10),
+//       };
+//     }
+
+//     // Reviews of a seller
+//     if (resource === "reviews") {
+//       const sellerId = params.meta?.sellerId;
+//       if (!sellerId) throw new Error("Missing sellerId in params.meta");
+
+//       const { page, perPage } = params.pagination;
+//       const query = new URLSearchParams();
+//       query.append("page", (page - 1).toString());
+//       query.append("size", perPage.toString());
+
+//       const url = `${apiUrl}/review-seller/sellers/${sellerId}/reviews?${query.toString()}`;
+
+//       const res = await fetch(url);
+//       if (!res.ok) throw new Error("Failed to fetch reviews");
+
+//       const total = res.headers.get("Content-Range")?.split("/").pop() || "0";
+//       const data = await res.json();
+
+//       return {
+//         data,
+//         total: parseInt(total, 10),
+//       };
+//     }
+
+//     if (resource === "users" || resource === "permissions") {
+//       const { page, perPage } = params.pagination;
+//       const { field, order } = params.sort;
+
+//       const kw = params.filter?.q || "";
+
+//       // ép mọi giá trị về string
+//       const query = new URLSearchParams({
+//         kw,
+//         page: String(page - 1), // Spring Data dùng 0-based page
+//         size: String(perPage),
+//         sort: `${field},${order.toLowerCase()}`,
+//       });
+
+//       const url = `${apiUrl}/${resource}?${query.toString()}`;
+
+//       const res = await fetch(url, {
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//       });
+
+//       if (!res.ok) throw new Error("Failed to fetch");
+
+//       const json = await res.json();
+//       const total = parseInt(res.headers.get("Content-Range")?.split("/")?.[1] || "0", 10);
+
+//       return {
+//         data: json,
+//         total,
+//       };
+//     }
+
+//     return defaultDataProvider.getList(resource, params);
+//   },
+
+//   getOne: async (resource: string, params: any) => {
+//     if (resource === "reviews") {
+//       const { id, meta } = params;
+//       const sellerId = meta?.sellerId;
+//       if (!sellerId) throw new Error("Missing sellerId in params.meta");
+
+//       const url = `${apiUrl}/review-seller/sellers/${sellerId}/reviews/${id}`;
+//       const res = await fetch(url);
+//       if (!res.ok) throw new Error("Failed to fetch review");
+
+//       const data = await res.json();
+//       return { data };
+//     }
+
+//     if (resource === "roles") {
+//       const res = await fetch(`${apiUrl}/roles/${params.id}`);
+//       if (!res.ok) throw new Error("Failed to fetch role");
+
+//       const data = await res.json();
+//       if (Array.isArray(data.permissions)) {
+//         data.permissions = data.permissions.map((p: any) =>
+//           typeof p === "object" ? p.id : p
+//         );
+//       }
+//       return { data };
+//     }
+
+//     return defaultDataProvider.getOne(resource, params);
+//   },
+// };
 import simpleRestProvider from "ra-data-simple-rest";
+import { httpClient } from "./HttpClient";
 
 const apiUrl = import.meta.env.VITE_SIMPLE_REST_URL;
-const defaultDataProvider = simpleRestProvider(apiUrl);
+const defaultDataProvider = simpleRestProvider(apiUrl, httpClient);
 
 export const dataProvider = {
   ...defaultDataProvider,
@@ -26,61 +333,71 @@ export const dataProvider = {
         }
       });
 
-      console.log("Create FormData entries:", Array.from(formData.entries()));
-
-      const response = await fetch(`${apiUrl}/properties`, {
+      const response = await httpClient(`${apiUrl}/properties`, {
         method: "POST",
         body: formData,
       });
 
-      if (!response.ok) {
-        const text = await response.text();
-        console.error("Create error:", text);
-        throw new Error(`Create property failed: ${text}`);
-      }
-
-      const data = await response.json();
-      return { data };
+      return { data: response.json };
     }
 
-    ///của Create Review
     if (resource === "reviews") {
-      // const sellerId = params.meta?.sellerId;
       const { sellerId } = params.meta || {};
       if (!sellerId) throw new Error("Missing sellerId in params.meta");
 
-      const response = await fetch(`${apiUrl}/review-seller/sellers/${sellerId}/reviews`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(params.data),
-      });
+      const response = await httpClient(
+        `${apiUrl}/review-seller/sellers/${sellerId}/reviews`,
+        {
+          method: "POST",
+          headers: new Headers({ "Content-Type": "application/json" }),
+          body: JSON.stringify(params.data),
+        }
+      );
 
-      if (!response.ok) {
-        const text = await response.text();
-        throw new Error(`Create review failed: ${text}`);
-      }
-
-      const data = await response.json();
-      return { data };
+      return { data: response.json };
     }
 
+    if (resource === "users") {
+      const formData = new FormData();
+
+      Object.entries(params.data).forEach(([key, value]) => {
+        if (key === "avatar") {
+          const file = (value as any)?.rawFile;
+          if (file instanceof File) {
+            formData.append("avatar", file);
+          }
+          return;
+        }
+
+        if (key === "birthday" && value instanceof Date) {
+          formData.append(key, value.toISOString().slice(0, 10));
+        } else if (value instanceof Date) {
+          formData.append(key, value.toISOString().slice(0, 19).replace("T", " "));
+        } else if (value !== null && value !== undefined && value !== "") {
+          formData.append(key, String(value));
+        }
+      });
+
+      const response = await httpClient(`${apiUrl}/users`, {
+        method: "POST",
+        body: formData,
+      });
+
+      return { data: response.json };
+    }
 
     return defaultDataProvider.create(resource, params);
   },
 
+  // UPDATE
   update: async (resource: string, params: any) => {
     if (resource === "properties") {
-      console.log("Update params received:", params);
-
-      // Kiểm tra xem có file mới không
-      const hasNewImages = params.data.images &&
+      const hasNewImages =
+        params.data.images &&
         Array.isArray(params.data.images) &&
         params.data.images.some((file: any) => file.rawFile);
 
       if (hasNewImages) {
-        // Có file mới -> dùng FormData và multipart
         const formData = new FormData();
 
         Object.entries(params.data).forEach(([key, value]) => {
@@ -97,92 +414,65 @@ export const dataProvider = {
           }
         });
 
-        console.log("Update with FormData entries:", Array.from(formData.entries()));
-
-        const response = await fetch(`${apiUrl}/properties/${params.id}`, {
+        const response = await httpClient(`${apiUrl}/properties/${params.id}`, {
           method: "PUT",
           body: formData,
         });
 
-        if (!response.ok) {
-          const text = await response.text();
-          console.error("Update with FormData error:", text);
-          throw new Error(`Update property failed: ${text}`);
-        }
-
-        const data = await response.json();
-        return { data };
+        return { data: response.json };
       } else {
-        // Không có file mới -> dùng JSON
         const { images, ...dataWithoutImages } = params.data;
 
-        // Xử lý date fields
-        Object.keys(dataWithoutImages).forEach(key => {
+        Object.keys(dataWithoutImages).forEach((key) => {
           if (dataWithoutImages[key] instanceof Date) {
-            dataWithoutImages[key] = dataWithoutImages[key].toISOString().slice(0, 19).replace("T", " ");
+            dataWithoutImages[key] = dataWithoutImages[key]
+              .toISOString()
+              .slice(0, 19)
+              .replace("T", " ");
           }
         });
 
-        console.log("Update without images:", dataWithoutImages);
-
-        const response = await fetch(`${apiUrl}/properties/${params.id}`, {
+        const response = await httpClient(`${apiUrl}/properties/${params.id}`, {
           method: "PUT",
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: new Headers({ "Content-Type": "application/json" }),
           body: JSON.stringify(dataWithoutImages),
         });
 
-        if (!response.ok) {
-          const text = await response.text();
-          console.error("Update without images error:", text);
-          throw new Error(`Update property failed: ${text}`);
-        }
-
-        const data = await response.json();
-        return { data };
+        return { data: response.json };
       }
     }
 
     return defaultDataProvider.update(resource, params);
   },
 
+  // GET LIST
   getList: async (resource: string, params: any) => {
-    // Sellers list
     if (resource === "sellers") {
       const query = new URLSearchParams();
 
-      // keyword search (React-Admin filter gửi trong params.filter)
       if (params.filter?.q) {
         query.append("keyword", params.filter.q);
       }
 
-      // phân trang
       const { page, perPage } = params.pagination;
-      query.append("page", (page - 1).toString());  // Spring pageable: zero-based
+      query.append("page", (page - 1).toString());
       query.append("size", perPage.toString());
-
-      // // sort
-
-      // if (params.sort?.field) {
-      //   query.append("sort", `${params.sort.field},${params.sort.order.toLowerCase()}`);
-      // }
 
       const url = `${apiUrl}/review-seller/sellers?${query.toString()}`;
 
-      const res = await fetch(url);
-      if (!res.ok) throw new Error("Failed to fetch sellers");
+      const response = await httpClient(url);
 
-      const total = res.headers.get("Content-Range")?.split("/").pop() || "0";
-      const data = await res.json();
+      const total = response.headers
+        .get("Content-Range")
+        ?.split("/")
+        .pop() || "0";
 
       return {
-        data,
+        data: response.json,
         total: parseInt(total, 10),
       };
     }
 
-    // Reviews of a seller
     if (resource === "reviews") {
       const sellerId = params.meta?.sellerId;
       if (!sellerId) throw new Error("Missing sellerId in params.meta");
@@ -194,14 +484,15 @@ export const dataProvider = {
 
       const url = `${apiUrl}/review-seller/sellers/${sellerId}/reviews?${query.toString()}`;
 
-      const res = await fetch(url);
-      if (!res.ok) throw new Error("Failed to fetch reviews");
+      const response = await httpClient(url);
 
-      const total = res.headers.get("Content-Range")?.split("/").pop() || "0";
-      const data = await res.json();
+      const total = response.headers
+        .get("Content-Range")
+        ?.split("/")
+        .pop() || "0";
 
       return {
-        data,
+        data: response.json,
         total: parseInt(total, 10),
       };
     }
@@ -212,29 +503,26 @@ export const dataProvider = {
 
       const kw = params.filter?.q || "";
 
-      // ép mọi giá trị về string
       const query = new URLSearchParams({
         kw,
-        page: String(page - 1), // Spring Data dùng 0-based page
+        page: String(page - 1),
         size: String(perPage),
         sort: `${field},${order.toLowerCase()}`,
       });
 
       const url = `${apiUrl}/${resource}?${query.toString()}`;
 
-      const res = await fetch(url, {
-        headers: {
-          "Content-Type": "application/json",
-        },
+      const response = await httpClient(url, {
+        headers: new Headers({ "Content-Type": "application/json" }),
       });
 
-      if (!res.ok) throw new Error("Failed to fetch");
-
-      const json = await res.json();
-      const total = parseInt(res.headers.get("Content-Range")?.split("/")?.[1] || "0", 10);
+      const total = parseInt(
+        response.headers.get("Content-Range")?.split("/")?.[1] || "0",
+        10
+      );
 
       return {
-        data: json,
+        data: response.json,
         total,
       };
     }
@@ -242,6 +530,7 @@ export const dataProvider = {
     return defaultDataProvider.getList(resource, params);
   },
 
+  // GET ONE
   getOne: async (resource: string, params: any) => {
     if (resource === "reviews") {
       const { id, meta } = params;
@@ -249,10 +538,20 @@ export const dataProvider = {
       if (!sellerId) throw new Error("Missing sellerId in params.meta");
 
       const url = `${apiUrl}/review-seller/sellers/${sellerId}/reviews/${id}`;
-      const res = await fetch(url);
-      if (!res.ok) throw new Error("Failed to fetch review");
+      const response = await httpClient(url);
 
-      const data = await res.json();
+      return { data: response.json };
+    }
+
+    if (resource === "roles") {
+      const response = await httpClient(`${apiUrl}/roles/${params.id}`);
+
+      let data = response.json;
+      if (Array.isArray(data.permissions)) {
+        data.permissions = data.permissions.map((p: any) =>
+          typeof p === "object" ? p.id : p
+        );
+      }
       return { data };
     }
 

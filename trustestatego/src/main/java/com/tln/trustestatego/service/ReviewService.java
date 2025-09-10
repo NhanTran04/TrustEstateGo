@@ -1,5 +1,6 @@
 package com.tln.trustestatego.service;
 
+import com.tln.trustestatego.dto.request.ReviewAdminRequest;
 import com.tln.trustestatego.dto.request.ReviewRequest;
 import com.tln.trustestatego.dto.response.PageResponse;
 import com.tln.trustestatego.dto.response.ReviewResponse;
@@ -12,9 +13,10 @@ import java.util.List;
 
 public interface ReviewService {
     PageResponse<ReviewResponse> getReviewBySellerId(int sellerId, Pageable pageable);
-    PageResponse<ReviewResponse> getReviewByUserId(int userId, Pageable pageable);
+    PageResponse<ReviewResponse> getReviewByUserId(Pageable pageable);
     Page<SellerReviewResponse> getSellerReviews(String keyword, Pageable pageable);
-    ReviewResponse createReview(ReviewRequest reviewRequest);
+    ReviewResponse createReview(ReviewRequest reviewRequest, int propertyId);
+    ReviewResponse createReviewFromAdmin(ReviewAdminRequest reviewAdminRequest);
     //ReviewResponse updateReview(int reviewId, ReviewRequest reviewRequest);
     void deleteReview(int reviewId);
 }
