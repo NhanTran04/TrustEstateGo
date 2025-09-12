@@ -1,0 +1,102 @@
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Home, Mail, Phone, MapPin } from 'lucide-react';
+
+const Footer = () => {
+  const navigate = useNavigate();
+
+  return (
+    <footer className="bg-dark text-light py-5 mt-5">
+      <div className="container">
+        <div className="row g-4">
+          <div className="col-lg-4">
+            <div className="d-flex align-items-center mb-4">
+              <div className="bg-primary rounded-3 p-2 me-3">
+                <Home size={32} className="text-white" />
+              </div>
+              <h4 className="text-primary fw-bold mb-0">TrustEstateGo</h4>
+            </div>
+            <p className="mb-4 opacity-75">
+              Nền tảng bất động sản hàng đầu Việt Nam, kết nối hàng triệu người với ngôi nhà mơ ước.
+              Uy tín - Chất lượng - Minh bạch.
+            </p>
+            <div className="d-flex gap-3">
+              <a href="#" className="btn btn-outline-light rounded-circle" style={{ width: '44px', height: '44px' }}>
+                <i className="fab fa-facebook-f"></i>
+              </a>
+              <a href="#" className="btn btn-outline-light rounded-circle" style={{ width: '44px', height: '44px' }}>
+                <i className="fab fa-youtube"></i>
+              </a>
+              <a href="#" className="btn btn-outline-light rounded-circle" style={{ width: '44px', height: '44px' }}>
+                <i className="fab fa-zalo"></i>
+              </a>
+            </div>
+          </div>
+
+          <div className="col-lg-2 col-md-3">
+            <h6 className="text-warning fw-bold mb-3">Dành cho khách hàng</h6>
+            <ul className="list-unstyled">
+              {[
+                { label: 'Mua bán', path: '/properties' },
+                { label: 'Cho thuê', path: '/rentals' },
+              ].map(item => (
+                <li key={item.path} className="mb-2">
+                  <button
+                    className="btn btn-link text-light p-0 text-decoration-none opacity-75 hover-opacity-100"
+                    onClick={() => navigate(item.path)}
+                  >
+                    {item.label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="col-lg-2 col-md-3">
+            <h6 className="text-warning fw-bold mb-3">Dành cho chủ nhà</h6>
+            <ul className="list-unstyled">
+              <li className="mb-2"><a href="#" className="text-light text-decoration-none opacity-75 hover-opacity-100">Đăng tin</a></li>
+              <li className="mb-2"><a href="#" className="text-light text-decoration-none opacity-75 hover-opacity-100">Gói dịch vụ</a></li>
+              <li className="mb-2"><a href="#" className="text-light text-decoration-none opacity-75 hover-opacity-100">Quản lý tin</a></li>
+              <li className="mb-2"><a href="#" className="text-light text-decoration-none opacity-75 hover-opacity-100">Báo cáo</a></li>
+            </ul>
+          </div>
+
+          <div className="col-lg-2 col-md-3">
+            <h6 className="text-warning fw-bold mb-3">Hỗ trợ</h6>
+            <ul className="list-unstyled">
+              <li className="mb-2"><a href="#" className="text-light text-decoration-none opacity-75 hover-opacity-100">Về chúng tôi</a></li>
+              <li className="mb-2"><a href="#" className="text-light text-decoration-none opacity-75 hover-opacity-100">Liên hệ</a></li>
+              <li className="mb-2"><a href="#" className="text-light text-decoration-none opacity-75 hover-opacity-100">Điều khoản</a></li>
+              <li className="mb-2"><a href="#" className="text-light text-decoration-none opacity-75 hover-opacity-100">Bảo mật</a></li>
+            </ul>
+          </div>
+
+          <div className="col-lg-2 col-md-3">
+            <h6 className="text-warning fw-bold mb-3">Liên hệ</h6>
+            <div className="mb-3">
+              <div className="d-flex align-items-center mb-2">
+                <Mail size={16} className="me-2 text-primary" />
+                <small>info@trustestatego.vn</small>
+              </div>
+              <div className="d-flex align-items-center mb-2">
+                <Phone size={16} className="me-2 text-primary" />
+                <small>1900 xxxx</small>
+              </div>
+              <div className="d-flex align-items-center">
+                <MapPin size={16} className="me-2 text-primary" />
+                <small>TP. Hồ Chí Minh, Việt Nam</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <hr className="my-4 opacity-25" />
+
+
+      </div>
+    </footer>
+  );
+};
+
+export default Footer;
