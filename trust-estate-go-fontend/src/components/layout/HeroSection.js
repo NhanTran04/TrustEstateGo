@@ -1,9 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Search, CheckCircle } from 'lucide-react';
 import { useProperty } from '../../contexts/PropertyContext';
+import { useNavigate } from 'react-router-dom';
 
 const HeroSection = () => {
     const { setSearchQuery } = useProperty();
+    const navigate = useNavigate();
+    const [localSearchQuery, setLocalSearchQuery] = useState('');
+
+    const handleSearch = () => {
+        setSearchQuery(localSearchQuery);
+        navigate('/properties');
+    };
+
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            handleSearch();
+        }
+    };
 
     return (
         <section className="hero-section d-flex align-items-center p-3"
@@ -56,13 +70,18 @@ const HeroSection = () => {
                                             type="text"
                                             className="form-control border-0 shadow-none"
                                             placeholder="Nhập tên dự án, địa điểm bạn muốn tìm..."
-                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            value={localSearchQuery}
+                                            onChange={(e) => setLocalSearchQuery(e.target.value)}
+                                            onKeyPress={handleKeyPress}
                                             style={{ fontSize: '1rem' }}
                                         />
                                     </div>
                                 </div>
                                 <div className="col-md-4">
-                                    <button className="btn btn-warning btn-lg w-100 fw-bold rounded-pill">
+                                    <button
+                                        className="btn btn-warning btn-lg w-100 fw-bold rounded-pill"
+                                        onClick={handleSearch}
+                                    >
                                         <Search size={18} className="me-2" />
                                         Tìm kiếm ngay
                                     </button>

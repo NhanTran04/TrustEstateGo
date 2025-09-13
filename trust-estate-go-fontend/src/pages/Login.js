@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { User, Lock, Eye, EyeOff } from 'lucide-react';
 import useAuth from '../hooks/useAuth';
+import { api, endpoints } from '../services/api';
 
 const Login = () => {
     const [formData, setFormData] = useState({
@@ -20,24 +21,15 @@ const Login = () => {
         setError('');
 
         try {
-            // Giả lập API call
-            setTimeout(() => {
-                const userData = {
-                    id: 1,
-                    firstName: 'Nguyen',
-                    lastName: 'Van A',
-                    email: 'user@example.com',
-                    phone: '0901234567',
-                    roles: [{ name: 'USER' }]
-                };
-                const token = 'mock-jwt-token-' + Date.now();
-
-                login(userData, token);
-                setLoading(false);
+            const result = await login(formData);
+            if (result.success) {
                 navigate('/');
-            }, 1000);
+            } else {
+                setError(result.error);
+            }
         } catch (err) {
-            setError('Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.');
+            setError('Đăng nhập thất bại. Vui lòng thử lại.');
+        } finally {
             setLoading(false);
         }
     };

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Building, Award, Users, Globe } from 'lucide-react';
 import PropertyCard from '../components/PropertyCard';
@@ -6,11 +6,28 @@ import PropertyCard from '../components/PropertyCard';
 import { mockProperties } from '../data/mockData';
 import { useProperty } from '../contexts/PropertyContext';
 import HeroSection from '../components/layout/HeroSection';
-import CategoriesSection from '../components/layout/CategoriesSection';
+import { authApi, endpoints } from '../services/api';
+import PropertyTypeSection from '../components/layout/PropertyTypeSection';
 
 const Home = () => {
     const navigate = useNavigate();
-    const { handleSaveProperty, savedProperties, setSearchQuery, setSelectedCategory } = useProperty();
+    const { handleSaveProperty, savedProperties, setSearchQuery, setSelectedCategory, properties } = useProperty();
+    const [featuredProperties, setFeaturedProperties] = useState([]);
+    const [stats, setStats] = useState({
+        totalProperties: 0,
+        successfulTransactions: 0,
+        partners: 0
+    });
+
+    useEffect(() => {
+        // Lấy featured properties (6 properties đầu tiên)
+        if (Array.isArray(properties)) {
+            const featured = properties.slice(0, 6);
+            setFeaturedProperties(featured);
+        } else {
+            setFeaturedProperties([]);
+        }
+    }, [properties]);
 
     return (
         <div>
@@ -29,7 +46,7 @@ const Home = () => {
             {/* Hero Section */}
             <HeroSection setSearchQuery={setSearchQuery} />
 
-            {/* Stats Section */}
+            {/* Stats Section - sử dụng data từ API */}
             <div className="container py-5">
                 <div className="row g-4">
                     {[
@@ -57,7 +74,7 @@ const Home = () => {
             </div>
 
             {/* Categories Section */}
-            <CategoriesSection setSelectedCategory={setSelectedCategory} />
+            <PropertyTypeSection />
 
             {/* Featured Properties Section */}
             <div className="container py-5">
@@ -66,7 +83,7 @@ const Home = () => {
                     <p className="text-muted fs-5">Những lựa chọn hàng đầu được khách hàng yêu thích nhất</p>
                 </div>
                 <div className="row">
-                    {mockProperties.slice(0, 6).map(property => (
+                    {featuredProperties.map(property => (
                         <PropertyCard
                             key={property.id}
                             property={property}

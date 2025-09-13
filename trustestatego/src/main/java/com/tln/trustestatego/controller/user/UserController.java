@@ -24,7 +24,7 @@ public class UserController {
     UserService userService;
 
     @PreAuthorize("hasAnyRole('SELLER', USER)")
-    @GetMapping
+    @GetMapping("/current-user")
     public ResponseEntity<ApiResponse<UserResponse>> getCurrentUser() {
         try {
             return ResponseEntity.ok(

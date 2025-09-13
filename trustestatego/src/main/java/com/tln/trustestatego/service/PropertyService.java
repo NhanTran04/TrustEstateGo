@@ -4,6 +4,7 @@ import com.tln.trustestatego.document.PropertyDocument;
 import com.tln.trustestatego.dto.request.PropertyRequest;
 import com.tln.trustestatego.dto.response.PageResponse;
 import com.tln.trustestatego.dto.response.PropertyResponse;
+import com.tln.trustestatego.dto.response.PropertyTypeResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -21,4 +22,6 @@ public interface PropertyService {
                                            PropertyRequest propertyRequest);
     PageResponse<PropertyDocument> searchProperty(Map<String, String> params, Pageable pageable);
     void deleteProperty(int propertyId);
+    List<PropertyTypeResponse> getAllPropertyTypes();
+
 }

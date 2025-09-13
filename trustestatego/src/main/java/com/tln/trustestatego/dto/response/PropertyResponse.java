@@ -22,12 +22,15 @@ public class PropertyResponse {
     String categoryName;
     String title;
     String description;
+    Integer area;
+    Integer bedroom;
+    String interior;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     LocalDateTime expireAt;
     BigDecimal price;
     String location;
     Boolean isActive;
-    String propertyType;
+    PropertyTypeResponse propertyType;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     LocalDateTime createdAt;
     List<String> images;

@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { PropertyProvider, useProperty } from './contexts/PropertyContext';
-import { mockProperties } from './data/mockData';
 import Home from './pages/Home';
 import Properties from './pages/Properties';
 import Rentals from './pages/Rentals';
@@ -13,20 +12,44 @@ import Register from './pages/Register';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import useAuth from './hooks/useAuth';
+import PropertyDetail from './pages/PropertyDetail';
 
-// Protected Route Component
 const ProtectedRoute = ({ children }) => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  if (loading) {
+    return (
+      <div className="min-vh-100 d-flex align-items-center justify-content-center">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
+  }
   return user ? children : <Navigate to="/login" />;
 };
 
-// App Content Component
 const AppContent = () => {
-  const { setProperties } = useProperty();
+  const { loading, error } = useProperty();
 
-  useEffect(() => {
-    setProperties(mockProperties);
-  }, [setProperties]);
+  if (loading) {
+    return (
+      <div className="min-vh-100 d-flex align-items-center justify-content-center">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-vh-100 d-flex align-items-center justify-content-center">
+        <div className="alert alert-danger">
+          {error}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-vh-100" style={{ backgroundColor: '#f8f9ff' }}>
@@ -37,6 +60,7 @@ const AppContent = () => {
         <Route path="/rentals" element={<Rentals />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/property/:id" element={<PropertyDetail />} />
         <Route path="/saved" element={
           <ProtectedRoute>
             <Saved />
@@ -54,7 +78,6 @@ const AppContent = () => {
   );
 };
 
-// Main App Component
 function App() {
   return (
     <Router>

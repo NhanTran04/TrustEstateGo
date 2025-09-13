@@ -11,9 +11,11 @@ import com.tln.trustestatego.document.PropertyDocument;
 import com.tln.trustestatego.dto.request.PropertyRequest;
 import com.tln.trustestatego.dto.response.PageResponse;
 import com.tln.trustestatego.dto.response.PropertyResponse;
+import com.tln.trustestatego.dto.response.PropertyTypeResponse;
 import com.tln.trustestatego.entity.Property;
 import com.tln.trustestatego.entity.PropertyImage;
 import com.tln.trustestatego.entity.User;
+import com.tln.trustestatego.enums.PropertyType;
 import com.tln.trustestatego.mapper.PageMapper;
 import com.tln.trustestatego.mapper.PropertyMapper;
 import com.tln.trustestatego.repository.CategoryRepository;
@@ -46,6 +48,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -71,6 +74,7 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
     PropertySearchRepository propertySearchRepository;
 
     CurrentUserService currentUserService;
+
 
     @Override
     public PageResponse<PropertyResponse> getProperties(Pageable pageable){
@@ -145,7 +149,11 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
         );
     }
 
-
+    public List<PropertyTypeResponse> getAllPropertyTypes() {
+        return Arrays.stream(PropertyType.values())
+                .map(propertyMapper::toPropertyTypeResponse)
+                .collect(Collectors.toList());
+    }
 
     @Override
     public PageResponse<PropertyResponse> getPropertyByUserId(Pageable pageable) {

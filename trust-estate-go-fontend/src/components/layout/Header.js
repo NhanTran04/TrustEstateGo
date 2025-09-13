@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Home, Plus, User, Bell, LogOut, Building, X, Menu } from 'lucide-react';
 import useAuth from '../../hooks/useAuth';
+import { api, endpoints } from '../../services/api';
 
 const Header = () => {
     const { user, logout } = useAuth();
@@ -9,16 +10,50 @@ const Header = () => {
     const location = useLocation();
     const [showMobileMenu, setShowMobileMenu] = useState(false);
     const [showUserDropdown, setShowUserDropdown] = useState(false);
+    const [category, setCategory] = useState([]);
+
+    useEffect(() => {
+        getCategories();
+    }, [])
+
+    const getCategories = async () => {
+        try {
+            const res = await api.get(endpoints.categories)
+            setCategory(res.data.result)
+        } catch (error) {
+            console.error('Error fetching category:', error);
+        }
+    }
+
 
     const getCurrentPage = () => {
         const path = location.pathname;
         if (path === '/') return 'home';
-        if (path === '/properties') return 'properties';
-        if (path === '/rentals') return 'rentals';
+        if (path.startsWith('/category/')) return 'category';
         if (path === '/saved') return 'saved';
         if (path === '/profile') return 'profile';
         return 'home';
     };
+
+    const handleCategoryClick = (categoryId, categoryName) => {
+        navigate(`/category/${categoryId}`, {
+            state: { categoryName }
+        });
+        setShowMobileMenu(false);
+    };
+
+    // const logout = async () => {
+    //     try {
+    //         await authApi().post('/auth/logout');
+    //     } catch (err) {
+    //         console.error('Error logging out:', err);
+    //     } finally {
+    //         localStorage.removeItem("token");
+    //         localStorage.removeItem("user");
+    //         setUser(null);
+    //         navigate('/');
+    //     }
+    // };
 
     const currentPage = getCurrentPage();
 
@@ -166,3 +201,4 @@ const Header = () => {
 };
 
 export default Header;
+

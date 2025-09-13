@@ -22,7 +22,7 @@ public class ReportController {
     ReportService reportService;
 
     @PreAuthorize("hasRole('USER')")
-    @GetMapping("/users/reports")
+    @GetMapping("/reports")
     public ResponseEntity<ApiResponse<PageResponse<ReportResponse>>> getReportByUserId(@PathVariable int userId, Pageable pageable){
         try{
             return ResponseEntity.ok()

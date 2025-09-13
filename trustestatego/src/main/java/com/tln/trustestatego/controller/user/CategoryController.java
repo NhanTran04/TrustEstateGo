@@ -21,7 +21,6 @@ import java.util.List;
 public class CategoryController {
     CategoryService categoryService;
 
-    @PreAuthorize("hasRole('USER')")
     @GetMapping
     public ResponseEntity<ApiResponse<List<CategoryResponse>>> getCategories() {
         try {

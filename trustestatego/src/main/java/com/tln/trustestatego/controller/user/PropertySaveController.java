@@ -24,7 +24,7 @@ public class PropertySaveController {
     CurrentUserService currentUserService;
 
     @PreAuthorize("hasRole('USER')")
-    @GetMapping("/users/property-save")
+    @GetMapping("/property-save")
     ResponseEntity<ApiResponse<List<PropertySaveResponse>>> getPropertySavesByUserId(){
         try{
             return ResponseEntity
@@ -42,7 +42,7 @@ public class PropertySaveController {
     }
 
     @PreAuthorize("hasRole('USER')")
-    @PostMapping("/users/properties/{propertyId}")
+    @PostMapping("/properties/{propertyId}")
     ResponseEntity<ApiResponse<Void>> togglePropertySave(@PathVariable(value = "propertyId") int propertyId) {
         try {
             proSaveService.togglePropertySave(propertyId);

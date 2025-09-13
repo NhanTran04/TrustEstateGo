@@ -3,6 +3,7 @@ package com.tln.trustestatego.dto.request;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.tln.trustestatego.entity.Category;
 import com.tln.trustestatego.entity.User;
+import com.tln.trustestatego.enums.PropertyType;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -27,6 +28,9 @@ public class PropertyRequest {
     BigDecimal price;
     String location;
     Boolean isActive;
-    String propertyType;
+    PropertyType propertyType;
     MultipartFile[] images;
+    Integer area;
+    Integer bedroom;
+    String interior;
 }

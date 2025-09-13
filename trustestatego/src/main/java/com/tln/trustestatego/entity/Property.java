@@ -1,6 +1,7 @@
 package com.tln.trustestatego.entity;
 
 import com.tln.trustestatego.elasticsearch.PropertyElasticListener;
+import com.tln.trustestatego.enums.PropertyType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -53,8 +54,18 @@ public class Property {
     @Column(name = "is_active")
     private Boolean isActive;
 
-    @Column(name = "property_type", length = 100)
-    private String propertyType;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "property_type", length = 50)
+    private PropertyType propertyType;
+
+    @Column(name = "area")
+    private Integer area;
+
+    @Column(name = "bedroom")
+    private Integer bedroom;
+
+    @Column(name = "interior", length = 255)
+    private String interior;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

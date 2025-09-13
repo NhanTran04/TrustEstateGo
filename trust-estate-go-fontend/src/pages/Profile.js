@@ -1,22 +1,46 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { User, Shield, Camera, CheckCircle, Star, MessageCircle, Bell, Award, Edit } from 'lucide-react';
 import useAuth from '../hooks/useAuth';
+import { authApi, endpoints } from '../services/api';
 
 const Profile = () => {
     const { user } = useAuth();
     const [editing, setEditing] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
-        firstName: user?.firstName || '',
-        lastName: user?.lastName || '',
-        email: user?.email || '',
-        phone: user?.phone || '',
-        address: user?.address || '',
-        birthday: user?.birthday || ''
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        address: '',
+        birthday: ''
     });
 
-    const handleSave = () => {
-        alert('Cập nhật thông tin thành công!');
-        setEditing(false);
+    useEffect(() => {
+        if (user) {
+            setFormData({
+                firstName: user.firstName || '',
+                lastName: user.lastName || '',
+                email: user.email || '',
+                phone: user.phone || '',
+                address: user.address || '',
+                birthday: user.birthday || ''
+            });
+        }
+    }, [user]);
+
+    const handleSave = async () => {
+        setLoading(true);
+        try {
+            const response = await authApi().put(`${endpoints.users}/${user.id}`, formData); // SỬA userData THÀNH formData
+            setFormData(response.data);
+            setEditing(false);
+            alert('Cập nhật thông tin thành công!');
+        } catch (err) {
+            alert('Có lỗi xảy ra khi cập nhật thông tin');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (

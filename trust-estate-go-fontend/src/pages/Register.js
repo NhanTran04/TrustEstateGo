@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { User, Mail, Phone, Lock, Eye, EyeOff, Shield } from 'lucide-react';
 import useAuth from '../hooks/useAuth';
+import { api, endpoints } from '../services/api';
 
 const Register = () => {
     const [formData, setFormData] = useState({
@@ -33,24 +34,15 @@ const Register = () => {
         }
 
         try {
-            // Giả lập API call
-            setTimeout(() => {
-                const userData = {
-                    id: 1,
-                    firstName: formData.firstName,
-                    lastName: formData.lastName,
-                    email: formData.email,
-                    phone: formData.phone,
-                    roles: [{ name: formData.userType }]
-                };
-                const token = 'mock-jwt-token-' + Date.now();
+            const response = await api.post(endpoints.register, formData);
+            const { token, ...userData } = response.data;
 
-                login(userData, token);
-                setLoading(false);
-                navigate('/');
-            }, 1000);
+            login(userData, token);
+            navigate('/');
         } catch (err) {
-            setError('Đăng ký thất bại. Vui lòng thử lại.');
+            const errorMessage = err.response?.data?.message || 'Đăng ký thất bại. Vui lòng thử lại.';
+            setError(errorMessage);
+        } finally {
             setLoading(false);
         }
     };

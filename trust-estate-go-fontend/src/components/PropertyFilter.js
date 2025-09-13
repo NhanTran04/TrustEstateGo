@@ -1,8 +1,38 @@
 import React, { useState } from 'react';
 import { Filter, Search } from 'lucide-react';
+import { useProperty } from '../contexts/PropertyContext';
 
-const PropertyFilter = ({ searchQuery, setSearchQuery, selectedCategory, setSelectedCategory }) => {
+const PropertyFilter = ({ searchQuery,
+    setSearchQuery,
+    selectedCategory,
+    setSelectedCategory,
+    selectedPropertyType,
+    setSelectedPropertyType,
+    onFilterChange }) => {
     const [showAdvanced, setShowAdvanced] = useState(false);
+    const [filters, setFilters] = useState({
+        priceRange: '',
+        areaRange: '',
+        bedrooms: '',
+        bathrooms: '',
+        direction: '',
+        constructionYear: ''
+    });
+
+    const { refetchProperties } = useProperty();
+
+    const handleFilterChange = (filterType, value) => {
+        setFilters(prev => ({ ...prev, [filterType]: value }));
+    };
+
+    const applyFilters = async () => {
+        // Gọi API với các filters
+        try {
+            await refetchProperties(); // Giả sử context đã xử lý filters
+        } catch (err) {
+            console.error('Error applying filters:', err);
+        }
+    };
 
     return (
         <div className="card border-0 shadow-lg rounded-4 mb-5">
@@ -36,11 +66,11 @@ const PropertyFilter = ({ searchQuery, setSearchQuery, selectedCategory, setSele
                         </div>
                     </div>
 
-                    <div className="col-md-2">
+                    {/* <div className="col-md-2">
                         <select
                             className="form-select border-0 bg-light"
-                            value={selectedCategory}
-                            onChange={(e) => setSelectedCategory(e.target.value)}
+                            value={selectedPropertyType}
+                            onChange={(e) => setSelectedPropertyType(e.target.value)}
                         >
                             <option value="">Tất cả loại hình</option>
                             <option value="Chung cư">🏢 Chung cư</option>
@@ -48,7 +78,7 @@ const PropertyFilter = ({ searchQuery, setSearchQuery, selectedCategory, setSele
                             <option value="Phòng trọ">🏡 Phòng trọ</option>
                             <option value="Biệt thự">🏰 Biệt thự</option>
                         </select>
-                    </div>
+                    </div> */}
 
                     <div className="col-md-2">
                         <select className="form-select border-0 bg-light">

@@ -31,14 +31,30 @@ public class SecurityConfig {
     @Value("${jwt.signer-key}")
     private String SIGNER_KEY;
 
+    private final String[] PUBLIC_ENDPOINTS = {
+            "/api/properties",
+            "/api/users/*/properties",
+            "/api/properties/*",
+            "/api/properties/search",
+            "/api/categories",
+            "/api/property-types",
+            "/api/auth/**"
+    };
+    //"/api/properties",
+    //            "/api/users/{sellerId}/properties",
+    //            "/api/properties/{propertyId}",
+    //            "/api/properties/search",
+    //            "/api/categories",
+    //            "/api/auth/**"
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(Customizer.withDefaults())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
@@ -67,14 +83,19 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfig = new CorsConfiguration();
-        corsConfig.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:3000"));
+        corsConfig.setAllowedOrigins(List.of(
+                "http://localhost:3000",
+                "http://localhost:5173"
+));
         corsConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         corsConfig.setAllowedHeaders(List.of("*"));
-        corsConfig.setExposedHeaders(List.of("Content-Range")); // React Admin cần
+        corsConfig.setExposedHeaders(List.of("Authorization", "Content-Range"));
         corsConfig.setAllowCredentials(true);
+        corsConfig.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfig);
+
         return source;
     }
 

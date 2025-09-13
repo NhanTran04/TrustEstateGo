@@ -14,5 +14,7 @@ public class PropertySaveResponse {
     int propertyId;
     String propertyTitle;
     String propertyImage;
-
+    Integer propertyArea;
+    Integer propertyBedroom;
+    String propertyInterior;
 }

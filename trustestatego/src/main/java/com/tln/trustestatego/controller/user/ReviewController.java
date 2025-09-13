@@ -22,7 +22,7 @@ public class ReviewController {
     ReviewService reviewService;
 
     @PreAuthorize("hasRole('USER')")
-    @GetMapping("/users/reviews")
+    @GetMapping("/reviews")
     public ResponseEntity<ApiResponse<PageResponse<ReviewResponse>>> getReviewByUserId(Pageable pageable){
         try{
             return ResponseEntity.ok()
