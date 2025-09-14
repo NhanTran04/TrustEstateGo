@@ -16,8 +16,8 @@ const PropertyDetail = () => {
     const { user } = useAuth();
     const { handleSaveProperty, savedProperties } = useProperty();
     const [property, setProperty] = useState(null);
-    const [activeImage, setActiveImage] = useState(0); // THÊM DÒNG NÀY
-    const [isSaved, setIsSaved] = useState(false); // THÊM DÒNG NÀY
+    const [activeImage, setActiveImage] = useState(0);
+    const [isSaved, setIsSaved] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -25,8 +25,8 @@ const PropertyDetail = () => {
         const fetchPropertyDetail = async () => {
             try {
                 const response = await authApi().get(`${endpoints.properties}/${id}`);
-                setProperty(response.data);
-                setIsSaved(savedProperties.includes(response.data.id)); // SỬA THÀNH response.data.id
+                setProperty(response.data.result);
+                setIsSaved(savedProperties.includes(response.data.result.id));
             } catch (err) {
                 const errorMessage = err.response?.data?.message || 'Không thể tải thông tin bất động sản';
                 setError(errorMessage);
@@ -37,7 +37,7 @@ const PropertyDetail = () => {
         };
 
         fetchPropertyDetail();
-    }, [id, savedProperties]); // THÊM savedProperties vào dependencies
+    }, [id, savedProperties]);
 
     const handleSave = () => {
         if (!user) {
@@ -108,7 +108,7 @@ const PropertyDetail = () => {
                                 {/* Main Image */}
                                 <div className="position-relative">
                                     <img
-                                        src={property.images?.[activeImage] || 'https://via.placeholder.com/800x500?text=Ảnh+BDS'}
+                                        src={property.images?.[activeImage]}
                                         className="img-fluid w-100 rounded-top-4"
                                         style={{ height: '500px', objectFit: 'cover' }}
                                         alt={property.title}
@@ -130,13 +130,6 @@ const PropertyDetail = () => {
                                     >
                                         <Share2 size={20} />
                                     </button>
-
-                                    {/* Hot Badge */}
-                                    {property.isHot && (
-                                        <span className="position-absolute top-0 start-0 m-3 badge bg-danger px-3 py-2 rounded-pill">
-                                            🔥 HOT
-                                        </span>
-                                    )}
                                 </div>
 
                                 {/* Thumbnails */}
@@ -177,9 +170,9 @@ const PropertyDetail = () => {
                                 {/* Price */}
                                 <div className="bg-light rounded-4 p-4 mb-4">
                                     <h3 className="text-primary fw-bold mb-2">{formatPrice(property.price)}</h3>
-                                    {/* <p className="text-muted mb-0">
+                                    <p className="text-muted mb-0">
                                         {property.propertyType.value === 'Cho thuê' ? 'Giá thuê' : 'Giá bán'}
-                                    </p> */}
+                                    </p>
                                 </div>
 
                                 {/* Description */}
@@ -207,15 +200,9 @@ const PropertyDetail = () => {
                                                     <Bed size={18} className="text-primary me-2" />
                                                     <span className="fw-medium">Phòng ngủ:</span>
                                                 </div>
-                                                <span className="text-muted">{property.bedrooms}</span>
+                                                <span className="text-muted">{property.bedroom}</span>
                                             </div>
-                                            <div className="col-6 mb-3">
-                                                <div className="d-flex align-items-center">
-                                                    <Bath size={18} className="text-primary me-2" />
-                                                    <span className="fw-medium">Phòng tắm:</span>
-                                                </div>
-                                                <span className="text-muted">{property.bathrooms}</span>
-                                            </div>
+
                                             <div className="col-6 mb-3">
                                                 <div className="d-flex align-items-center">
                                                     <Car size={18} className="text-primary me-2" />
@@ -232,7 +219,7 @@ const PropertyDetail = () => {
                                             <div className="col-6 mb-3">
                                                 <div className="d-flex align-items-center">
                                                     <Ruler size={18} className="text-primary me-2" />
-                                                    <span className="fw-medium">Hướng nhà:</span>
+                                                    <span className="fw-medium">Hướng nhà: Đông</span>
                                                 </div>
                                                 <span className="text-muted">{property.direction}</span>
                                             </div>
@@ -241,7 +228,7 @@ const PropertyDetail = () => {
                                                     <Home size={18} className="text-primary me-2" />
                                                     <span className="fw-medium">Nội thất:</span>
                                                 </div>
-                                                <span className="text-muted">{property.furnished}</span>
+                                                <span className="text-muted">{property.interior}</span>
                                             </div>
                                             <div className="col-6 mb-3">
                                                 <div className="d-flex align-items-center">
@@ -257,7 +244,7 @@ const PropertyDetail = () => {
                                                     <Eye size={18} className="text-primary me-2" />
                                                     <span className="fw-medium">Lượt xem:</span>
                                                 </div>
-                                                <span className="text-muted">{property.viewCount}</span>
+                                                <span className="text-muted">{10000}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -291,26 +278,26 @@ const PropertyDetail = () => {
                                 {/* Seller Info */}
                                 <div className="d-flex align-items-center mb-4">
                                     <img
-                                        src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80"
+                                        src={property.userAvatar}
                                         className="rounded-circle me-3"
                                         width="60"
                                         height="60"
                                         alt="Seller"
                                     />
                                     <div>
-                                        <h6 className="fw-bold mb-1">{property.sellerName}</h6>
+                                        <h6 className="fw-bold mb-1">{property.userFullName}</h6>
                                         <div className="d-flex align-items-center">
                                             <Star size={14} className="text-warning me-1" fill="currentColor" />
-                                            <small className="text-muted">{property.sellerRating} (25 đánh giá)</small>
+                                            <small className="text-muted">{property.avgUserReview} ({property.countUserReview}đánh giá)</small>
                                         </div>
                                     </div>
                                 </div>
 
                                 {/* Verified Badge */}
-                                <div className="d-flex align-items-center mb-4">
+                                {/* <div className="d-flex align-items-center mb-4">
                                     <Shield size={16} className="text-success me-2" />
                                     <small className="text-success">Đã xác thực danh tính</small>
-                                </div>
+                                </div> */}
 
                                 {/* Contact Buttons */}
                                 <div className="d-grid gap-2">

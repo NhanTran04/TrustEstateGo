@@ -51,6 +51,7 @@ public class UserServiceImpl implements UserService {
     PageMapper pageMapper;
     CurrentUserService currentUserService;
 
+    @Override
     public PageResponse<UserResponse> getUsers(String kw, Pageable pageable){
         if(kw != null && !kw.isEmpty()) {
             Page<UserResponse> userPage =  userRepository.findByUsernameContainingIgnoreCase(kw, pageable)
@@ -62,6 +63,7 @@ public class UserServiceImpl implements UserService {
         return pageMapper.toPageResponse(userPage);
     }
 
+    @Override
     public UserResponse getUserById(int userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
@@ -69,6 +71,7 @@ public class UserServiceImpl implements UserService {
         return userMapper.toUserResponse(user);
     }
 
+    @Override
     public UserResponse getCurrentUser() {
         User user = currentUserService.getCurrentUser();
         return userMapper.toUserResponse(user);
@@ -137,6 +140,7 @@ public class UserServiceImpl implements UserService {
 //        return getUserById(user.getId());
 //    }
 
+    @Override
     public UserResponse updateUserFromAdmin(int userId, UserUpdateRequest userUpdateRequest) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
@@ -182,6 +186,7 @@ public class UserServiceImpl implements UserService {
         return userMapper.toUserResponse(user);
     }
 
+    @Override
     public UserResponse updateUser(UserUpdateRequest userUpdateRequest) {
         User user = currentUserService.getCurrentUser();
         // Map các field cơ bản
@@ -238,6 +243,7 @@ public class UserServiceImpl implements UserService {
         return null;
     }
 
+    @Override
     public void deleteUser(int userId){
         userRepository.deleteById(userId);
     }

@@ -5,11 +5,8 @@ import com.tln.trustestatego.dto.request.ReviewRequest;
 import com.tln.trustestatego.dto.response.PageResponse;
 import com.tln.trustestatego.dto.response.ReviewResponse;
 import com.tln.trustestatego.dto.response.SellerReviewResponse;
-import com.tln.trustestatego.dto.response.UserResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import java.util.List;
 
 public interface ReviewService {
     PageResponse<ReviewResponse> getReviewBySellerId(int sellerId, Pageable pageable);
@@ -19,4 +16,6 @@ public interface ReviewService {
     ReviewResponse createReviewFromAdmin(ReviewAdminRequest reviewAdminRequest);
     //ReviewResponse updateReview(int reviewId, ReviewRequest reviewRequest);
     void deleteReview(int reviewId);
+    Long countReviewBySellerId(int sellerId);
+    Double getAvgRatingBySellerId(int sellerId);
 }

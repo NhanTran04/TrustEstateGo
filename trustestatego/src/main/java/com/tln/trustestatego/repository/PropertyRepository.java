@@ -8,4 +8,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface PropertyRepository extends JpaRepository<Property, Integer>, JpaSpecificationExecutor<Property> {
     Page<Property> findByUser_Id(int userId, Pageable pageable);
+    Page<Property> findByCategory_Id(int categoryId, Pageable pageable);
 }

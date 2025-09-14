@@ -19,6 +19,7 @@ public class PropertyResponse {
     int id;
     int categoryId;
     int userId;
+    String userFullName;
     String categoryName;
     String title;
     String description;
@@ -34,4 +35,7 @@ public class PropertyResponse {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     LocalDateTime createdAt;
     List<String> images;
+    double avgUserReview;
+    long countUserReview;
+    String userAvatar;
 }

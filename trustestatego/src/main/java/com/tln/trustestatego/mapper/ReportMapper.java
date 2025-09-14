@@ -7,7 +7,7 @@ import com.tln.trustestatego.entity.Report;
 import com.tln.trustestatego.entity.Role;
 import org.mapstruct.*;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface ReportMapper {
     Report toReport(ReportUserRequest reportUserRequest);
     @Mapping(source = "property.id", target = "propertyId")

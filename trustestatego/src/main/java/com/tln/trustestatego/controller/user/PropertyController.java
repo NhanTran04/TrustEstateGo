@@ -27,11 +27,11 @@ public class PropertyController {
     PropertyService propertyService;
 
     @GetMapping("/properties")
-    public ResponseEntity<ApiResponse<PageResponse<PropertyResponse>>> getProperties(Pageable pageable) {
+    public ResponseEntity<ApiResponse<PageResponse<PropertyResponse>>> getProperties(@RequestParam(required = false) Integer categoryId,Pageable pageable) {
         try {
                 return ResponseEntity.ok(
                         ApiResponse.<PageResponse<PropertyResponse>>builder()
-                                .result(propertyService.getProperties(pageable))
+                                .result(propertyService.getProperties(categoryId, pageable))
                                 .build()
                 );
             } catch (Exception e) {

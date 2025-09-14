@@ -4,62 +4,52 @@ import { Home, Plus, User, Bell, LogOut, Building, X, Menu } from 'lucide-react'
 import useAuth from '../../hooks/useAuth';
 import { api, endpoints } from '../../services/api';
 
+// Hàm sinh slug từ tên category
+const toSlug = (text) => {
+    return text
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "") // bỏ dấu tiếng Việt
+        .replace(/\s+/g, "-") // thay space bằng -
+        .replace(/[^\w-]/g, ""); // bỏ ký tự đặc biệt
+};
+
 const Header = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
     const [showMobileMenu, setShowMobileMenu] = useState(false);
     const [showUserDropdown, setShowUserDropdown] = useState(false);
-    const [category, setCategory] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         getCategories();
-    }, [])
+    }, []);
 
     const getCategories = async () => {
         try {
-            const res = await api.get(endpoints.categories)
-            setCategory(res.data.result)
+            const res = await api.get(endpoints.categories);
+            setCategories(res.data.result);
         } catch (error) {
             console.error('Error fetching category:', error);
+        } finally {
+            setLoading(false);
         }
-    }
+    };
 
-
+    // Lấy slug hiện tại từ URL
     const getCurrentPage = () => {
-        const path = location.pathname;
-        if (path === '/') return 'home';
-        if (path.startsWith('/category/')) return 'category';
-        if (path === '/saved') return 'saved';
-        if (path === '/profile') return 'profile';
-        return 'home';
+        const path = location.pathname.split("/")[1];
+        return path || 'home';
     };
-
-    const handleCategoryClick = (categoryId, categoryName) => {
-        navigate(`/category/${categoryId}`, {
-            state: { categoryName }
-        });
-        setShowMobileMenu(false);
-    };
-
-    // const logout = async () => {
-    //     try {
-    //         await authApi().post('/auth/logout');
-    //     } catch (err) {
-    //         console.error('Error logging out:', err);
-    //     } finally {
-    //         localStorage.removeItem("token");
-    //         localStorage.removeItem("user");
-    //         setUser(null);
-    //         navigate('/');
-    //     }
-    // };
 
     const currentPage = getCurrentPage();
 
     return (
         <nav className="navbar navbar-expand-lg sticky-top shadow-lg" style={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(10px)' }}>
             <div className="container-fluid px-4">
+                {/* Logo */}
                 <button
                     className="navbar-brand btn btn-link text-decoration-none fw-bold d-flex align-items-center p-0"
                     onClick={() => navigate('/')}
@@ -73,6 +63,7 @@ const Header = () => {
                     </div>
                 </button>
 
+                {/* Nút mobile menu */}
                 <button
                     className="navbar-toggler border-0 shadow-sm"
                     onClick={() => setShowMobileMenu(!showMobileMenu)}
@@ -82,21 +73,38 @@ const Header = () => {
 
                 <div className={`collapse navbar-collapse ${showMobileMenu ? 'show' : ''}`}>
                     <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-                        {[
-                            { key: 'home', label: 'Trang chủ', path: '/' },
-                            { key: 'properties', label: 'Mua bán', path: '/properties' },
-                            { key: 'rentals', label: 'Cho thuê', path: '/rentals' },
-                        ].map(item => (
-                            <li key={item.key} className="nav-item mx-1">
-                                <button
-                                    className={`nav-link btn btn-link text-decoration-none fw-semibold px-3 py-2 rounded-pill transition-all ${currentPage === item.key ? 'bg-primary text-white shadow-sm' : 'text-dark hover-bg-light'
-                                        }`}
-                                    onClick={() => navigate(item.path)}
-                                >
-                                    {item.label}
-                                </button>
-                            </li>
-                        ))}
+                        {/* Trang chủ */}
+                        <li className="nav-item mx-1">
+                            <button
+                                className={`nav-link btn btn-link text-decoration-none fw-semibold px-3 py-2 rounded-pill ${currentPage === 'home' ? 'bg-primary text-white shadow-sm' : 'text-dark'
+                                    }`}
+                                onClick={() => navigate('/')}
+                            >
+                                Trang chủ
+                            </button>
+                        </li>
+
+                        {/* Categories từ API */}
+                        {!loading && categories.map((cat) => {
+                            const slug = toSlug(cat.name);
+                            return (
+                                <li key={cat.id} className="nav-item mx-1">
+                                    <button
+                                        className={`nav-link btn btn-link text-decoration-none fw-semibold px-3 py-2 rounded-pill ${currentPage === slug ? 'bg-primary text-white shadow-sm' : 'text-dark'
+                                            }`}
+                                        onClick={() => {
+                                            navigate(`/${slug}?categoryId=${cat.id}`);
+                                            setShowMobileMenu(false);
+                                        }}
+
+                                    >
+                                        {cat.name}
+                                    </button>
+                                </li>
+                            );
+                        })}
+
+                        {/* Đã lưu */}
                         {user && (
                             <li className="nav-item mx-1">
                                 <button
@@ -110,12 +118,13 @@ const Header = () => {
                         )}
                     </ul>
 
+                    {/* User menu */}
                     <div className="d-flex align-items-center gap-3">
                         {user ? (
                             <>
                                 <button
                                     className="btn btn-outline-primary fw-semibold rounded-pill px-4 shadow-sm"
-                                    onClick={() => {/* Xử lý đăng tin */ }}
+                                    onClick={() => navigate('/create-property')}
                                 >
                                     <Plus size={16} className="me-2" />
                                     Đăng tin
@@ -146,7 +155,7 @@ const Header = () => {
                                                 <button
                                                     className="dropdown-item d-flex align-items-center py-2 rounded-2 m-1"
                                                     onClick={() => {
-                                                        // navigate('/my-properties');
+                                                        navigate('/my-properties');
                                                         setShowUserDropdown(false);
                                                     }}
                                                 >
@@ -158,7 +167,7 @@ const Header = () => {
                                                 <button
                                                     className="dropdown-item d-flex align-items-center py-2 rounded-2 m-1"
                                                     onClick={() => {
-                                                        // navigate('/notifications');
+                                                        navigate('/notifications');
                                                         setShowUserDropdown(false);
                                                     }}
                                                 >
@@ -201,4 +210,3 @@ const Header = () => {
 };
 
 export default Header;
-

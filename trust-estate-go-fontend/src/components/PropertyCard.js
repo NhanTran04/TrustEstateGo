@@ -27,7 +27,7 @@ const PropertyCard = ({ property, onSave, isSaved, showActions = false, onEdit, 
         navigate(`/property/${property.id}`);
     };
 
-    const mainImage = property.images?.[0] || property.imageUrl || 'https://via.placeholder.com/400x250?text=Ảnh+BDS';
+    const mainImage = property.images?.[0];
     const categoryName = property.category?.name || property.categoryName || 'Bất động sản';
     const location = property.location || property.address || 'Địa điểm không xác định';
     const area = property.area || property.squareArea;
@@ -43,9 +43,9 @@ const PropertyCard = ({ property, onSave, isSaved, showActions = false, onEdit, 
                         className="card-img-top hover-scale transition-all"
                         style={{ height: '220px', objectFit: 'cover' }}
                         alt={property.title}
-                        onError={(e) => {
-                            e.target.src = 'https://via.placeholder.com/400x250?text=Ảnh+BDS';
-                        }}
+                    // onError={(e) => {
+                    //     e.target.src = 'https://via.placeholder.com/400x250?text=Ảnh+BDS';
+                    // }}
                     />
 
                     <div className="position-absolute top-0 start-0 m-3">
@@ -72,7 +72,7 @@ const PropertyCard = ({ property, onSave, isSaved, showActions = false, onEdit, 
                         </button>
                     </div>
 
-                    {/* {showActions && (
+                    {showActions && (
                         <div className="position-absolute bottom-0 end-0 m-3 d-flex gap-2">
                             <button className="btn btn-sm btn-warning rounded-circle shadow-sm"
                                 onClick={() => onEdit(property.id)}
@@ -85,7 +85,7 @@ const PropertyCard = ({ property, onSave, isSaved, showActions = false, onEdit, 
                                 <Trash2 size={14} />
                             </button>
                         </div>
-                    )} */}
+                    )}
 
                     <div className="position-absolute bottom-0 start-0 end-0"
                         style={{ height: '60px', background: 'linear-gradient(transparent, rgba(0,0,0,0.7))' }}>

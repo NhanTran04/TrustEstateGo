@@ -56,11 +56,12 @@ const AppContent = () => {
       <Header />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/properties" element={<Properties />} />
-        <Route path="/rentals" element={<Rentals />} />
+        <Route path="/property/:id" element={<PropertyDetail />} />
+        <Route path="/:slug" element={<Properties />} />
+
+        {/* <Route path="/rentals" element={<Rentals />} /> */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/property/:id" element={<PropertyDetail />} />
         <Route path="/saved" element={
           <ProtectedRoute>
             <Saved />

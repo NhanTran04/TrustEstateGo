@@ -1,17 +1,23 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
 import { api, authApi, endpoints } from '../services/api';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const token = localStorage.getItem("token");
+        const savedUser = localStorage.getItem("user");
+
         if (token) {
-            fetchCurrentUser();
+            if (savedUser) {
+                setUser(JSON.parse(savedUser)); // hiển thị ngay user cũ
+            }
+            fetchCurrentUser(); // cập nhật dữ liệu mới từ server
         } else {
             setLoading(false);
         }
@@ -21,8 +27,8 @@ export const AuthProvider = ({ children }) => {
         try {
             const response = await authApi().get(endpoints.currentUser);
             setUser(response.data);
+            localStorage.setItem("user", JSON.stringify(response.data));
         } catch (err) {
-            console.error('Error fetching current user:', err);
             logout();
         } finally {
             setLoading(false);
@@ -74,7 +80,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
         setUser(null);
-        Navigate('/'); // Thêm điều hướng về trang chủ
+        navigate('/'); // Thêm điều hướng về trang chủ
     };
 
     return (

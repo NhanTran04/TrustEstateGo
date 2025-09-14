@@ -11,7 +11,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface PermissionMapper {
     PermissionResponse toPermissionResponse(Permission permission);
     Permission toPermission(PermissionRequest permissionRequest);

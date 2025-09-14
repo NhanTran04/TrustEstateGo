@@ -27,4 +27,11 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
         GROUP BY s.id, s.firstName, s.lastName, s.username
     """)
     Page<SellerReviewResponse> findSellerReview(@Param("keyword") String keyword, Pageable pageable);
+
+    @Query("SELECT AVG(r.rating) FROM Review r WHERE r.seller.id = :sellerId")
+    Double findAvgRatingBySeller(@Param("sellerId") Integer sellerId);
+
+    @Query("SELECT COUNT(r) FROM Review r WHERE r.seller.id = :sellerId")
+    Long countReviewBySeller(@Param("sellerId") Integer sellerId);
+
 }

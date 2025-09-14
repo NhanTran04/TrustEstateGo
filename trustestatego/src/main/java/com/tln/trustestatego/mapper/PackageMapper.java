@@ -8,7 +8,7 @@ import com.tln.trustestatego.entity.Category;
 import com.tln.trustestatego.entity.Package;
 import org.mapstruct.*;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface PackageMapper {
     PackageResponse toPackageResponse(Package pack);
     Package toPackage(PackageRequest packageRequest);

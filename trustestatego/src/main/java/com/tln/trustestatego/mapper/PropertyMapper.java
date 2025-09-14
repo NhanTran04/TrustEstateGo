@@ -7,6 +7,7 @@ import com.tln.trustestatego.dto.response.PropertyResponse;
 import com.tln.trustestatego.dto.response.PropertyTypeResponse;
 import com.tln.trustestatego.entity.Property;
 import com.tln.trustestatego.entity.PropertyImage;
+import com.tln.trustestatego.entity.User;
 import com.tln.trustestatego.enums.PropertyType;
 import org.mapstruct.*;
 
@@ -18,14 +19,18 @@ import java.time.ZoneOffset;
 import java.time.Instant;
 import java.time.LocalDateTime;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface PropertyMapper {
     Property toProperty(PropertyRequest propertyRequest);
     @Mapping(source = "category.name", target = "categoryName")
     @Mapping(source = "category.id", target = "categoryId")
     @Mapping(source = "user.id", target = "userId")
+    @Mapping(target = "userFullName", expression = "java(property.getUser().getFirstName() + \" \" + property.getUser().getLastName())")
     @Mapping(target = "images", expression = "java(mapImages(property.getPropertyImages()))")
     @Mapping(target = "propertyType", expression = "java(toPropertyTypeResponse(property.getPropertyType()))")
+    @Mapping(target = "avgUserReview", expression = "java(Math.round(calculateAvgReview(property.getUser()) * 10.0) / 10.0)")
+    @Mapping(target = "countUserReview", expression = "java(calculateCountReview(property.getUser()))")
+    @Mapping(target = "userAvatar", expression = "java(property.getUser().getAvatar())")
     PropertyResponse toPropertyResponse(Property property);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -64,6 +69,21 @@ public interface PropertyMapper {
             case RENTAL_ROOM: return "Phòng trọ, ký túc xá giá hợp lý";
             default: return "";
         }
+    }
+
+    default double calculateAvgReview(User user) {
+        if (user == null || user.getReviewsAsSeller() == null || user.getReviewsAsSeller().isEmpty())
+            return 0;
+
+        return user.getReviewsAsSeller().stream()
+                .mapToInt(r -> r.getRating() != null ? r.getRating() : 0)
+                .average()
+                .orElse(0);
+    }
+
+    default long calculateCountReview(User user) {
+        if (user == null || user.getReviewsAsSeller() == null) return 0;
+        return user.getReviewsAsSeller().size();
     }
 
     default Instant toInstant(LocalDateTime time) {

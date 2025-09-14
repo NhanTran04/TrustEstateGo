@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     UserService userService;
 
-    @PreAuthorize("hasAnyRole('SELLER', USER)")
+    @PreAuthorize("hasAnyRole('SELLER', 'USER')")
     @GetMapping("/current-user")
     public ResponseEntity<ApiResponse<UserResponse>> getCurrentUser() {
         try {
@@ -56,10 +56,9 @@ public class UserController {
 //        }
 //    }
 
-    @PreAuthorize("hasAnyRole('SELLER', USER)")
+    @PreAuthorize("hasAnyRole('SELLER', 'USER')")
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<UserResponse>> updateUser(
-            @PathVariable int userId,
             @ModelAttribute UserUpdateRequest userUpdateRequest) {
         try {
             return ResponseEntity.ok(

@@ -6,8 +6,11 @@ import com.tln.trustestatego.dto.response.ReviewResponse;
 import com.tln.trustestatego.entity.Review;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface ReviewMapper {
     Review toReview(ReviewRequest reviewRequest);
     Review toReview(ReviewAdminRequest reviewAdminRequest);

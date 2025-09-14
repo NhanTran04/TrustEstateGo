@@ -13,6 +13,7 @@ public interface UserService {
     PageResponse<UserResponse> getUsers(String kw, Pageable pageable);
     UserResponse getUserById(int userId);
     UserResponse getCurrentUser();
+//    UserResponse getSellerByPropertyId(int propertyId);
     UserResponse createUser(UserCreationRequest userCreationRequest);
     UserResponse updateUser(UserUpdateRequest userUpdateRequest);
     UserResponse updateUserFromAdmin(int userId, UserUpdateRequest userUpdateRequest);

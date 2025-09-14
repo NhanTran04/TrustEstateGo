@@ -132,4 +132,14 @@ public class ReviewServiceImpl implements ReviewService {
     public void deleteReview(int reviewId) {
         reviewRepository.deleteById(reviewId);
     }
+
+    @Override
+    public Long countReviewBySellerId(int sellerId) {
+        return reviewRepository.countReviewBySeller(sellerId);
+    }
+
+    @Override
+    public Double getAvgRatingBySellerId(int sellerId) {
+        return reviewRepository.findAvgRatingBySeller(sellerId);
+    }
 }

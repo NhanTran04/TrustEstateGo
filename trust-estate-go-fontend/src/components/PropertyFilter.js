@@ -6,8 +6,6 @@ const PropertyFilter = ({ searchQuery,
     setSearchQuery,
     selectedCategory,
     setSelectedCategory,
-    selectedPropertyType,
-    setSelectedPropertyType,
     onFilterChange }) => {
     const [showAdvanced, setShowAdvanced] = useState(false);
     const [filters, setFilters] = useState({
@@ -28,7 +26,7 @@ const PropertyFilter = ({ searchQuery,
     const applyFilters = async () => {
         // Gọi API với các filters
         try {
-            await refetchProperties(); // Giả sử context đã xử lý filters
+            await refetchProperties(1, { category: selectedCategory }); // Giả sử context đã xử lý filters
         } catch (err) {
             console.error('Error applying filters:', err);
         }

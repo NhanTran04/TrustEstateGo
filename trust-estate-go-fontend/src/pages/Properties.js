@@ -1,15 +1,18 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Menu, Building, X, Search } from 'lucide-react';
 import PropertyCard from '../components/PropertyCard';
 import PropertyFilter from '../components/PropertyFilter';
 import { useProperty } from '../contexts/PropertyContext';
 
 const Properties = () => {
-    const navigate = useNavigate();
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const categoryId = queryParams.get("categoryId");
+    console.log(categoryId);
     const {
         properties,
-        pagination = {}, // DEFAULT VALUE
+        pagination = {},
         searchQuery,
         selectedCategory,
         handleSaveProperty,
@@ -18,8 +21,18 @@ const Properties = () => {
         setSelectedCategory,
         refetchProperties,
         loading,
-        error
+        error,
+        categories = [] // lấy từ context
     } = useProperty();
+
+    useEffect(() => {
+        if (categoryId) {
+            setSelectedCategory(Number(categoryId));
+        } else {
+            setSelectedCategory(null); // hoặc 0
+        }
+    }, [categoryId]);
+
 
     const handlePageChange = (newPage) => {
         refetchProperties(newPage);
@@ -28,6 +41,37 @@ const Properties = () => {
     const handleFilterChange = () => {
         refetchProperties(1);
     };
+
+    const getCategoryTitle = () => {
+        const category = categories.find(c => c.id === selectedCategory);
+        if (!category) {
+            return {
+                title: "Bất động sản",
+                subtitle: "Khám phá bất động sản phù hợp nhu cầu của bạn"
+            };
+        }
+
+        if (category.name.toLowerCase().includes("bán")) {
+            return {
+                title: "Nhà đất bán",
+                subtitle: "Khám phá các BĐS bán chất lượng cao từ chủ đầu tư uy tín"
+            };
+        }
+
+        if (category.name.toLowerCase().includes("thuê")) {
+            return {
+                title: "Nhà đất cho thuê",
+                subtitle: "Khám phá các BĐS cho thuê phù hợp nhu cầu của bạn"
+            };
+        }
+
+        return {
+            title: category.name,
+            subtitle: "Danh sách bất động sản"
+        };
+    };
+
+    const { title, subtitle } = getCategoryTitle();
 
     if (loading) {
         return (
@@ -52,7 +96,6 @@ const Properties = () => {
         );
     }
 
-    // SỬ DỤNG OPTIONAL CHAINING ĐỂ TRÁNH LỖI
     const totalResults = pagination?.total || properties.length;
     const currentPage = pagination?.page || 1;
     const totalPages = pagination?.totalPages || 1;
@@ -61,8 +104,8 @@ const Properties = () => {
         <div style={{ paddingTop: '100px' }}>
             <div className="container">
                 <div className="text-center mb-5">
-                    <h2 className="fw-bold text-dark mb-3">Nhà đất bán</h2>
-                    <p className="text-muted">Khám phá các BDS bán chất lượng cao từ chủ đầu tư uy tín</p>
+                    <h2 className="fw-bold text-dark mb-3">{title}</h2>
+                    <p className="text-muted">{subtitle}</p>
                 </div>
 
                 <PropertyFilter
@@ -123,7 +166,6 @@ const Properties = () => {
                             className="btn btn-primary px-4 py-2 rounded-pill"
                             onClick={() => {
                                 setSearchQuery('');
-                                setSelectedCategory('');
                                 refetchProperties(1);
                             }}
                         >
@@ -147,10 +189,8 @@ const Properties = () => {
                                     </button>
                                 </li>
 
-                                {/* Hiển thị số trang */}
                                 {[...Array(totalPages)].map((_, index) => {
                                     const pageNumber = index + 1;
-                                    // Chỉ hiển thị một số trang xung quanh trang hiện tại
                                     if (
                                         pageNumber === 1 ||
                                         pageNumber === totalPages ||

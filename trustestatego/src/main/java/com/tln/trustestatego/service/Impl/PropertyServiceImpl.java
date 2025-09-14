@@ -77,10 +77,16 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
 
 
     @Override
-    public PageResponse<PropertyResponse> getProperties(Pageable pageable){
-        Page<PropertyResponse> propertiesPage = propertyRepository
+    public PageResponse<PropertyResponse> getProperties(Integer categoryId,Pageable pageable){
+        Page<PropertyResponse> property;
+        if(categoryId != null)
+            property = propertyRepository
+                    .findByCategory_Id(categoryId, pageable)
+                    .map(propertyMapper::toPropertyResponse);
+        else
+            property = propertyRepository
                 .findAll(pageable).map(propertyMapper::toPropertyResponse);
-        return pageMapper.toPageResponse(propertiesPage);
+        return pageMapper.toPageResponse(property);
     }
 
     @Override
@@ -163,12 +169,12 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
         return pageMapper.toPageResponse(propertiesPage);
     }
 
-    @Override
-    public PageResponse<PropertyResponse> getPropertyBySellerId(int userId,Pageable pageable) {
-        Page<PropertyResponse> propertiesPage = propertyRepository
-                .findByUser_Id(userId, pageable).map(propertyMapper::toPropertyResponse);
-        return pageMapper.toPageResponse(propertiesPage);
-    }
+//    @Override
+//    public PageResponse<PropertyResponse> getPropertyBySellerId(int userId,Pageable pageable) {
+//        Page<PropertyResponse> propertiesPage = propertyRepository
+//                .findByUser_Id(userId, pageable).map(propertyMapper::toPropertyResponse);
+//        return pageMapper.toPageResponse(propertiesPage);
+//    }
 
 
 

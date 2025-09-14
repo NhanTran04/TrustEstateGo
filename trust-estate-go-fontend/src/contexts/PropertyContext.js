@@ -23,6 +23,7 @@ export const PropertyProvider = ({ children }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [filters, setFilters] = useState({});
+    const [categories, setCategories] = useState([]);
     const [pagination, setPagination] = useState({
         page: 1,
         limit: 12,
@@ -31,30 +32,25 @@ export const PropertyProvider = ({ children }) => {
     });
 
     // Fetch properties từ API
-    const fetchProperties = useCallback(async (page = 1, filters = {}) => {
+    const fetchProperties = useCallback(async (page = 1, extraFilters = {}) => {
         setLoading(true);
         setError(null);
         try {
             const params = {
                 page: page - 1, // Spring Data JPA page bắt đầu từ 0
-                size: pagination.limit, // Spring Data JPA dùng 'size' thay vì 'limit'
-                ...filters
+                size: pagination.limit,// Spring Data JPA dùng 'size' thay vì 'limit'
+                search: searchQuery || undefined,
+                categoryId: selectedCategory || undefined,
+                ...filters,
+                ...extraFilters
             };
-
-            if (searchQuery) params.search = searchQuery;
-            if (selectedCategory) params.category = selectedCategory;
 
             const response = await api.get(endpoints.properties, { params });
 
-            console.log('API Response:', response.data); // DEBUG
-
-            // SỬA THEO CẤU TRÚC API THỰC TẾ
-            if (response.data.result && response.data.result.content && Array.isArray(response.data.result.content)) {
+            if (response.data.result?.content) {
                 setProperties(response.data.result.content);
-
-                // CẬP NHẬT PAGINATION TỪ API RESPONSE
                 setPagination({
-                    page: response.data.result.pageNumber + 1, // Chuyển từ 0-based sang 1-based
+                    page: response.data.result.pageNumber + 1,
                     limit: response.data.result.pageSize,
                     total: response.data.result.totalElements,
                     totalPages: response.data.result.totalPages
@@ -70,7 +66,7 @@ export const PropertyProvider = ({ children }) => {
         } finally {
             setLoading(false);
         }
-    }, [searchQuery, selectedCategory, pagination.limit]);
+    }, [searchQuery, selectedCategory, filters, pagination.limit]);
 
     // Fetch saved properties từ API
     const fetchSavedProperties = useCallback(async () => {
@@ -130,7 +126,7 @@ export const PropertyProvider = ({ children }) => {
         selectedCategory,
         loading,
         error,
-        pagination, // THÊM DÒNG NÀY
+        pagination,
         setProperties,
         setSavedProperties,
         setSearchQuery,

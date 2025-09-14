@@ -2,244 +2,234 @@ import React, { useState, useEffect } from 'react';
 import { User, Shield, Camera, CheckCircle, Star, MessageCircle, Bell, Award, Edit } from 'lucide-react';
 import useAuth from '../hooks/useAuth';
 import { authApi, endpoints } from '../services/api';
+import { Button, Col, Container, Form, Image, Row } from 'react-bootstrap';
 
 const Profile = () => {
     const { user } = useAuth();
-    const [editing, setEditing] = useState(false);
+
+    const [preview, setPreview] = useState(null);
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
-        firstName: '',
-        lastName: '',
-        email: '',
-        phone: '',
-        address: '',
-        birthday: ''
+        username: "",
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        gender: true,
+        birthday: "",
+        avatar: null,
+        address: "",
     });
 
     useEffect(() => {
         if (user) {
             setFormData({
-                firstName: user.firstName || '',
-                lastName: user.lastName || '',
-                email: user.email || '',
+                username: user.username,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
                 phone: user.phone || '',
-                address: user.address || '',
-                birthday: user.birthday || ''
+                gender: user.gender === true,
+                birthday: user.birthday || '',
+                avatar: user.avatar,
+                address: user.address,
             });
+            setPreview(user.avatar);
         }
     }, [user]);
 
-    const handleSave = async () => {
-        setLoading(true);
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleGenderChange = (value) => {
+        setFormData(prev => ({ ...prev, gender: value }));
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        setFormData(prev => ({ ...prev, avatar: file }));
+
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setPreview(reader.result);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        const form = new FormData();
+        for (let [key, value] of Object.entries(formData)) {
+            if (key !== "avatar") {
+                form.append(key, value);
+            }
+        }
+
+        if (formData.avatar instanceof File) {
+            form.append("avatar", formData.avatar);
+        } else {
+            try {
+                const response = await fetch(user.avatar);
+                const blob = await response.blob();
+                const fileFromUrl = new File([blob], "avatar.jpg", { type: blob.type });
+                form.append("file", fileFromUrl);
+            } catch (error) {
+                console.error("Lỗi khi tải ảnh từ URL:", error);
+            }
+        }
+
         try {
-            const response = await authApi().put(`${endpoints.users}/${user.id}`, formData); // SỬA userData THÀNH formData
-            setFormData(response.data);
-            setEditing(false);
-            alert('Cập nhật thông tin thành công!');
+            setLoading(true);
+            const res = await authApi().put(`${endpoints.users}`, form,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data"
+                    }
+                });
+            if (res.status === 200) {
+                alert("Cập nhật thành công!");
+            } else {
+                alert("Có lỗi xảy ra khi cập nhật.");
+            }
         } catch (err) {
-            alert('Có lỗi xảy ra khi cập nhật thông tin');
+            console.error("Lỗi update user", err);
         } finally {
             setLoading(false);
         }
     };
 
+    // 🔒 Tránh lỗi khi user chưa load xong
+    if (!user || !formData.username) return <p>Đang tải thông tin người dùng...</p>;
+
     return (
-        <div style={{ paddingTop: '100px' }}>
-            <div className="container">
-                <div className="row">
-                    <div className="col-lg-4">
-                        <div className="card border-0 rounded-4 gradient-card text-center p-4 mb-4">
-                            <div className="position-relative d-inline-block mb-4">
-                                <img
-                                    src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80"
-                                    className="rounded-circle border border-4 border-white shadow"
-                                    width="120"
-                                    height="120"
-                                    style={{ objectFit: 'cover' }}
-                                    alt="Avatar"
+        <Container className="m-5 bg-white p-5 mx-auto" style={{ width: "80%" }}>
+            <h4>Hồ Sơ Của Tôi</h4>
+            <hr />
+            <Row>
+                <Col md={8}>
+                    <Form onSubmit={handleSubmit}>
+                        <Form.Group as={Row} className="mb-3">
+                            <Form.Label column sm={3}>Tên đăng nhập</Form.Label>
+                            <Col sm={9}>
+                                <Form.Control
+                                    type="text"
+                                    plaintext
+                                    value={formData.username}
+                                    readOnly
+
                                 />
-                                <button className="btn btn-primary position-absolute bottom-0 end-0 rounded-circle p-2">
-                                    <Camera size={16} />
-                                </button>
-                            </div>
+                            </Col>
+                        </Form.Group>
 
-                            <h5 className="fw-bold">{user?.firstName} {user?.lastName}</h5>
-                            <p className="text-muted mb-3">{user?.email}</p>
+                        <Form.Group as={Row} className="mb-3">
+                            <Form.Label column sm={3}>Họ</Form.Label>
+                            <Col sm={9}>
+                                <Form.Control
+                                    type="text"
+                                    name="lastName"
+                                    value={formData.lastName}
+                                    onChange={handleChange}
+                                />
+                            </Col>
+                        </Form.Group>
 
-                            <div className="d-flex justify-content-center align-items-center mb-3">
-                                <Star className="text-warning me-1" size={16} fill="currentColor" />
-                                <Star className="text-warning me-1" size={16} fill="currentColor" />
-                                <Star className="text-warning me-1" size={16} fill="currentColor" />
-                                <Star className="text-warning me-1" size={16} fill="currentColor" />
-                                <Star className="text-warning me-2" size={16} fill="currentColor" />
-                                <span className="small fw-bold">4.8 (25 đánh giá)</span>
-                            </div>
+                        <Form.Group as={Row} className="mb-3">
+                            <Form.Label column sm={3}>Tên</Form.Label>
+                            <Col sm={9}>
+                                <Form.Control
+                                    type="text"
+                                    name="firstName"
+                                    value={formData.firstName}
+                                    onChange={handleChange}
+                                />
+                            </Col>
+                        </Form.Group>
 
-                            <div className="d-flex justify-content-center gap-2 mb-3">
-                                <span className="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill">
-                                    <CheckCircle size={14} className="me-1" />
-                                    Đã xác thực
-                                </span>
-                                {user?.roles?.some(role => role.name === 'SELLER') && (
-                                    <span className="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill">
-                                        <Award size={14} className="me-1" />
-                                        Môi giới
-                                    </span>
-                                )}
-                            </div>
+                        <Form.Group as={Row} className="mb-3">
+                            <Form.Label column sm={3}>Email</Form.Label>
+                            <Col sm={9}>
+                                <Form.Control plaintext readOnly value={formData.email} />
+                            </Col>
+                        </Form.Group>
 
-                            <button className="btn btn-outline-primary rounded-pill w-100">
-                                <MessageCircle size={16} className="me-2" />
-                                Nhắn tin
-                            </button>
-                        </div>
+                        <Form.Group as={Row} className="mb-3">
+                            <Form.Label column sm={3}>Số điện thoại</Form.Label>
+                            <Col sm={9}>
+                                <Form.Control
+                                    type="text"
+                                    name="phone"
+                                    value={formData.phone}
+                                    onChange={handleChange}
+                                />
+                            </Col>
+                        </Form.Group>
 
-                        <div className="card border-0 rounded-4 gradient-card">
-                            <div className="card-header bg-transparent border-0">
-                                <h6 className="fw-bold mb-0">Hoạt động</h6>
-                            </div>
-                            <div className="card-body">
-                                <div className="row text-center">
-                                    <div className="col-4">
-                                        <div className="fw-bold text-primary h5">12</div>
-                                        <small className="text-muted">Tin đăng</small>
-                                    </div>
-                                    <div className="col-4">
-                                        <div className="fw-bold text-success h5">8</div>
-                                        <small className="text-muted">Đã bán</small>
-                                    </div>
-                                    <div className="col-4">
-                                        <div className="fw-bold text-warning h5">24</div>
-                                        <small className="text-muted">Đã lưu</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                        <Form.Group as={Row} className="mb-3">
+                            <Form.Label column sm={3}>Giới tính</Form.Label>
+                            <Col sm={9} className='mt-2'>
+                                <Form.Check
+                                    inline label="Nam"
+                                    name="gender"
+                                    type="radio"
+                                    checked={formData.gender === true}
+                                    onChange={() => handleGenderChange(true)}
+                                />
+                                <Form.Check
+                                    inline label="Nữ"
+                                    name="gender"
+                                    type="radio"
+                                    checked={formData.gender === false}
+                                    onChange={() => handleGenderChange(false)}
+                                />
+                            </Col>
+                        </Form.Group>
 
-                    <div className="col-lg-8">
-                        <div className="card border-0 rounded-4 gradient-card mb-4">
-                            <div className="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
-                                <h6 className="fw-bold mb-0">Thông tin cá nhân</h6>
-                                <button
-                                    className={`btn ${editing ? 'btn-success' : 'btn-outline-primary'} btn-sm rounded-pill px-3`}
-                                    onClick={() => editing ? handleSave() : setEditing(true)}
-                                >
-                                    {editing ? (
-                                        <>
-                                            <CheckCircle size={16} className="me-1" />
-                                            Lưu
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Edit size={16} className="me-1" />
-                                            Chỉnh sửa
-                                        </>
-                                    )}
-                                </button>
-                            </div>
-                            <div className="card-body">
-                                <div className="row">
-                                    <div className="col-md-6 mb-3">
-                                        <label className="form-label fw-medium">Họ</label>
-                                        <input
-                                            type="text"
-                                            className="form-control rounded-pill"
-                                            value={formData.firstName}
-                                            onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                                            disabled={!editing}
-                                        />
-                                    </div>
-                                    <div className="col-md-6 mb-3">
-                                        <label className="form-label fw-medium">Tên</label>
-                                        <input
-                                            type="text"
-                                            className="form-control rounded-pill"
-                                            value={formData.lastName}
-                                            onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                                            disabled={!editing}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="row">
-                                    <div className="col-md-6 mb-3">
-                                        <label className="form-label fw-medium">Email</label>
-                                        <input
-                                            type="email"
-                                            className="form-control rounded-pill"
-                                            value={formData.email}
-                                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                            disabled={!editing}
-                                        />
-                                    </div>
-                                    <div className="col-md-6 mb-3">
-                                        <label className="form-label fw-medium">Số điện thoại</label>
-                                        <input
-                                            type="tel"
-                                            className="form-control rounded-pill"
-                                            value={formData.phone}
-                                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                            disabled={!editing}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="row">
-                                    <div className="col-md-8 mb-3">
-                                        <label className="form-label fw-medium">Địa chỉ</label>
-                                        <input
-                                            type="text"
-                                            className="form-control rounded-pill"
-                                            value={formData.address}
-                                            onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                                            disabled={!editing}
-                                        />
-                                    </div>
-                                    <div className="col-md-4 mb-3">
-                                        <label className="form-label fw-medium">Ngày sinh</label>
-                                        <input
-                                            type="date"
-                                            className="form-control rounded-pill"
-                                            value={formData.birthday}
-                                            onChange={(e) => setFormData({ ...formData, birthday: e.target.value })}
-                                            disabled={!editing}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <Form.Group as={Row} className="mb-4">
+                            <Form.Label column sm={3}>Ngày sinh</Form.Label>
+                            <Col sm={9}>
+                                <Form.Control
+                                    type="date"
+                                    name="birthday"
+                                    value={formData.birthday}
+                                    onChange={handleChange}
+                                />
+                            </Col>
+                        </Form.Group>
 
-                        <div className="card border-0 rounded-4 gradient-card">
-                            <div className="card-header bg-transparent border-0">
-                                <h6 className="fw-bold mb-0 d-flex align-items-center">
-                                    <Shield size={18} className="text-primary me-2" />
-                                    Đổi mật khẩu
-                                </h6>
-                            </div>
-                            <div className="card-body">
-                                <div className="row">
-                                    <div className="col-md-4 mb-3">
-                                        <label className="form-label fw-medium">Mật khẩu hiện tại</label>
-                                        <input type="password" className="form-control rounded-pill" />
-                                    </div>
-                                    <div className="col-md-4 mb-3">
-                                        <label className="form-label fw-medium">Mật khẩu mới</label>
-                                        <input type="password" className="form-control rounded-pill" />
-                                    </div>
-                                    <div className="col-md-4 mb-3">
-                                        <label className="form-label fw-medium">Xác nhận mật khẩu</label>
-                                        <input type="password" className="form-control rounded-pill" />
-                                    </div>
-                                </div>
-                                <button className="btn btn-warning rounded-pill px-4">
-                                    <Shield size={16} className="me-2" />
-                                    Cập nhật mật khẩu
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                        <Button
+                            type="submit"
+                            variant="link"
+                            className="mb-2 text-white text-decoration-none"
+                            style={{ width: "100px", background: "repeating-linear-gradient(25deg, black, cyan 95px)" }}
+                            disabled={loading}
+                        >
+                            {loading ? "Đang lưu..." : "Lưu"}
+                        </Button>
+                    </Form>
+                </Col>
+
+                <Col md={4} className="text-center">
+                    <Image
+                        src={preview}
+                        roundedCircle
+                        className="mb-3"
+                        style={{ width: '150px', height: '150px', objectFit: 'cover' }}
+                    />
+                    <Form.Group controlId="formFile" className="mb-2">
+                        <Form.Control type="file" accept="image/*" onChange={handleImageChange} />
+                    </Form.Group>
+                    <p className="text-muted" style={{ fontSize: '0.875rem' }}>
+                        Dung lượng tối đa 1MB<br />
+                        Định dạng: .JPEG, .PNG
+                    </p>
+                </Col>
+            </Row>
+        </Container>
     );
 };
 
