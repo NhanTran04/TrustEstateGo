@@ -13,14 +13,13 @@ const Home = () => {
     const navigate = useNavigate();
     const { handleSaveProperty, savedProperties, setSearchQuery, setSelectedCategory, properties } = useProperty();
     const [featuredProperties, setFeaturedProperties] = useState([]);
-    const [stats, setStats] = useState({
-        totalProperties: 0,
-        successfulTransactions: 0,
-        partners: 0
-    });
+    // const [stats, setStats] = useState({
+    //     totalProperties: 0,
+    //     successfulTransactions: 0,
+    //     partners: 0
+    // });
 
     useEffect(() => {
-        // Lấy featured properties (6 properties đầu tiên)
         if (Array.isArray(properties)) {
             const featured = properties.slice(0, 6);
             setFeaturedProperties(featured);

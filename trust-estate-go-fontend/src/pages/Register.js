@@ -3,17 +3,24 @@ import { useNavigate, Link } from 'react-router-dom';
 import { User, Mail, Phone, Lock, Eye, EyeOff, Shield } from 'lucide-react';
 import useAuth from '../hooks/useAuth';
 import { api, endpoints } from '../services/api';
+import { BsGenderAmbiguous, BsGenderTrans } from 'react-icons/bs';
+import { TbAddressBook } from 'react-icons/tb';
+import { FaAddressCard, FaBirthdayCake } from 'react-icons/fa';
 
 const Register = () => {
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
         email: '',
+        address: '',
+        // gender: '',
+        // birthday: '',
         phone: '',
         username: '',
         password: '',
+        avatar: '',
         confirmPassword: '',
-        userType: 'USER'
+        roleId: 2
     });
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -21,6 +28,15 @@ const Register = () => {
     const [error, setError] = useState('');
     const { login } = useAuth();
     const navigate = useNavigate();
+
+    const handleChange = (e) => {
+        const { name, value, type, files } = e.target;
+        if (type === 'file') {
+            setFormData({ ...formData, [name]: files[0] });
+        } else {
+            setFormData({ ...formData, [name]: value });
+        }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -34,11 +50,21 @@ const Register = () => {
         }
 
         try {
-            const response = await api.post(endpoints.register, formData);
-            const { token, ...userData } = response.data;
 
+            const data = new FormData();
+            Object.entries(formData).forEach(([key, value]) => {
+                if (key !== 'confirmPassword' && value !== null && value !== '') {
+                    data.append(key, value);
+                }
+            });
+
+            const response = await api.post(endpoints.register, data, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+
+            const { token, ...userData } = response.data;
             login(userData, token);
-            navigate('/');
+            navigate('/login');
         } catch (err) {
             const errorMessage = err.response?.data?.message || 'Đăng ký thất bại. Vui lòng thử lại.';
             setError(errorMessage);
@@ -78,10 +104,11 @@ const Register = () => {
                                                 </span>
                                                 <input
                                                     type="text"
+                                                    name="lastName"
                                                     className="form-control border-start-0"
                                                     placeholder="Nhập họ"
-                                                    value={formData.firstName}
-                                                    onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                                                    value={formData.lastName}
+                                                    onChange={handleChange}
                                                     required
                                                 />
                                             </div>
@@ -94,10 +121,11 @@ const Register = () => {
                                                 </span>
                                                 <input
                                                     type="text"
+                                                    name="firstName"
                                                     className="form-control border-start-0"
                                                     placeholder="Nhập tên"
-                                                    value={formData.lastName}
-                                                    onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                                                    value={formData.firstName}
+                                                    onChange={handleChange}
                                                     required
                                                 />
                                             </div>
@@ -112,14 +140,66 @@ const Register = () => {
                                             </span>
                                             <input
                                                 type="email"
+                                                name="email"
                                                 className="form-control border-start-0"
                                                 placeholder="example@email.com"
                                                 value={formData.email}
-                                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                                onChange={handleChange}
                                                 required
                                             />
                                         </div>
                                     </div>
+
+                                    <div className="mb-3">
+                                        <label className="form-label fw-semibold">Địa chỉ</label>
+                                        <div className="input-group">
+                                            <span className="input-group-text bg-light border-end-0">
+                                                <FaAddressCard size={18} className="text-primary" />
+                                            </span>
+                                            <input
+                                                type="text"
+                                                name="address"
+                                                className="form-control border-start-0"
+                                                placeholder="Nhập địa chỉ"
+                                                value={formData.address}
+                                                onChange={handleChange}
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* <div className="row">
+                                        <div className="col-md-6 mb-3">
+                                            <label className="form-label fw-semibold">Giới tính</label>
+
+                                            <select
+                                                name="gender"
+                                                className="form-select"
+                                                value={formData.gender}
+                                                onChange={handleChange}
+                                                required
+                                            >
+                                                <option value="">-- Chọn giới tính --</option>
+                                                <option value={true}>Nam</option>
+                                                <option value={false}>Nữ</option>
+                                            </select>
+                                        </div>
+                                        <div className="col-md-6 mb-3">
+                                            <label className="form-label fw-semibold">Ngày sinh</label>
+                                            <div className="input-group">
+                                                <span className="input-group-text bg-light border-end-0">
+                                                    <FaBirthdayCake size={18} className="text-primary" />
+                                                </span>
+                                                <input
+                                                    type="date"
+                                                    name="birthday"
+                                                    className="form-control"
+                                                    value={formData.birthday}
+                                                    onChange={handleChange}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div> */}
 
                                     <div className="mb-3">
                                         <label className="form-label fw-semibold">Số điện thoại</label>
@@ -129,13 +209,25 @@ const Register = () => {
                                             </span>
                                             <input
                                                 type="tel"
+                                                name="phone"
                                                 className="form-control border-start-0"
                                                 placeholder="0901234567"
                                                 value={formData.phone}
-                                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                                onChange={handleChange}
                                                 required
                                             />
                                         </div>
+                                    </div>
+
+                                    <div className="mb-3">
+                                        <label className="form-label fw-semibold">Ảnh đại diện</label>
+                                        <input
+                                            type="file"
+                                            name="avatar"
+                                            className="form-control"
+                                            accept="image/*"
+                                            onChange={handleChange}
+                                        />
                                     </div>
 
                                     <div className="mb-3">
@@ -146,11 +238,11 @@ const Register = () => {
                                             </span>
                                             <select
                                                 className="form-select border-start-0"
-                                                value={formData.userType}
-                                                onChange={(e) => setFormData({ ...formData, userType: e.target.value })}
+                                                value={formData.roleId}
+                                                onChange={handleChange}
                                             >
-                                                <option value="USER">🏠 Người mua/thuê</option>
-                                                <option value="SELLER">🏢 Chủ nhà/Môi giới</option>
+                                                <option value={2}>🏠 Người mua/thuê</option>
+                                                <option value={3}>🏢 Chủ nhà/Môi giới</option>
                                             </select>
                                         </div>
                                     </div>
@@ -163,10 +255,11 @@ const Register = () => {
                                             </span>
                                             <input
                                                 type="text"
+                                                name="username"
                                                 className="form-control border-start-0"
                                                 placeholder="Nhập tên đăng nhập"
                                                 value={formData.username}
-                                                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                                                onChange={handleChange}
                                                 required
                                             />
                                         </div>
@@ -181,10 +274,11 @@ const Register = () => {
                                                 </span>
                                                 <input
                                                     type={showPassword ? 'text' : 'password'}
+                                                    name="password"
                                                     className="form-control border-start-0 pe-5"
                                                     placeholder="Nhập mật khẩu"
                                                     value={formData.password}
-                                                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                                    onChange={handleChange}
                                                     required
                                                 />
                                                 <button
@@ -205,10 +299,11 @@ const Register = () => {
                                                 </span>
                                                 <input
                                                     type={showConfirmPassword ? 'text' : 'password'}
+                                                    name="confirmPassword"
                                                     className="form-control border-start-0 pe-5"
                                                     placeholder="Nhập lại mật khẩu"
                                                     value={formData.confirmPassword}
-                                                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                                                    onChange={handleChange}
                                                     required
                                                 />
                                                 <button
@@ -221,13 +316,6 @@ const Register = () => {
                                                 </button>
                                             </div>
                                         </div>
-                                    </div>
-
-                                    <div className="form-check mb-4">
-                                        <input className="form-check-input" type="checkbox" id="terms" required />
-                                        <label className="form-check-label text-muted" htmlFor="terms">
-                                            Tôi đồng ý với <a href="#" className="text-primary text-decoration-none">Điều khoản sử dụng</a> và <a href="#" className="text-primary text-decoration-none">Chính sách bảo mật</a>
-                                        </label>
                                     </div>
 
                                     <button

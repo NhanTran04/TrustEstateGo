@@ -23,8 +23,8 @@ public class PropertySaveController {
     PropertySaveService proSaveService;
     CurrentUserService currentUserService;
 
-    @PreAuthorize("hasRole('USER')")
-    @GetMapping("/property-save")
+    @PreAuthorize("hasAnyRole('USER','SELLER')")
+    @GetMapping("/property-saves")
     ResponseEntity<ApiResponse<List<PropertySaveResponse>>> getPropertySavesByUserId(){
         try{
             return ResponseEntity
@@ -41,7 +41,7 @@ public class PropertySaveController {
         }
     }
 
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','SELLER')")
     @PostMapping("/properties/{propertyId}")
     ResponseEntity<ApiResponse<Void>> togglePropertySave(@PathVariable(value = "propertyId") int propertyId) {
         try {
@@ -59,23 +59,5 @@ public class PropertySaveController {
                             .build());
         }
     }
-
-//    @DeleteMapping("/{proSaveId}")
-//    ResponseEntity<ApiResponse<Void>> deletePropertySaves(@PathVariable int proSaveId) {
-//        try {
-//            proSaveService.deleteById(proSaveId);
-//            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(
-//                    ApiResponse.<Void>builder()
-//                            .result(null) // vì không có dữ liệu trả về
-//                            .build()
-//            );
-//        } catch (RuntimeException e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body(ApiResponse.<Void>builder()
-//                            .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
-//                            .message(e.getMessage())
-//                            .build());
-//        }
-//    }
 
 }

@@ -38,7 +38,7 @@ public class ReviewController {
         }
     }
 
-    @PreAuthorize("hasAnyRole('SELLER', USER)")
+    @PreAuthorize("hasAnyRole('SELLER', 'USER')")
     @GetMapping("/sellers/{sellerId}/reviews")
     public ResponseEntity<ApiResponse<PageResponse<ReviewResponse>>> getReviewBySellerId(@PathVariable int sellerId, Pageable pageable){
         try{

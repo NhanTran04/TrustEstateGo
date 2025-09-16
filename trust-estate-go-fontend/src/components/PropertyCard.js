@@ -41,7 +41,7 @@ const PropertyCard = ({ property, onSave, isSaved, showActions = false, onEdit, 
                     <img
                         src={mainImage}
                         className="card-img-top hover-scale transition-all"
-                        style={{ height: '220px', objectFit: 'cover' }}
+                        style={{ height: '220px', objectFit: 'contain' }}
                         alt={property.title}
                     // onError={(e) => {
                     //     e.target.src = 'https://via.placeholder.com/400x250?text=Ảnh+BDS';

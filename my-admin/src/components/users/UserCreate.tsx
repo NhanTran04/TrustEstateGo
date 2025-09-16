@@ -25,25 +25,8 @@ export const UserCreate: React.FC = () => (
                 </Box>
                 <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
                     <TextInput source="password" label="Mật khẩu" type="password" validate={[required(), minLength(6)]} />
-                    <SelectInput
-                        source="gender"
-                        label="Giới tính"
-                        choices={[
-                            { id: true, name: 'Nam' },
-                            { id: false, name: 'Nữ' },
-                        ]}
-                        validate={required()}
-                        defaultValue={true}
-                        sx={{ marginTop: 0 }}
-                    />
-                </Box>
-
-
-                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
-                    <DateInput source="birthday" label="Ngày sinh" />
                     <TextInput source="phone" label="Số điện thoại" />
                 </Box>
-
 
                 <TextInput source="address" label="Địa chỉ" multiline rows={2} />
                 <ReferenceInput source="roleId" reference="roles" label="Vai trò">

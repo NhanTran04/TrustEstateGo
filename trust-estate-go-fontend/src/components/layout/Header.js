@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Home, Plus, User, Bell, LogOut, Building, X, Menu } from 'lucide-react';
 import useAuth from '../../hooks/useAuth';
 import { api, endpoints } from '../../services/api';
+import { hasRole } from '../../utils/helper';
 
 // Hàm sinh slug từ tên category
 const toSlug = (text) => {
@@ -116,19 +117,34 @@ const Header = () => {
                                 </button>
                             </li>
                         )}
+
+                        {hasRole(user, 'SELLER') && (<li className="nav-item mx-1">
+                            <button
+                                className={`nav-link btn btn-link text-decoration-none fw-semibold px-3 py-2 rounded-pill ${currentPage === 'packages' ? 'bg-primary text-white shadow-sm' : 'text-dark'
+                                    }`}
+                                onClick={() => navigate('/packages')}
+                            >
+                                Gói tin
+                            </button>
+                        </li>
+                        )}
+
+
                     </ul>
 
                     {/* User menu */}
                     <div className="d-flex align-items-center gap-3">
                         {user ? (
                             <>
-                                <button
-                                    className="btn btn-outline-primary fw-semibold rounded-pill px-4 shadow-sm"
-                                    onClick={() => navigate('/create-property')}
-                                >
-                                    <Plus size={16} className="me-2" />
-                                    Đăng tin
-                                </button>
+                                {hasRole(user, "SELLER") && (
+                                    <button
+                                        className="btn btn-outline-primary fw-semibold rounded-pill px-4 shadow-sm"
+                                        onClick={() => navigate('/create-property')}
+                                    >
+                                        <Plus size={16} className="me-2" />
+                                        Đăng tin
+                                    </button>
+                                )}
                                 <div className="dropdown">
                                     <button
                                         className="btn btn-primary dropdown-toggle d-flex align-items-center fw-semibold rounded-pill px-4 shadow-sm"
@@ -151,18 +167,34 @@ const Header = () => {
                                                     Hồ sơ cá nhân
                                                 </button>
                                             </li>
-                                            <li>
-                                                <button
-                                                    className="dropdown-item d-flex align-items-center py-2 rounded-2 m-1"
-                                                    onClick={() => {
-                                                        navigate('/my-properties');
-                                                        setShowUserDropdown(false);
-                                                    }}
-                                                >
-                                                    <Building size={16} className="me-3 text-success" />
-                                                    BĐS của tôi
-                                                </button>
-                                            </li>
+                                            {hasRole(user, "SELLER") && (
+                                                <li>
+                                                    <button
+                                                        className="dropdown-item d-flex align-items-center py-2 rounded-2 m-1"
+                                                        onClick={() => {
+                                                            navigate('/my-properties');
+                                                            setShowUserDropdown(false);
+                                                        }}
+                                                    >
+                                                        <Building size={16} className="me-3 text-success" />
+                                                        BĐS của tôi
+                                                    </button>
+                                                </li>
+                                            )}
+                                            {hasRole(user, "SELLER") && (
+                                                <li>
+                                                    <button
+                                                        className="dropdown-item d-flex align-items-center py-2 rounded-2 m-1"
+                                                        onClick={() => {
+                                                            navigate('/payments/history');
+                                                            setShowUserDropdown(false);
+                                                        }}
+                                                    >
+                                                        <Building size={16} className="me-3 text-success" />
+                                                        Lịch sử thanh toán
+                                                    </button>
+                                                </li>
+                                            )}
                                             <li>
                                                 <button
                                                     className="dropdown-item d-flex align-items-center py-2 rounded-2 m-1"
@@ -189,13 +221,13 @@ const Header = () => {
                         ) : (
                             <div className="d-flex gap-2">
                                 <button
-                                    className="btn btn-outline-primary fw-semibold rounded-pill px-4"
+                                    className={`btn fw-semibold rounded-pill px-4 ${currentPage === 'login' ? 'btn-primary shadow-sm text-white' : 'btn-outline-primary'}`}
                                     onClick={() => navigate('/login')}
                                 >
                                     Đăng nhập
                                 </button>
                                 <button
-                                    className="btn btn-primary fw-semibold rounded-pill px-4 shadow-sm"
+                                    className={`btn fw-semibold rounded-pill px-4 ${currentPage === 'register' ? 'btn-primary shadow-sm text-white' : 'btn-outline-primary'}`}
                                     onClick={() => navigate('/register')}
                                 >
                                     Đăng ký

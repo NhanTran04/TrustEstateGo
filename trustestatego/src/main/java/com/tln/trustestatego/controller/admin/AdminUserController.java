@@ -56,7 +56,7 @@ public class AdminUserController {
                 .body(userService.createUser(userCreationRequest));
     }
 
-    @PutMapping(path = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(path = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserResponse> updateUser(
             @PathVariable int userId,
             @ModelAttribute UserUpdateRequest userUpdateRequest) {

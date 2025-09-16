@@ -26,8 +26,8 @@ export const AuthProvider = ({ children }) => {
     const fetchCurrentUser = async () => {
         try {
             const response = await authApi().get(endpoints.currentUser);
-            setUser(response.data);
-            localStorage.setItem("user", JSON.stringify(response.data));
+            setUser(response.data.result);
+            localStorage.setItem("user", JSON.stringify(response.data.result));
         } catch (err) {
             logout();
         } finally {
@@ -40,9 +40,20 @@ export const AuthProvider = ({ children }) => {
             const response = await api.post(endpoints.login, loginData);
             const { token, user: userData } = response.data;
 
+            const allowedRoles = ["USER", "SELLER"];
+            const hasValidRole = userData.roles?.some(r => allowedRoles.includes(r.name));
+
+            if (!hasValidRole) {
+                return {
+                    success: false,
+                    error: "Tài khoản của bạn không có quyền đăng nhập vào hệ thống."
+                };
+            }
+
             localStorage.setItem("token", token);
             localStorage.setItem("user", JSON.stringify(userData));
             setUser(userData);
+
 
             return { success: true };
         } catch (err) {

@@ -19,8 +19,7 @@ const Saved = () => {
     const fetchSavedProperties = async () => {
         try {
             const response = await authApi().get(endpoints.propertySave);
-            const savedIds = response.data.map(item => item.propertyId);
-            setSavedProperties(savedIds);
+            setSavedProperties(response.data.result);
         } catch (err) {
             setError('Không thể tải danh sách đã lưu');
             console.error('Error fetching saved properties:', err);
@@ -28,8 +27,6 @@ const Saved = () => {
             setLoading(false);
         }
     };
-
-    const savedPropertiesData = properties.filter(p => savedProperties.includes(p.id));
 
     if (loading) {
         return (
@@ -61,12 +58,23 @@ const Saved = () => {
                     <p className="text-muted">Quản lý danh sách các BDS bạn yêu thích</p>
                 </div>
 
-                {savedPropertiesData.length > 0 ? (
+                {savedProperties.length > 0 ? (
                     <div className="row">
-                        {savedPropertiesData.map(property => (
+                        {savedProperties.map(item => (
                             <PropertyCard
-                                key={property.id}
-                                property={property}
+                                key={item.propertyId}
+                                property={{
+                                    id: item.propertyId,
+                                    title: item.propertyTitle,
+                                    price: item.propertyPrice,
+                                    location: item.propertyLocation,
+                                    images: [item.propertyImage],
+                                    area: item.propertyArea,
+                                    bedroom: item.propertyBedroom,
+                                    interior: item.propertyInterior,
+                                    categoryName: item.categoryName,
+                                    createdAt: item.propertyCreatedAt
+                                }}
                                 onSave={handleSaveProperty}
                                 isSaved={true}
                             />

@@ -34,18 +34,13 @@ public class SecurityConfig {
     private final String[] PUBLIC_ENDPOINTS = {
             "/api/properties",
             "/api/users/*/properties",
+            "/api/users",
             "/api/properties/*",
             "/api/properties/search",
             "/api/categories",
             "/api/property-types",
-            "/api/auth/**"
+            "/api/auth/**",
     };
-    //"/api/properties",
-    //            "/api/users/{sellerId}/properties",
-    //            "/api/properties/{propertyId}",
-    //            "/api/properties/search",
-    //            "/api/categories",
-    //            "/api/auth/**"
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -87,7 +82,7 @@ public class SecurityConfig {
                 "http://localhost:3000",
                 "http://localhost:5173"
 ));
-        corsConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        corsConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH" , "OPTIONS"));
         corsConfig.setAllowedHeaders(List.of("*"));
         corsConfig.setExposedHeaders(List.of("Authorization", "Content-Range"));
         corsConfig.setAllowCredentials(true);

@@ -34,8 +34,8 @@ public class Payment {
     @Column(name = "payment_method", length = 50)
     private String paymentMethod;
 
-    @Column(name = "transaction_id", length = 100)
-    private String transactionId;
+//    @Column(name = "transaction_id", length = 100)
+//    private String transactionId;
 
     @Column(name = "is_pay")
     private Boolean isPay;
@@ -45,5 +45,20 @@ public class Payment {
 
     @Column(name = "paid_at")
     private LocalDateTime paidAt;
+
+    // PayPal Order ID
+    @Column(name = "order_id", length = 100)
+    private String orderId;
+
+    // PayPal Capture ID
+    @Column(name = "capture_id", length = 100)
+    private String captureId;
+
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    // Auto set khi update
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
 }

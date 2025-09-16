@@ -77,7 +77,7 @@ export const PropertyProvider = ({ children }) => {
 
         try {
             const response = await authApi().get(endpoints.propertySave);
-            setSavedProperties(response.data.map(item => item.propertyId));
+            setSavedProperties(response.data.result.map(item => item.propertyId));
         } catch (err) {
             console.error('Error fetching saved properties:', err);
             setSavedProperties([]);
@@ -93,11 +93,10 @@ export const PropertyProvider = ({ children }) => {
         }
 
         try {
+            await authApi().post(`${endpoints.properties}/${propertyId}`); // toggle
             if (savedProperties.includes(propertyId)) {
-                await authApi().delete(`${endpoints.propertySave}/${propertyId}`);
                 setSavedProperties(prev => prev.filter(id => id !== propertyId));
             } else {
-                await authApi().post(endpoints.propertySave, { propertyId });
                 setSavedProperties(prev => [...prev, propertyId]);
             }
         } catch (err) {

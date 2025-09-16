@@ -23,6 +23,7 @@ public class UserCreationRequest {
     String firstName;
     String lastName;
     Boolean gender;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     LocalDate birthday;
     String email;
     String address;

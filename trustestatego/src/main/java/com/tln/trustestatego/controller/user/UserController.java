@@ -41,21 +41,6 @@ public class UserController {
     }
 
 
-//    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-//    public ResponseEntity<ApiResponse<UserResponse>> createUser(@ModelAttribute UserCreationRequest userCreationRequest) {
-//        try {
-//            return ResponseEntity.status(HttpStatus.CREATED)
-//                    .body(ApiResponse.<UserResponse>builder()
-//                            .result(userService.createUser(userCreationRequest))
-//                            .build());
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-//                    .body(ApiResponse.<UserResponse>builder()
-//                            .message(e.getMessage())
-//                            .build());
-//        }
-//    }
-
     @PreAuthorize("hasAnyRole('SELLER', 'USER')")
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<UserResponse>> updateUser(

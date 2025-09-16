@@ -13,7 +13,8 @@ export const endpoints = {
     propertySave: "/property-saves",
     reports: "/reports",
     reviews: "/reviews",
-    propertyTypes: "/property-types"
+    propertyTypes: "/property-types",
+    payments: "/payments"
     // stats: "/stats"
 };
 

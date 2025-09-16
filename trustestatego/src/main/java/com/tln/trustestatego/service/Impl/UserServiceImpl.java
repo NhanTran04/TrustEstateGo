@@ -31,9 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -77,6 +75,7 @@ public class UserServiceImpl implements UserService {
         return userMapper.toUserResponse(user);
     }
 
+    @Override
     public UserResponse createUser(UserCreationRequest request) {
         // Check user đã tồn tại chưa
         Optional<User> optionalUser = userRepository.findByUsername(request.getUsername());
@@ -140,45 +139,64 @@ public class UserServiceImpl implements UserService {
 //        return getUserById(user.getId());
 //    }
 
+//    @Override
+//    public UserResponse updateUserFromAdmin(int userId, UserUpdateRequest userUpdateRequest) {
+//        User user = userRepository.findById(userId)
+//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+//
+//        // Map các field cơ bản
+//        userMapper.update(user, userUpdateRequest);
+//
+//        // Cập nhật password nếu có
+//        if (userUpdateRequest.getPassword() != null && !userUpdateRequest.getPassword().isBlank()) {
+//            user.setPassword(passwordEncoder.encode(userUpdateRequest.getPassword()));
+//        }
+//
+//        // Cập nhật avatar nếu có
+//        String image = upload(userUpdateRequest.getAvatar());
+//        if (image != null) {
+//            user.setAvatar(image);
+//        }
+//
+//        // Cập nhật gender và birthday nếu có
+//        if (userUpdateRequest.getGender() != null) {
+//            user.setGender(userUpdateRequest.getGender());
+//        }
+//        if (userUpdateRequest.getBirthday() != null) {
+//            user.setBirthday(userUpdateRequest.getBirthday());
+//        }
+//
+//        // ===================== UPDATE ROLE (Cách 1) =====================
+//        if (userUpdateRequest.getRoleId() != null && !userUpdateRequest.getRoleId().isEmpty()) {
+//            // Xoá hết role cũ
+//            userRoleRepository.deleteByUserId(userId);
+//            userRoleRepository.flush();
+//
+//            // Thêm lại role mới
+//            for (Integer roleId : userUpdateRequest.getRoleId().stream().distinct().toList()) {
+//                Role role = roleRepository.findById(roleId)
+//                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found"));
+//
+//                UserRole userRole = new UserRole();
+//                userRole.setUser(user);
+//                userRole.setRole(role);
+//                userRoleRepository.save(userRole);
+//            }
+//        }
+//        // ===============================================================
+//
+//        user.setUpdatedAt(LocalDateTime.now());
+//        user = userRepository.save(user);
+//
+//        return userMapper.toUserResponse(user);
+//    }
+
     @Override
     public UserResponse updateUserFromAdmin(int userId, UserUpdateRequest userUpdateRequest) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-        // Map các field cơ bản
-        userMapper.update(user, userUpdateRequest);
-
-        // Cập nhật password nếu có
-        if (userUpdateRequest.getPassword() != null && !userUpdateRequest.getPassword().isBlank()) {
-            user.setPassword(passwordEncoder.encode(userUpdateRequest.getPassword()));
-        }
-
-        // Cập nhật avatar nếu có
-        String image = upload(userUpdateRequest.getAvatar());
-        if (image != null) {
-            user.setAvatar(image);
-        }
-
-        // Cập nhật roles nếu có truyền
-        if (userUpdateRequest.getRoleId() != null && !userUpdateRequest.getRoleId().isEmpty()) {
-            userRoleRepository.deleteByUserId(userId);
-
-            // Gán role mới
-            for (Integer roleId : userUpdateRequest.getRoleId()) {
-                if (userUpdateRequest.getGender() != null) user.setGender(userUpdateRequest.getGender());
-                if (userUpdateRequest.getBirthday() != null) user.setBirthday(userUpdateRequest.getBirthday());
-                if (userUpdateRequest.getAvatar() != null && !userUpdateRequest.getAvatar().isEmpty()) {
-                    user.setAvatar(upload(userUpdateRequest.getAvatar()));
-                }
-                Role role = roleRepository.findById(roleId)
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found"));
-
-                UserRole userRole = new UserRole();
-                userRole.setUser(user);
-                userRole.setRole(role);
-                userRoleRepository.save(userRole);
-            }
-        }
+        updateUserFields(user, userUpdateRequest, true);
 
         user.setUpdatedAt(LocalDateTime.now());
         user = userRepository.save(user);
@@ -189,6 +207,16 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse updateUser(UserUpdateRequest userUpdateRequest) {
         User user = currentUserService.getCurrentUser();
+
+        updateUserFields(user, userUpdateRequest, false);
+
+        user.setUpdatedAt(LocalDateTime.now());
+        user = userRepository.save(user);
+
+        return userMapper.toUserResponse(user);
+    }
+    
+    private void updateUserFields(User user, UserUpdateRequest userUpdateRequest, boolean isAdmin) {
         // Map các field cơ bản
         userMapper.update(user, userUpdateRequest);
 
@@ -203,17 +231,37 @@ public class UserServiceImpl implements UserService {
             user.setAvatar(image);
         }
 
-        // Cập nhật roles nếu có truyền
-        if (userUpdateRequest.getRoleId() != null && !userUpdateRequest.getRoleId().isEmpty()) {
-            userRoleRepository.deleteByUserId(user.getId());
+        // Cập nhật gender và birthday nếu có
+        if (userUpdateRequest.getGender() != null) {
+            user.setGender(userUpdateRequest.getGender());
+        }
+        if (userUpdateRequest.getBirthday() != null) {
+            user.setBirthday(userUpdateRequest.getBirthday());
+        }
 
-            // Gán role mới
-            for (Integer roleId : userUpdateRequest.getRoleId()) {
-                if (userUpdateRequest.getGender() != null) user.setGender(userUpdateRequest.getGender());
-                if (userUpdateRequest.getBirthday() != null) user.setBirthday(userUpdateRequest.getBirthday());
-                if (userUpdateRequest.getAvatar() != null && !userUpdateRequest.getAvatar().isEmpty()) {
-                    user.setAvatar(upload(userUpdateRequest.getAvatar()));
-                }
+        // Nếu là admin thì cho phép cập nhật roles
+        if (isAdmin && userUpdateRequest.getRoleId() != null) {
+            // Lấy danh sách role hiện tại
+            List<UserRole> currentRoles = userRoleRepository.findByUserId(user.getId());
+            Set<Integer> currentRoleIds = currentRoles.stream()
+                    .map(ur -> ur.getRole().getId())
+                    .collect(Collectors.toSet());
+
+            Set<Integer> newRoleIds = new HashSet<>(userUpdateRequest.getRoleId());
+
+            // Roles cần xóa
+            Set<Integer> rolesToRemove = new HashSet<>(currentRoleIds);
+            rolesToRemove.removeAll(newRoleIds);
+
+            // Roles cần thêm
+            Set<Integer> rolesToAdd = new HashSet<>(newRoleIds);
+            rolesToAdd.removeAll(currentRoleIds);
+
+            if (!rolesToRemove.isEmpty()) {
+                userRoleRepository.deleteByUserIdAndRoleIdIn(user.getId(), rolesToRemove);
+            }
+
+            for (Integer roleId : rolesToAdd) {
                 Role role = roleRepository.findById(roleId)
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found"));
 
@@ -222,12 +270,9 @@ public class UserServiceImpl implements UserService {
                 userRole.setRole(role);
                 userRoleRepository.save(userRole);
             }
+
+            userRoleRepository.flush();
         }
-
-        user.setUpdatedAt(LocalDateTime.now());
-        user = userRepository.save(user);
-
-        return userMapper.toUserResponse(user);
     }
 
     private String upload(MultipartFile file){

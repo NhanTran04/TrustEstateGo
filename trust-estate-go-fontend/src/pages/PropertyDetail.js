@@ -110,7 +110,7 @@ const PropertyDetail = () => {
                                     <img
                                         src={property.images?.[activeImage]}
                                         className="img-fluid w-100 rounded-top-4"
-                                        style={{ height: '500px', objectFit: 'cover' }}
+                                        style={{ height: '400px', objectFit: 'contain' }}
                                         alt={property.title}
                                     />
 

@@ -19,6 +19,12 @@ public interface PropertySaveMapper {
             expression = "java(propertySave.getProperty().getPropertyImages().isEmpty() ? null : propertySave.getProperty().getPropertyImages().iterator().next().getImageUrl())"
     )
     @Mapping(source = "property.id", target = "propertyId")
-    @Mapping(source = "user.id", target = "userId")
+    @Mapping(source = "property.price", target = "propertyPrice")
+    @Mapping(source = "property.location", target = "propertyLocation")
+    @Mapping(source = "property.bedroom", target = "propertyBedroom")
+    @Mapping(source = "property.interior", target = "propertyInterior")
+    @Mapping(source = "property.createdAt", target = "propertyCreatedAt")
+    @Mapping(source = "property.category.name", target = "categoryName")
+    @Mapping(source = "property.area", target = "propertyArea")
     PropertySaveResponse toPropertySaveResponse(PropertySave propertySave);
 }

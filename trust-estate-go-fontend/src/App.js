@@ -13,6 +13,10 @@ import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import useAuth from './hooks/useAuth';
 import PropertyDetail from './pages/PropertyDetail';
+import Packages from './pages/Packages';
+import PaymentSuccess from './pages/PaymentSuccess';
+import PaymentCancel from './pages/PaymentCancel';
+import PaymentHistory from './pages/PaymentHistory';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -62,14 +66,26 @@ const AppContent = () => {
         {/* <Route path="/rentals" element={<Rentals />} /> */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/payment-success" element={<PaymentSuccess />} />
+        <Route path="/payment-cancel" element={<PaymentCancel />} />
         <Route path="/saved" element={
           <ProtectedRoute>
             <Saved />
           </ProtectedRoute>
         } />
+        <Route path="/packages" element={
+          <ProtectedRoute>
+            <Packages />
+          </ProtectedRoute>
+        } />
         <Route path="/profile" element={
           <ProtectedRoute>
             <Profile />
+          </ProtectedRoute>
+        } />
+        <Route path="/payments/history" element={
+          <ProtectedRoute>
+            <PaymentHistory />
           </ProtectedRoute>
         } />
         <Route path="*" element={<Navigate to="/" />} />
