@@ -17,6 +17,9 @@ import Packages from './pages/Packages';
 import PaymentSuccess from './pages/PaymentSuccess';
 import PaymentCancel from './pages/PaymentCancel';
 import PaymentHistory from './pages/PaymentHistory';
+import Chat from './pages/Chat';
+import ChatRoom from './pages/ChatRoom';
+import ChatList from './pages/ChatList';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -68,6 +71,21 @@ const AppContent = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path="/payment-cancel" element={<PaymentCancel />} />
+        <Route path="/chat" element={
+          <ProtectedRoute>
+            <Chat />
+          </ProtectedRoute>
+        } />
+        <Route path="/chat/:roomId" element={
+          <ProtectedRoute>
+            <ChatRoom />
+          </ProtectedRoute>
+        } />
+        <Route path="/chat/rooms" element={
+          <ProtectedRoute>
+            <ChatList />
+          </ProtectedRoute>
+        } />
         <Route path="/saved" element={
           <ProtectedRoute>
             <Saved />

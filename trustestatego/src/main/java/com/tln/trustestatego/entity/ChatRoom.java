@@ -31,9 +31,9 @@ public class ChatRoom {
     @JoinColumn(name = "seller_id")
     private User seller;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "property_id")
-    private Property property;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "property_id")
+//    private Property property;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

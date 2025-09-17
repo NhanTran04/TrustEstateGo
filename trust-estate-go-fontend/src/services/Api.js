@@ -14,7 +14,11 @@ export const endpoints = {
     reports: "/reports",
     reviews: "/reviews",
     propertyTypes: "/property-types",
-    payments: "/payments"
+    payments: "/payments",
+    chatRoom: (sellerId) => `/chat/room/${sellerId}`,
+    chatRooms: "/chat/rooms",
+    chatMessages: (roomId) => `/chat/messages/${roomId}`, // GET
+    ws: "http://localhost:8080/trustestatego/ws",
     // stats: "/stats"
 };
 

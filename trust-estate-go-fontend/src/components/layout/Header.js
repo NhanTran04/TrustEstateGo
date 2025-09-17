@@ -129,6 +129,16 @@ const Header = () => {
                         </li>
                         )}
 
+                        {user && (<li className="nav-item mx-1">
+                            <button
+                                className={`nav-link btn btn-link text-decoration-none fw-semibold px-3 py-2 rounded-pill ${currentPage === 'chat' ? 'bg-primary text-white shadow-sm' : 'text-dark'
+                                    }`}
+                                onClick={() => navigate('/chat/rooms')}
+                            >
+                                Tin nhắn
+                            </button>
+                        </li>
+                        )}
 
                     </ul>
 

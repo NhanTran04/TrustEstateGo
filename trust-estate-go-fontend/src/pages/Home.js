@@ -6,7 +6,6 @@ import PropertyCard from '../components/PropertyCard';
 import { mockProperties } from '../data/mockData';
 import { useProperty } from '../contexts/PropertyContext';
 import HeroSection from '../components/layout/HeroSection';
-import { authApi, endpoints } from '../services/api';
 import PropertyTypeSection from '../components/layout/PropertyTypeSection';
 
 const Home = () => {

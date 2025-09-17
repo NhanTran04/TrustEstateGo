@@ -49,10 +49,24 @@ const PropertyDetail = () => {
         setIsSaved(!isSaved);
     };
 
-    const handleContact = () => {
-        alert('Tính năng liên hệ sẽ được kích hoạt sau!');
-    };
+    const handleContact = async () => {
+        if (!user) {
+            alert("Vui lòng đăng nhập để nhắn tin");
+            return;
+        }
 
+        try {
+            // gọi API tạo room
+            const res = await authApi().post(endpoints.chatRoom(property.userId));
+            const room = res.data; // ChatRoomResponse
+
+            // điều hướng sang trang chat, truyền roomId
+            navigate(`/chat/${room.id}`);
+        } catch (err) {
+            console.error("Error creating chat room:", err);
+            alert("Không thể mở phòng chat");
+        }
+    };
     if (loading) {
         return (
             <div className="min-vh-100 d-flex align-items-center justify-content-center" style={{ paddingTop: '100px' }}>
@@ -250,7 +264,6 @@ const PropertyDetail = () => {
                                     </div>
                                 </div>
 
-                                {/* Amenities */}
                                 <div className="mb-4">
                                     <h5 className="fw-bold mb-3">Tiện nghi</h5>
                                     <div className="row">
