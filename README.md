@@ -21,10 +21,8 @@ It supports property posting, advanced search, PayPal-based subscriptions, and r
 ---
 
 ## Sandbox Test Account
-- **Email**: sb-testaccount@example.com  
-- **Password**: Test@12345  
-
-*(You can replace with your real PayPal sandbox test account when deploying)*
+- **Email**: sb-mcyl246179052@personal.example.com 
+- **Password**: qF+@C^1"
 
 ---
 
