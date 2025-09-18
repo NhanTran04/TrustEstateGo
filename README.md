@@ -16,7 +16,6 @@ It supports property posting, advanced search, PayPal-based subscriptions, and r
 - Real-time chat between users and sellers with **WebSocket**
 - Property posting with images stored on **Cloudinary**
 - API testing with **Postman**
-- Containerization with **Docker**
 
 ---
 
