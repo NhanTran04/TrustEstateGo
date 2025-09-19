@@ -40,6 +40,7 @@ public class SecurityConfig {
             "/api/categories",
             "/api/property-types",
             "/api/auth/**",
+            "/api/chat-box"
     };
 
     @Bean

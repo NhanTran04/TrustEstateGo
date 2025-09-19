@@ -19,6 +19,7 @@ export const endpoints = {
     chatRooms: "/chat/rooms",
     chatMessages: (roomId) => `/chat/messages/${roomId}`, // GET
     ws: "http://localhost:8080/trustestatego/ws",
+    chatBox: "/chat-box"
     // stats: "/stats"
 };
 

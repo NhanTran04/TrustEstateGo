@@ -7,6 +7,7 @@ import { mockProperties } from '../data/mockData';
 import { useProperty } from '../contexts/PropertyContext';
 import HeroSection from '../components/layout/HeroSection';
 import PropertyTypeSection from '../components/layout/PropertyTypeSection';
+import ChatBox from '../components/ChatBox';
 
 const Home = () => {
     const navigate = useNavigate();
@@ -99,6 +100,7 @@ const Home = () => {
                     </button>
                 </div>
             </div>
+            <ChatBox />
         </div>
     );
 };

@@ -26,8 +26,16 @@ spring:
         one-indexed-parameters: true  # page=1 sẽ là trang đầu (mặc định Spring là page=0)
   elasticsearch:
     uris: http://localhost:9200
-#    username: elastic
-#    password: NQbLpkuruBK5c0*80vba
+    #    username: elastic
+    #    password: NQbLpkuruBK5c0*80vba
+
+
+app:
+  api:
+    gemini:
+      api-key: ${GEMINI_KEY}            # set env var GEMINI_API_KEY
+      base-url: https://generativelanguage.googleapis.com
+      model: gemini-2.5-flash
 
 cloudinary:
   cloud-name: diimcwvs5
