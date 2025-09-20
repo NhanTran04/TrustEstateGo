@@ -5,12 +5,10 @@ import api, { endpoints } from "../services/api";
 function BuyPackageButton({ packageId }) {
   const handleBuy = async () => {
     try {
-      // Gọi backend để tạo order
       const res = await api.post(endpoints.createPayment(packageId));
       const { approvalLink } = res.data;
 
       if (approvalLink) {
-        // Redirect sang PayPal cho user login/approve
         window.location.href = approvalLink;
       } else {
         alert("Không lấy được approval link!");

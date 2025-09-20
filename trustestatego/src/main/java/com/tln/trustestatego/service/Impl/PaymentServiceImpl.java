@@ -2,6 +2,7 @@ package com.tln.trustestatego.service.Impl;
 
 import com.paypal.core.PayPalHttpClient;
 import com.paypal.http.HttpResponse;
+import com.paypal.http.exceptions.HttpException;
 import com.paypal.orders.*;
 import com.tln.trustestatego.dto.response.PaymentResponse;
 import com.tln.trustestatego.entity.Package;
@@ -100,24 +101,41 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public PaymentResponse captureOrder(String orderId) throws IOException {
-        OrdersCaptureRequest request = new OrdersCaptureRequest(orderId);
-        HttpResponse<Order> response = payPalClient.execute(request);
-        Order order = response.result();
-
-        String captureId = order.purchaseUnits()
-                .get(0).payments().captures().get(0).id();
-
         Payment payment = paymentRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Payment not found"));
+        // Nếu đã thanh toán rồi thì không gọi PayPal nữa
+        if (Boolean.TRUE.equals(payment.getIsPay())) {
+            return paymentMapper.toResponse(payment);
+        }
+        try {
+            OrdersCaptureRequest request = new OrdersCaptureRequest(orderId);
+            HttpResponse<Order> response = payPalClient.execute(request);
+            Order order = response.result();
 
-        payment.setIsPay(true);
-        payment.setCaptureId(captureId);
-        payment.setPaidAt(LocalDateTime.now());
-        payment.setUpdatedAt(LocalDateTime.now());
+            String captureId = order.purchaseUnits()
+                    .get(0).payments().captures().get(0).id();
 
-        Payment updatedPayment = paymentRepository.save(payment);
 
-        return paymentMapper.toResponse(updatedPayment);
+            if ("COMPLETED".equals(order.status())) {
+                payment.setIsPay(true);
+            } else {
+                throw new IllegalStateException("Payment not completed: " + order.status());
+            }
+            payment.setCaptureId(captureId);
+            payment.setPaidAt(LocalDateTime.now());
+            payment.setUpdatedAt(LocalDateTime.now());
+
+            Payment updatedPayment = paymentRepository.save(payment);
+
+            return paymentMapper.toResponse(updatedPayment);
+
+        } catch (HttpException e) {
+            if (e.getMessage().contains("ORDER_ALREADY_CAPTURED")) {
+                // lấy record Payment từ DB trả về cho frontend
+                return paymentMapper.toResponse(payment);
+            }
+            throw e;
+        }
     }
 
     @Override

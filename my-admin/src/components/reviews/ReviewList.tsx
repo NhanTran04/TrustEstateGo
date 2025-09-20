@@ -8,7 +8,7 @@ export const ReviewList = () => {
 
     return (
         <List
-            resource={`reviews`} // gọi đúng API GET /api/reviews/{sellerId}/reviews
+            resource={`reviews`}
             perPage={10}
             filter={{}} // tránh bị đính filter mặc định
             queryOptions={{ meta: { sellerId } }}

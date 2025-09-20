@@ -1,7 +1,7 @@
 // src/authProvider.ts
 import { AuthProvider } from 'react-admin';
 
-const apiUrl = "http://localhost:8080/trustestatego/api"; // đổi thành endpoint Spring Boot của bạn
+const apiUrl = "http://localhost:8080/trustestatego/api";
 
 export const authProvider: AuthProvider = {
     login: async ({ username, password }) => {

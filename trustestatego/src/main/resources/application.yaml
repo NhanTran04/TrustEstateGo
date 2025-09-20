@@ -2,14 +2,15 @@ server:
   port: 8080
   servlet:
     context-path: /trustestatego
-    multipart:
-      enabled : true
-      max-file-size: 100MB
-      max-request-size: 300MB
-      file-size-threshold: 2MB
-      resolve-lazily: false
 
 spring:
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 200MB
+      max-request-size: 400MB
+      file-size-threshold: 10MB
+      resolve-lazily: false
   datasource:
     url: "jdbc:mysql://localhost:3306/trust_estate_go"
     username: root
@@ -28,6 +29,8 @@ spring:
     uris: http://localhost:9200
     #    username: elastic
     #    password: NQbLpkuruBK5c0*80vba
+
+
 
 
 app:

@@ -10,6 +10,7 @@ import { dataProvider } from "./dataProvider";
 import { createTheme, List } from "@mui/material";
 import {
   Category,
+  DashboardCustomize,
   Person,
   PlaylistAddCheckSharp,
   PostAdd,
@@ -55,10 +56,17 @@ import { PermissionEdit } from "./components/permissions/PermissionEdit";
 import { PermissionCreate } from "./components/permissions/PermissionCreate";
 import { authProvider } from "./AuthProvider";
 import LoginPage from "./LoginPage";
+import Dashboard from "./components/dashboard/Dashboard";
 
 // 🌟 Custom Menu
 const MyMenu = () => (
   <List sx={{ padding: 2 }}>
+    <MenuItemLink
+      to="/dashboard"
+      primaryText="Dashboard"
+      leftIcon={<DashboardCustomize />}
+      sx={{ mb: 2 }}
+    />
     <MenuItemLink
       to="/users"
       primaryText="Người dùng"
@@ -135,9 +143,10 @@ export const App = () => (
     loginPage={LoginPage}
     title="TrustEstate Admin"
     theme={theme}
-    layout={MyLayout} // dùng menu custom
+    layout={MyLayout}
   >
     <CustomRoutes>
+      <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/user-properties/:userId" element={<UserPropertiesList />} />
       <Route path="/sellers/:sellerId/reviews" element={<ReviewList />} />
       <Route
