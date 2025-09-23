@@ -83,8 +83,8 @@ public class User {
     @OneToMany(mappedBy = "user")
     private Set<PropertySave> propertySaves = new LinkedHashSet<>();
 
-    @OneToMany(mappedBy = "user")
-    private Set<PropertyView> propertyViews = new LinkedHashSet<>();
+//    @OneToMany(mappedBy = "user")
+//    private Set<PropertyView> propertyViews = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "user")
     private Set<Report> reportsAsUser = new LinkedHashSet<>();

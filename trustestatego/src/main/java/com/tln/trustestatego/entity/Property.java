@@ -79,8 +79,8 @@ public class Property {
     @OneToMany(mappedBy = "property")
     private Set<PropertySave> propertySaves = new LinkedHashSet<>();
 
-    @OneToMany(mappedBy = "property")
-    private Set<PropertyView> propertyViews = new LinkedHashSet<>();
+//    @OneToMany(mappedBy = "property")
+//    private Set<PropertyView> propertyViews = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "property")
     private Set<Report> reports = new LinkedHashSet<>();

@@ -3,10 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { Building, Award, Users, Globe } from 'lucide-react';
 import PropertyCard from '../components/PropertyCard';
 
-import { mockProperties } from '../data/mockData';
 import { useProperty } from '../contexts/PropertyContext';
 import HeroSection from '../components/layout/HeroSection';
 import PropertyTypeSection from '../components/layout/PropertyTypeSection';
+import ChatBox from '../components/ChatBox';
 
 const Home = () => {
     const navigate = useNavigate();
@@ -99,6 +99,7 @@ const Home = () => {
                     </button>
                 </div>
             </div>
+            <ChatBox />
         </div>
     );
 };

@@ -149,7 +149,7 @@ const Header = () => {
                                 {hasRole(user, "SELLER") && (
                                     <button
                                         className="btn btn-outline-primary fw-semibold rounded-pill px-4 shadow-sm"
-                                        onClick={() => navigate('/create-property')}
+                                        onClick={() => navigate('/properties/create')}
                                     >
                                         <Plus size={16} className="me-2" />
                                         Đăng tin

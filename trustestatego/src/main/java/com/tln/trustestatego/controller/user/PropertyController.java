@@ -116,11 +116,13 @@ public class PropertyController {
     @PostMapping(path = "/properties",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<PropertyResponse>> createProperty(@ModelAttribute PropertyRequest propertyRequest) {
         try {
+            System.out.println("📥 PropertyRequest nhận được: " + propertyRequest);
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(ApiResponse.<PropertyResponse>builder()
                             .result(propertyService.createProperty(propertyRequest))
                             .build());
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(ApiResponse.<PropertyResponse>builder()
                             .code(HttpStatus.BAD_REQUEST.value())

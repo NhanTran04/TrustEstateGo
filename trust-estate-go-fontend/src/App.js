@@ -4,7 +4,6 @@ import { AuthProvider } from './contexts/AuthContext';
 import { PropertyProvider, useProperty } from './contexts/PropertyContext';
 import Home from './pages/Home';
 import Properties from './pages/Properties';
-import Rentals from './pages/Rentals';
 import Saved from './pages/Saved';
 import Profile from './pages/Profile';
 import Login from './pages/Login';
@@ -20,6 +19,8 @@ import PaymentHistory from './pages/PaymentHistory';
 import Chat from './pages/Chat';
 import ChatRoom from './pages/ChatRoom';
 import ChatList from './pages/ChatList';
+import CreateEditProperty from './pages/CreateEditProperty';
+import SellerPropertyList from './pages/SellerPropertyList';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -66,11 +67,25 @@ const AppContent = () => {
         <Route path="/property/:id" element={<PropertyDetail />} />
         <Route path="/:slug" element={<Properties />} />
 
-        {/* <Route path="/rentals" element={<Rentals />} /> */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path="/payment-cancel" element={<PaymentCancel />} />
+        <Route path="/my-properties" element={
+          <ProtectedRoute>
+            <SellerPropertyList />
+          </ProtectedRoute>
+        } />
+        <Route path="/properties/create" element={
+          <ProtectedRoute>
+            <CreateEditProperty />
+          </ProtectedRoute>
+        } />
+        <Route path="/properties/edit/:propertyId" element={
+          <ProtectedRoute>
+            <CreateEditProperty />
+          </ProtectedRoute>
+        } />
         <Route path="/chat" element={
           <ProtectedRoute>
             <Chat />
