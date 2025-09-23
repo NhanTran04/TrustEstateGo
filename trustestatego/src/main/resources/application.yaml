@@ -41,9 +41,9 @@ app:
       model: gemini-2.5-flash
 
 cloudinary:
-  cloud-name: diimcwvs5
-  api-key: 225587137214427
-  api-secret: Y1xcUA7_9U-DB3usTuz2JK1jGME
+  cloud-name: ${CLOUDINARY_NAME}
+  api-key: ${CLOUDINARY_KEY}
+  api-secret: ${CLOUDINARY_SECRET}
 
 jwt:
   signer-key: "0Q6WIzJCAQu7xzibeabCKqV5huSJXjFxsVyxxp5ShhlxP1V88NDUgghB8ZHNwhre"
@@ -58,8 +58,8 @@ logging:
 
 paypal:
   client:
-    id: ATXNICqBEs-ovl3Ns8D-jAK4F1qoD2IcP8wG26IWaYy6JqBfQZHJxOjA9Bt9Y4ManI1Mp84U2ySiXjmM
-    secret: EGeHKwRXHey9tBovP9T5SFE5_21OUwPO4T7q74y7V-CdmtAdSXIJMBB40iojw-q-eMDJMEcR1B_NJ0qN
+    id: ${PAYPAL_ID}
+    secret: ${PAYPAL_SECRET}
   mode: sandbox
   successUrl: http://localhost:3000/payment-success
   cancelUrl: http://localhost:3000/payment-cancel

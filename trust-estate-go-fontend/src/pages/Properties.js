@@ -35,7 +35,7 @@ const Properties = () => {
 
 
     const handlePageChange = (newPage) => {
-        refetchProperties(newPage);
+        refetchProperties(newPage - 1);
     };
 
     const handleFilterChange = () => {
