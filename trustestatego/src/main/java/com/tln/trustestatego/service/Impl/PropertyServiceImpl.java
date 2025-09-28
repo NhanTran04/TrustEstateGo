@@ -1,10 +1,5 @@
 package com.tln.trustestatego.service.Impl;
 
-import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.Operator;
-import co.elastic.clients.elasticsearch._types.query_dsl.RangeQuery;
-import co.elastic.clients.elasticsearch.core.search.SuggestFuzziness;
-import co.elastic.clients.json.JsonData;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.tln.trustestatego.document.PropertyDocument;
@@ -30,14 +25,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.elasticsearch.client.elc.NativeQuery;
+
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
-
 import org.springframework.data.elasticsearch.core.query.Criteria;
 import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
-import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -63,15 +56,11 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
 
     CategoryRepository categoryRepository;
 
-    UserRepository userRepository;
-
     Cloudinary cloudinary;
 
     ElasticsearchOperations elasticsearchOperations;
 
     PageMapper pageMapper;
-
-    PropertySearchRepository propertySearchRepository;
 
     CurrentUserService currentUserService;
 
@@ -162,6 +151,13 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
     }
 
     @Override
+    public void reindexAllProperties() {
+        List<Property> properties = propertyRepository.findAll();
+        List<PropertyDocument> docs = properties.stream().map(propertyMapper::toPropertyDocument).toList();
+        elasticsearchOperations.save(docs);
+    }
+
+    @Override
     public PageResponse<PropertyResponse> getPropertyByUserId(Pageable pageable) {
         User user = currentUserService.getCurrentUser();
         Page<PropertyResponse> propertiesPage = propertyRepository
@@ -222,58 +218,43 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
         return propertyMapper.toPropertyResponse(propertyRepository.save(property));
     }
 
-
-
     @Override
-    public PageResponse<PropertyDocument> searchProperty(Map<String,String> params, Pageable pageable) {
+    public PageResponse<PropertyDocument> searchProperty(Map<String, String> params, Pageable pageable) {
         Criteria criteria = new Criteria();
 
-        // Tìm kiếm keyword
+        // Tìm kiếm theo keyword (title + location)
         String keyword = params.get("keyword");
-        if(keyword != null && !keyword.trim().isEmpty()) {
-            // Sử dụng contains() thay vì matches() để tìm kiếm partial match
-//            criteria = criteria.and(new Criteria("title").contains(keyword.trim().toLowerCase()));
-            criteria = criteria.and(new Criteria("title").contains(keyword.trim().toLowerCase()));
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            criteria = criteria.or(new Criteria("title").matches(keyword.trim().toLowerCase()))
+                    .or(new Criteria("location").matches(keyword.trim().toLowerCase()));
         }
 
-
-
-        // Xử lý price range với exception handling
+        // Xử lý price range
         try {
             String minPriceStr = params.get("minPrice");
             String maxPriceStr = params.get("maxPrice");
 
-            BigDecimal minPrice = null;
-            BigDecimal maxPrice = null;
+            Double minPrice = (minPriceStr != null && !minPriceStr.isBlank()) ? Double.valueOf(minPriceStr) : null;
+            Double maxPrice = (maxPriceStr != null && !maxPriceStr.isBlank()) ? Double.valueOf(maxPriceStr) : null;
 
-            if(minPriceStr != null && !minPriceStr.trim().isEmpty()) {
-                minPrice = new BigDecimal(minPriceStr.trim());
-            }
-
-            if(maxPriceStr != null && !maxPriceStr.trim().isEmpty()) {
-                maxPrice = new BigDecimal(maxPriceStr.trim());
-            }
-
-            // Xử lý các trường hợp khác nhau
-            if(minPrice != null && maxPrice != null) {
+            if (minPrice != null && maxPrice != null) {
                 criteria = criteria.and(new Criteria("price").between(minPrice, maxPrice));
-            } else if(minPrice != null) {
+            } else if (minPrice != null) {
                 criteria = criteria.and(new Criteria("price").greaterThanEqual(minPrice));
-            } else if(maxPrice != null) {
+            } else if (maxPrice != null) {
                 criteria = criteria.and(new Criteria("price").lessThanEqual(maxPrice));
             }
-
         } catch (NumberFormatException e) {
-            // Log error hoặc throw custom exception
             throw new IllegalArgumentException("Invalid price format", e);
         }
 
-        // Property type
+        // Property type filter
         String propertyType = params.get("propertyType");
         if (propertyType != null && !propertyType.trim().isEmpty()) {
             criteria = criteria.and(new Criteria("propertyType").is(propertyType.trim()));
         }
 
+        // Tạo query và search
         CriteriaQuery query = new CriteriaQuery(criteria).setPageable(pageable);
         SearchHits<PropertyDocument> hits = elasticsearchOperations.search(query, PropertyDocument.class);
 
@@ -282,9 +263,69 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
                 .toList();
 
         Page<PropertyDocument> page = new PageImpl<>(docs, pageable, hits.getTotalHits());
-        System.out.println(query.getCriteria().toString());
+
         return pageMapper.toPageResponse(page);
     }
+
+
+//    @Override
+//    public PageResponse<PropertyDocument> searchProperty(Map<String,String> params, Pageable pageable) {
+//        Criteria criteria = new Criteria();
+//
+//        // Tìm kiếm keyword
+//        String keyword = params.get("keyword");
+//        if(keyword != null && !keyword.trim().isEmpty()) {
+//            // Sử dụng contains() thay vì matches() để tìm kiếm partial match
+////            criteria = criteria.and(new Criteria("title").contains(keyword.trim().toLowerCase()));
+//            criteria = criteria.and(new Criteria("title").contains(keyword.trim().toLowerCase()));
+//        }
+//        // Xử lý price range với exception handling
+//        try {
+//            String minPriceStr = params.get("minPrice");
+//            String maxPriceStr = params.get("maxPrice");
+//
+//            BigDecimal minPrice = null;
+//            BigDecimal maxPrice = null;
+//
+//            if(minPriceStr != null && !minPriceStr.trim().isEmpty()) {
+//                minPrice = new BigDecimal(minPriceStr.trim());
+//            }
+//
+//            if(maxPriceStr != null && !maxPriceStr.trim().isEmpty()) {
+//                maxPrice = new BigDecimal(maxPriceStr.trim());
+//            }
+//
+//            // Xử lý các trường hợp khác nhau
+//            if(minPrice != null && maxPrice != null) {
+//                criteria = criteria.and(new Criteria("price").between(minPrice, maxPrice));
+//            } else if(minPrice != null) {
+//                criteria = criteria.and(new Criteria("price").greaterThanEqual(minPrice));
+//            } else if(maxPrice != null) {
+//                criteria = criteria.and(new Criteria("price").lessThanEqual(maxPrice));
+//            }
+//
+//        } catch (NumberFormatException e) {
+//            // Log error hoặc throw custom exception
+//            throw new IllegalArgumentException("Invalid price format", e);
+//        }
+//
+//        // Property type
+//        String propertyType = params.get("propertyType");
+//        if (propertyType != null && !propertyType.trim().isEmpty()) {
+//            criteria = criteria.and(new Criteria("propertyType").is(propertyType.trim()));
+//        }
+//
+//        CriteriaQuery query = new CriteriaQuery(criteria).setPageable(pageable);
+//        SearchHits<PropertyDocument> hits = elasticsearchOperations.search(query, PropertyDocument.class);
+//
+//        List<PropertyDocument> docs = hits.getSearchHits().stream()
+//                .map(SearchHit::getContent)
+//                .toList();
+//
+//        Page<PropertyDocument> page = new PageImpl<>(docs, pageable, hits.getTotalHits());
+//        System.out.println(query.getCriteria().toString());
+//        return pageMapper.toPageResponse(page);
+//    }
 
     private Set<PropertyImage> uploadPropertyImages(MultipartFile[] images, Property property) {
         Set<PropertyImage> propertyImages = new HashSet<>();

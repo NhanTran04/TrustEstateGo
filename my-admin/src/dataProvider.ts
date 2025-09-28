@@ -2,6 +2,7 @@ import simpleRestProvider from "ra-data-simple-rest";
 import { httpClient } from "./HttpClient";
 
 const apiUrl = import.meta.env.VITE_SIMPLE_REST_URL;
+const staffUrl = "http://localhost:8080/trustestatego/api/staff";
 const defaultDataProvider = simpleRestProvider(apiUrl, httpClient);
 
 export const dataProvider = {
@@ -160,6 +161,14 @@ export const dataProvider = {
 
       return { data: response.json };
     }
+    if (resource === "reports") {
+      const url = `${staffUrl}/reports/${params.id}`;
+      const response = await httpClient(url, {
+        method: "PUT",
+        body: JSON.stringify(params.data),
+      });
+      return { data: response.json };
+    }
 
     return defaultDataProvider.update(resource, params);
 
@@ -247,6 +256,31 @@ export const dataProvider = {
       };
     }
 
+    if (resource === "reports") {
+      const { page, perPage } = params.pagination;
+      const { field, order } = params.sort;
+
+      const query = new URLSearchParams({
+        page: String(page - 1),
+        size: String(perPage),
+        sort: `${field},${order.toLowerCase()}`,
+      });
+
+      const url = `${staffUrl}/reports?${query.toString()}`;
+      const response = await httpClient(url);
+
+      const total = parseInt(
+        response.headers.get("Content-Range")?.split("/")?.[1] || "0",
+        10
+      );
+
+      return {
+        data: response.json,
+        total,
+      };
+    }
+
+
     return defaultDataProvider.getList(resource, params);
   },
 
@@ -274,7 +308,21 @@ export const dataProvider = {
       }
       return { data };
     }
+    if (resource === "reports") {
+      const url = `${staffUrl}/reports/${params.id}`;
+      const response = await httpClient(url);
+      return { data: response.json };
+    }
 
     return defaultDataProvider.getOne(resource, params);
+  },
+
+  delete: async (resource: string, params: any) => {
+    if (resource === "reports") {
+      const url = `${staffUrl}/reports/${params.id}`;
+      await httpClient(url, { method: "DELETE" });
+      return { data: { id: params.id } };
+    }
+    return defaultDataProvider.delete(resource, params);
   },
 };

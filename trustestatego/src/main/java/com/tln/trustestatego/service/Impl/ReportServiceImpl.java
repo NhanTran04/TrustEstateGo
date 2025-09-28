@@ -57,6 +57,17 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
+    public ReportResponse getReport(int id) {
+        ReportResponse report = reportRepository
+                .findById(id)
+                .map(reportMapper::toReportResponse)
+                .orElseThrow(() -> new
+                         ResponseStatusException(HttpStatus.NOT_FOUND, "Report not found"));
+        return report;
+    }
+
+
+    @Override
     public PageResponse<ReportResponse> getReportByUserId(Pageable pageable) {
         User user = currentUserService.getCurrentUser();
         Page<ReportResponse> reportPage = reportRepository.findByUser_Id(user.getId(), pageable).map(reportMapper::toReportResponse);
@@ -79,7 +90,7 @@ public class ReportServiceImpl implements ReportService {
         report.setProperty(propertyRepository.findById(propertyId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Property not found")));
         report.setCreatedAt(LocalDateTime.now());
-
+        report.setStatus(false);
         reportRepository.save(report);
 
         return reportMapper.toReportResponse(report);

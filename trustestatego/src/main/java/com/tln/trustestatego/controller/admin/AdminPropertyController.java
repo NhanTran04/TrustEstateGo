@@ -48,7 +48,7 @@ public class AdminPropertyController {
     public ResponseEntity<List<PropertyResponse>> getProperties(
             @RequestParam(name = "filter", required = false) String filter,
             @RequestParam(name = "range", required = false) String range,
-            @RequestParam(name = "sort", required = false) String sort // 👈 thêm sort
+            @RequestParam(name = "sort", required = false) String sort
     ) throws JsonProcessingException {
 
         ObjectMapper mapper = new ObjectMapper();

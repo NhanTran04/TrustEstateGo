@@ -1,17 +1,12 @@
 package com.tln.trustestatego.document;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Id;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.springframework.data.elasticsearch.annotations.DateFormat;
-import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.data.elasticsearch.annotations.*;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -19,24 +14,50 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Document(indexName = "properties")
+@Setting(settingPath = "/elasticsearch/settings.json")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PropertyDocument {
+
     @Id
-    int id;
-    @Field(type = FieldType.Text, analyzer = "standard")
+    String id;
+
+    // QUAN TRỌNG: Phải có analyzer và searchAnalyzer để tìm "tro" ra "trọ"
+    @Field(type = FieldType.Text, analyzer = "custom_index_analyzer", searchAnalyzer = "custom_search_analyzer")
     String title;
-    String description;
-//    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-//    LocalDateTime expireAt;
-    @Field(type = FieldType.Date, format = DateFormat.epoch_millis)
-    private Instant expireAt;
-    BigDecimal price;
+
+    @Field(type = FieldType.Text, analyzer = "custom_index_analyzer", searchAnalyzer = "custom_search_analyzer")
     String location;
-    Boolean isActive;
-    String propertyType;
-//    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-//    LocalDateTime createdAt;
+
+    @Field(type = FieldType.Double)
+    Double price;
+
     @Field(type = FieldType.Date, format = DateFormat.epoch_millis)
-    private Instant createdAt;
+    Instant expireAt;
+
+    @Field(type = FieldType.Boolean)
+    Boolean isActive;
+
+    @Field(type = FieldType.Keyword)
+    String propertyType;
+
+    @Field(type = FieldType.Date, format = DateFormat.epoch_millis)
+    Instant createdAt;
+
+    @Field(type = FieldType.Keyword)
     List<String> images;
+
+    @Field(type = FieldType.Integer)
+    Integer area;
+
+    @Field(type = FieldType.Integer)
+    Integer bedroom;
+
+    @Field(type = FieldType.Keyword)
+    String interior;
+
+    @Field(type = FieldType.Integer)
+    Integer userId;
+
+    @Field(type = FieldType.Integer)
+    Integer categoryId;
 }

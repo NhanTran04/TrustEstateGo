@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
-import { PropertyProvider, useProperty } from './contexts/PropertyContext';
+import { useProperty } from './contexts/PropertyContext';
 import Home from './pages/Home';
 import Properties from './pages/Properties';
 import Saved from './pages/Saved';
@@ -132,9 +132,7 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <PropertyProvider>
-          <AppContent />
-        </PropertyProvider>
+        <AppContent />
       </AuthProvider>
     </Router>
   );

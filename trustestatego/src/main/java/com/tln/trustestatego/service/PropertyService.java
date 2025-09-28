@@ -23,5 +23,6 @@ public interface PropertyService {
     PageResponse<PropertyDocument> searchProperty(Map<String, String> params, Pageable pageable);
     void deleteProperty(int propertyId);
     List<PropertyTypeResponse> getAllPropertyTypes();
+    void reindexAllProperties();
 
 }
