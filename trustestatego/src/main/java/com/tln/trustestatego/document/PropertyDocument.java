@@ -1,5 +1,7 @@
 package com.tln.trustestatego.document;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import jakarta.persistence.Id;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -28,8 +30,9 @@ public class PropertyDocument {
     @Field(type = FieldType.Text, analyzer = "custom_index_analyzer", searchAnalyzer = "custom_search_analyzer")
     String location;
 
-    @Field(type = FieldType.Double)
-    Double price;
+    @JsonSerialize(using = ToStringSerializer.class)
+    @Field(type = FieldType.Scaled_Float, scalingFactor = 100)
+    BigDecimal price;
 
     @Field(type = FieldType.Date, format = DateFormat.epoch_millis)
     Instant expireAt;

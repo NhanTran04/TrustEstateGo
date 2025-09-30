@@ -10,7 +10,7 @@ import ChatBox from '../components/ChatBox';
 
 const Home = () => {
     const navigate = useNavigate();
-    const { handleSaveProperty, savedProperties, setSearchQuery, setSelectedCategory, properties } = useProperty();
+    const { handleSaveProperty, savedProperties, setSearchQuery, properties, refetchProperties } = useProperty();
     const [featuredProperties, setFeaturedProperties] = useState([]);
     // const [stats, setStats] = useState({
     //     totalProperties: 0,
@@ -26,6 +26,10 @@ const Home = () => {
             setFeaturedProperties([]);
         }
     }, [properties]);
+
+    useEffect(() => {
+        refetchProperties(1);
+    }, []);
 
     return (
         <div>

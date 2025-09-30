@@ -10,7 +10,6 @@ export const useProperty = () => {
     const [properties, setProperties] = useState([]);
     const [savedProperties, setSavedProperties] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
-    const [selectedCategory, setSelectedCategory] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [filters, setFilters] = useState({});
@@ -22,22 +21,31 @@ export const useProperty = () => {
         totalPages: 0,
     });
 
-    // Fetch properties từ API
     const fetchProperties = useCallback(
-        async (page = 1, extraFilters = {}) => {
+        async (page = 1, extraFilters = {}, isSearch = false) => {
             setLoading(true);
             setError(null);
             try {
                 const params = {
                     page: page,
-                    size: pagination.limit || 5,
-                    search: searchQuery || undefined,
-                    categoryId: selectedCategory || undefined,
+                    size: pagination.limit || 6,
                     ...filters,
                     ...extraFilters,
                 };
 
-                const response = await api.get(endpoints.properties, { params });
+                if (isSearch) {
+                    Object.keys(extraFilters).forEach(key => {
+                        if (extraFilters[key] !== "" && extraFilters[key] !== null && extraFilters[key] !== undefined) {
+                            params[key] = extraFilters[key];
+                        }
+                    });
+                }
+
+                const url = isSearch
+                    ? `${endpoints.properties}/search`
+                    : endpoints.properties;
+
+                const response = await api.get(url, { params });
 
                 if (response.data.result?.content) {
                     setProperties(response.data.result.content);
@@ -59,7 +67,12 @@ export const useProperty = () => {
                 setLoading(false);
             }
         },
-        [searchQuery, selectedCategory, filters]
+        [filters, pagination.limit]
+    );
+
+    const refetchProperties = useCallback(
+        (page, extraFilters, isSearch = false) => fetchProperties(page, extraFilters, isSearch),
+        [fetchProperties]
     );
 
     const fetchSavedProperties = useCallback(async () => {
@@ -104,17 +117,15 @@ export const useProperty = () => {
     );
 
     useEffect(() => {
-        fetchProperties(1);
         if (user) {
             fetchSavedProperties();
         }
-    }, [fetchProperties, fetchSavedProperties, user]);
+    }, [fetchSavedProperties, user]);
 
     return {
         properties,
         savedProperties,
         searchQuery,
-        selectedCategory,
         loading,
         error,
         pagination,
@@ -122,11 +133,11 @@ export const useProperty = () => {
         setProperties,
         setSavedProperties,
         setSearchQuery,
-        setSelectedCategory,
         setFilters,
         setCategories,
         handleSaveProperty,
-        refetchProperties: fetchProperties,
+        refetchProperties,
+        searchProperties: (page, extraFilters) => fetchProperties(page, extraFilters, true),
         setPagination,
     };
 };

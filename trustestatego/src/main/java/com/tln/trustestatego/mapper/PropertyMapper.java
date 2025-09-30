@@ -36,7 +36,7 @@ public interface PropertyMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void update(@MappingTarget Property property, PropertyRequest propertyRequest);
     @Mapping(target = "id", expression = "java(property.getId() != null ? property.getId().toString() : null)")
-    @Mapping(target = "price", expression = "java(toDouble(property.getPrice()))")
+    @Mapping(target = "price", expression = "java(property.getPrice())")
     @Mapping(target = "createdAt", expression = "java(toInstant(property.getCreatedAt()))")
     @Mapping(target = "expireAt", expression = "java(toInstant(property.getExpireAt()))")
     @Mapping(target = "images", expression = "java(mapImages(property.getPropertyImages()))")
@@ -89,9 +89,9 @@ public interface PropertyMapper {
         return user.getReviewsAsSeller().size();
     }
 
-    default Double toDouble(java.math.BigDecimal value) {
-        return value != null ? value.doubleValue() : null;
-    }
+//    default Double toDouble(java.math.BigDecimal value) {
+//        return value != null ? value.doubleValue() : null;
+//    }
 
     default Instant toInstant(LocalDateTime time) {
         return time != null ? time.toInstant(ZoneOffset.UTC) : null;

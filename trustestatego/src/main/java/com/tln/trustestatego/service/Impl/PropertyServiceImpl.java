@@ -172,8 +172,6 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
 //        return pageMapper.toPageResponse(propertiesPage);
 //    }
 
-
-
     @Override
     public PropertyResponse getPropertyById(int propertyId){
         Property property = propertyRepository.findById(propertyId)
@@ -225,9 +223,15 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
         // Tìm kiếm theo keyword (title + location)
         String keyword = params.get("keyword");
         if (keyword != null && !keyword.trim().isEmpty()) {
-            criteria = criteria.or(new Criteria("title").matches(keyword.trim().toLowerCase()))
-                    .or(new Criteria("location").matches(keyword.trim().toLowerCase()));
+            criteria = criteria.and(new Criteria("title").matches(keyword.trim().toLowerCase()));
         }
+
+        // Tìm kiếm theo location
+        String location = params.get("location");
+        if (location != null && !location.trim().isEmpty()) {
+            criteria = criteria.and(new Criteria("location").matches(location.trim().toLowerCase()));
+        }
+
 
         // Xử lý price range
         try {

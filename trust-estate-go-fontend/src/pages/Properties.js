@@ -20,30 +20,57 @@ const Properties = () => {
         properties = [],
         pagination = {},
         searchQuery,
-        selectedCategory,
         handleSaveProperty,
         savedProperties,
         setSearchQuery,
-        setSelectedCategory,
         refetchProperties,
         loading,
         error,
         categories = [],
-    } = useProperty();
+    } = useProperty(true);
 
     useEffect(() => {
-        if (categoryId) {
-            setSelectedCategory(Number(categoryId));
-            refetchProperties(0);
+        const keyword = queryParams.get("keyword");
+        const minPrice = queryParams.get("minPrice");
+        const maxPrice = queryParams.get("maxPrice");
+        const locationFilter = queryParams.get("location");
+
+        if (keyword || minPrice || maxPrice || locationFilter) {
+            // gọi search
+            refetchProperties(1, {
+                keyword,
+                minPrice,
+                maxPrice,
+                location: locationFilter,
+            }, true);
+        } else if (categoryId) {
+            refetchProperties(1, { categoryId: Number(categoryId) });
         } else {
-            setSelectedCategory(null);
+            refetchProperties(1);
         }
-    }, [categoryId]);
+    }, [categoryId, location.search, refetchProperties]);
+
 
     const handlePageChange = (newPage) => {
-        console.log('📄 Clicked page:', newPage + 1, 'Current page:', currentPage + 1);
         if (newPage >= 1 && newPage <= (pagination.totalPages || 1)) {
-            refetchProperties(newPage);
+            const keyword = queryParams.get("keyword");
+            const minPrice = queryParams.get("minPrice");
+            const maxPrice = queryParams.get("maxPrice");
+            const locationFilter = queryParams.get("location");
+
+            if (keyword || minPrice || maxPrice || locationFilter) {
+                // vẫn gọi search khi đang ở chế độ search
+                refetchProperties(newPage, {
+                    keyword,
+                    minPrice,
+                    maxPrice,
+                    location: locationFilter,
+                }, true);
+            } else if (categoryId) {
+                refetchProperties(newPage, { categoryId: Number(categoryId) });
+            } else {
+                refetchProperties(newPage);
+            }
         }
     };
 
@@ -53,12 +80,11 @@ const Properties = () => {
 
     const handleClearFilter = () => {
         setSearchQuery("");
-        setSelectedCategory(null);
         refetchProperties(0);
     };
 
     const getCategoryTitle = () => {
-        const category = categories.find((c) => c.id === selectedCategory);
+        const category = categories.find((c) => c.id === Number(categoryId));
         if (!category) {
             return {
                 title: "Bất động sản",
@@ -122,8 +148,6 @@ const Properties = () => {
                 <PropertyFilter
                     searchQuery={searchQuery}
                     setSearchQuery={setSearchQuery}
-                    selectedCategory={selectedCategory}
-                    setSelectedCategory={setSelectedCategory}
                     onFilterChange={handleFilterChange}
                 />
 

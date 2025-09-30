@@ -23,7 +23,7 @@ spring:
   data:
     web:
       pageable:
-        default-page-size: 5        # số record mặc định mỗi trang
+        default-page-size: 6
         one-indexed-parameters: true  # page=1 sẽ là trang đầu (mặc định Spring là page=0)
     elasticsearch:
       repositories:
