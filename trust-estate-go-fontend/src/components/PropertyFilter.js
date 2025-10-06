@@ -1,34 +1,49 @@
 import React, { useState } from 'react';
 import { Filter, Search } from 'lucide-react';
 import { useProperty } from '../contexts/PropertyContext';
+import { useNavigate } from 'react-router-dom';
 
-const PropertyFilter = ({ searchQuery,
-    setSearchQuery,
-    selectedCategory,
-    setSelectedCategory,
-    onFilterChange }) => {
+const PropertyFilter = ({ searchQuery, setSearchQuery }) => {
     const [showAdvanced, setShowAdvanced] = useState(false);
     const [filters, setFilters] = useState({
-        priceRange: '',
-        areaRange: '',
-        bedrooms: '',
-        bathrooms: '',
-        direction: '',
-        constructionYear: ''
+        minPrice: '',
+        maxPrice: '',
+        location: '',
     });
 
-    const { refetchProperties } = useProperty();
+    const navigate = useNavigate();
+
+    const { searchProperties } = useProperty();
 
     const handleFilterChange = (filterType, value) => {
         setFilters(prev => ({ ...prev, [filterType]: value }));
     };
 
     const applyFilters = async () => {
-        // Gọi API với các filters
         try {
-            await refetchProperties(1, { category: selectedCategory }); // Giả sử context đã xử lý filters
+            await searchProperties(1, {
+                keyword: searchQuery,
+                minPrice: filters.minPrice,
+                maxPrice: filters.maxPrice,
+                location: filters.location,
+            });
+
+            // Cập nhật query trên URL
+            const params = new URLSearchParams();
+            if (searchQuery) params.set("keyword", searchQuery);
+            if (filters.minPrice) params.set("minPrice", filters.minPrice);
+            if (filters.maxPrice) params.set("maxPrice", filters.maxPrice);
+            if (filters.location) params.set("location", filters.location);
+
+            navigate(`/properties?${params.toString()}`);
         } catch (err) {
-            console.error('Error applying filters:', err);
+            console.error("Error applying filters:", err);
+        }
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === "Enter") {
+            applyFilters();
         }
     };
 
@@ -48,8 +63,10 @@ const PropertyFilter = ({ searchQuery,
                     </button>
                 </div>
 
+                {/* Hàng đầu tiên: Tiêu đề, Giá, Địa chỉ, nút tìm kiếm */}
                 <div className="row g-3">
-                    <div className="col-md-4">
+                    {/* Title */}
+                    <div className="col-md-3">
                         <div className="input-group">
                             <span className="input-group-text bg-light border-0">
                                 <Search size={16} className="text-primary" />
@@ -57,61 +74,75 @@ const PropertyFilter = ({ searchQuery,
                             <input
                                 type="text"
                                 className="form-control border-0 bg-light"
-                                placeholder="Tìm theo tên hoặc địa điểm..."
+                                placeholder="Tiêu đề..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
+                                onKeyDown={handleKeyDown}
                             />
                         </div>
                     </div>
 
-                    {/* <div className="col-md-2">
-                        <select
-                            className="form-select border-0 bg-light"
-                            value={selectedPropertyType}
-                            onChange={(e) => setSelectedPropertyType(e.target.value)}
+                    {/* Price */}
+                    <div className="col-md-4 d-flex gap-2">
+                        <div className="input-group">
+                            <span className="input-group-text bg-light border-0">💰</span>
+                            <input
+                                type="number"
+                                className="form-control border-0 bg-light"
+                                placeholder="Giá từ"
+                                value={filters.minPrice}
+                                onChange={(e) => handleFilterChange('minPrice', e.target.value)}
+                            />
+                        </div>
+                        <div className="input-group">
+                            <span className="input-group-text bg-light border-0">💰</span>
+                            <input
+                                type="number"
+                                className="form-control border-0 bg-light"
+                                placeholder="Đến"
+                                value={filters.maxPrice}
+                                onChange={(e) => handleFilterChange('maxPrice', e.target.value)}
+                                onKeyDown={handleKeyDown}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Location */}
+                    <div className="col-md-3">
+                        <div className="input-group">
+                            <span className="input-group-text bg-light border-0">📍</span>
+                            <input
+                                type="text"
+                                className="form-control border-0 bg-light"
+                                placeholder="Địa chỉ"
+                                value={filters.location}
+                                onChange={(e) => handleFilterChange('location', e.target.value)}
+                                onKeyDown={handleKeyDown}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Button search */}
+                    <div className="col-md-2">
+                        <button
+                            className="btn btn-primary w-100 rounded-pill d-flex align-items-center justify-content-center"
+                            onClick={applyFilters}
                         >
-                            <option value="">Tất cả loại hình</option>
-                            <option value="Chung cư">🏢 Chung cư</option>
-                            <option value="Nhà phố">🏠 Nhà phố</option>
-                            <option value="Phòng trọ">🏡 Phòng trọ</option>
-                            <option value="Biệt thự">🏰 Biệt thự</option>
-                        </select>
-                    </div> */}
-
-                    <div className="col-md-2">
-                        <select className="form-select border-0 bg-light">
-                            <option value="">💰 Khoảng giá</option>
-                            <option value="0-5">Dưới 5 triệu</option>
-                            <option value="5-10">5-10 triệu</option>
-                            <option value="10-20">10-20 triệu</option>
-                            <option value="20-50">20-50 triệu</option>
-                            <option value="50+">Trên 50 triệu</option>
-                        </select>
-                    </div>
-
-                    <div className="col-md-2">
-                        <select className="form-select border-0 bg-light">
-                            <option value="">📐 Diện tích</option>
-                            <option value="0-30">Dưới 30m²</option>
-                            <option value="30-50">30-50m²</option>
-                            <option value="50-80">50-80m²</option>
-                            <option value="80-100">80-100m²</option>
-                            <option value="100+">Trên 100m²</option>
-                        </select>
-                    </div>
-
-                    <div className="col-md-2">
-                        <button className="btn btn-primary w-100 rounded-pill">
-                            <Search size={16} className="me-2" />
+                            <Search size={18} className="me-2" />
                             Tìm kiếm
                         </button>
                     </div>
                 </div>
 
+                {/* Advanced filters */}
                 {showAdvanced && (
                     <div className="row g-3 mt-3 pt-3 border-top">
                         <div className="col-md-3">
-                            <select className="form-select border-0 bg-light">
+                            <select
+                                className="form-select border-0 bg-light"
+                            // value={filters.bedrooms}
+                            // onChange={(e) => handleFilterChange('bedrooms', e.target.value)}
+                            >
                                 <option value="">🛏️ Phòng ngủ</option>
                                 <option value="1">1 phòng</option>
                                 <option value="2">2 phòng</option>
@@ -121,16 +152,24 @@ const PropertyFilter = ({ searchQuery,
                         </div>
 
                         <div className="col-md-3">
-                            <select className="form-select border-0 bg-light">
+                            <select
+                                className="form-select border-0 bg-light"
+                            // value={filters.bathrooms}
+                            // onChange={(e) => handleFilterChange('bathrooms', e.target.value)}
+                            >
                                 <option value="">🚿 Phòng tắm</option>
-                                <option value="1">1 phòng tắm</option>
-                                <option value="2">2 phòng tắm</option>
-                                <option value="3+">3+ phòng tắm</option>
+                                <option value="1">1 phòng</option>
+                                <option value="2">2 phòng</option>
+                                <option value="3+">3+ phòng</option>
                             </select>
                         </div>
 
                         <div className="col-md-3">
-                            <select className="form-select border-0 bg-light">
+                            <select
+                                className="form-select border-0 bg-light"
+                            // value={filters.direction}
+                            // onChange={(e) => handleFilterChange('direction', e.target.value)}
+                            >
                                 <option value="">🧭 Hướng nhà</option>
                                 <option value="dong">Đông</option>
                                 <option value="tay">Tây</option>
@@ -142,7 +181,11 @@ const PropertyFilter = ({ searchQuery,
                         </div>
 
                         <div className="col-md-3">
-                            <select className="form-select border-0 bg-light">
+                            <select
+                                className="form-select border-0 bg-light"
+                            // value={filters.constructionYear}
+                            // onChange={(e) => handleFilterChange('constructionYear', e.target.value)}
+                            >
                                 <option value="">🏗️ Năm xây dựng</option>
                                 <option value="2020+">Sau 2020</option>
                                 <option value="2015-2020">2015-2020</option>

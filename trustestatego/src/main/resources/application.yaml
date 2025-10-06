@@ -23,12 +23,21 @@ spring:
   data:
     web:
       pageable:
-        default-page-size: 5        # số record mặc định mỗi trang
+        default-page-size: 6
         one-indexed-parameters: true  # page=1 sẽ là trang đầu (mặc định Spring là page=0)
-  elasticsearch:
-    uris: http://localhost:9200
+    elasticsearch:
+      repositories:
+        enabled: true
+      client:
+        rest:
+          uris: http://localhost:9200
+#  elasticsearch:
+#    uris: http://localhost:9200
+#    connection-timeout: 5s
+#    socket-timeout: 60s
     #    username: elastic
     #    password: NQbLpkuruBK5c0*80vba
+
 
 
 

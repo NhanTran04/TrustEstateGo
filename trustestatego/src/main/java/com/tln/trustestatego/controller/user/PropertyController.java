@@ -78,22 +78,25 @@ public class PropertyController {
         }
     }
 
-    @GetMapping("/users/{sellerId}/properties")
-    public ResponseEntity<ApiResponse<PageResponse<PropertyResponse>>> getPropertyBySellerId(@PathVariable int userId, Pageable pageable) {
-        try {
-            return ResponseEntity.ok(
-                    ApiResponse.<PageResponse<PropertyResponse>>builder()
-                            .result(propertyService.getPropertyByUserId(pageable))
-                            .build()
-            );
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResponse.<PageResponse<PropertyResponse>>builder()
-                            .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                            .message(e.getMessage())
-                            .build());
-        }
-    }
+//    @GetMapping("/users/{sellerId}/properties")
+//    public ResponseEntity<ApiResponse<PageResponse<PropertyResponse>>> getPropertyBySellerId(
+//            @PathVariable("sellerId") int sellerId, Pageable pageable) {
+//        try {
+//            // dùng sellerId từ path chứ không dùng currentUser
+//            PageResponse<PropertyResponse> result = propertyService.getPropertyBySellerId(sellerId, pageable);
+//            return ResponseEntity.ok(
+//                    ApiResponse.<PageResponse<PropertyResponse>>builder()
+//                            .result(result)
+//                            .build()
+//            );
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body(ApiResponse.<PageResponse<PropertyResponse>>builder()
+//                            .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
+//                            .message(e.getMessage())
+//                            .build());
+//        }
+//    }
 
     @GetMapping("/properties/{propertyId}")
     public ResponseEntity<ApiResponse<PropertyResponse>> getPropertyById(@PathVariable int propertyId) {

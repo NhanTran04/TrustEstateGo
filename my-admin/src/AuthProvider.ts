@@ -19,10 +19,19 @@ export const authProvider: AuthProvider = {
         }
 
         const data = await response.json();
-        localStorage.setItem('token', data.token); // backend trả JWT
+
+        const roles = (data.user?.roles || []).map((r: any) => r.name);
+        const allowed = roles.includes("ADMIN") || roles.includes("STAFF");
+
+        if (!allowed) {
+            throw new Error("Bạn không có quyền truy cập hệ thống");
+        }
+
+        localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         return Promise.resolve();
     },
+
 
     logout: () => {
         localStorage.removeItem('token');
@@ -30,21 +39,37 @@ export const authProvider: AuthProvider = {
         return Promise.resolve();
     },
 
-    checkAuth: () =>
-        localStorage.getItem('token') ? Promise.resolve() : Promise.reject(),
+    checkAuth: () => {
+        const token = localStorage.getItem('token');
+        const userStr = localStorage.getItem('user');
+        if (!token || !userStr) return Promise.reject();
+
+        const user = JSON.parse(userStr);
+        const roles = (user.roles || []).map((r: any) => r.name);
+        const allowed = roles.includes("ADMIN") || roles.includes("STAFF");
+
+        return allowed ? Promise.resolve() : Promise.reject();
+    },
+
 
     checkError: (error) => {
         const status = error.status;
         if (status === 401 || status === 403) {
             localStorage.removeItem('token');
+            localStorage.removeItem('user');
             return Promise.reject();
         }
         return Promise.resolve();
     },
 
     getPermissions: () => {
-        const user = localStorage.getItem('user');
-        return user ? Promise.resolve(JSON.parse(user).roles) : Promise.resolve([]);
+        const userStr = localStorage.getItem('user');
+        if (!userStr) return Promise.resolve([]);
+
+        const user = JSON.parse(userStr);
+        // Lấy danh sách tên role
+        const roles = (user.roles || []).map((r: any) => r.name);
+        return Promise.resolve(roles);
     },
 
     getIdentity: () => {

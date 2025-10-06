@@ -35,9 +35,12 @@ public interface PropertyMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void update(@MappingTarget Property property, PropertyRequest propertyRequest);
-
+    @Mapping(target = "id", expression = "java(property.getId() != null ? property.getId().toString() : null)")
+    @Mapping(target = "price", expression = "java(property.getPrice())")
     @Mapping(target = "createdAt", expression = "java(toInstant(property.getCreatedAt()))")
     @Mapping(target = "expireAt", expression = "java(toInstant(property.getExpireAt()))")
+    @Mapping(target = "images", expression = "java(mapImages(property.getPropertyImages()))")
+    @Mapping(target = "propertyType", expression = "java(property.getPropertyType() != null ? property.getPropertyType().name() : null)")
     PropertyDocument toPropertyDocument(Property property);
 
     default List<String> mapImages(Set<PropertyImage> proImages){
@@ -85,6 +88,10 @@ public interface PropertyMapper {
         if (user == null || user.getReviewsAsSeller() == null) return 0;
         return user.getReviewsAsSeller().size();
     }
+
+//    default Double toDouble(java.math.BigDecimal value) {
+//        return value != null ? value.doubleValue() : null;
+//    }
 
     default Instant toInstant(LocalDateTime time) {
         return time != null ? time.toInstant(ZoneOffset.UTC) : null;

@@ -1,73 +1,111 @@
-import React, { useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Menu, Building, X, Search } from 'lucide-react';
-import PropertyCard from '../components/PropertyCard';
-import PropertyFilter from '../components/PropertyFilter';
-import { useProperty } from '../contexts/PropertyContext';
+import React, { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import {
+    ChevronLeft,
+    ChevronRight,
+    X,
+    Search,
+} from "lucide-react";
+
+import PropertyCard from "../components/PropertyCard";
+import PropertyFilter from "../components/PropertyFilter";
+import { useProperty } from "../contexts/PropertyContext";
 
 const Properties = () => {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const categoryId = queryParams.get("categoryId");
-    console.log(categoryId);
+
     const {
-        properties,
+        properties = [],
         pagination = {},
         searchQuery,
-        selectedCategory,
         handleSaveProperty,
         savedProperties,
         setSearchQuery,
-        setSelectedCategory,
         refetchProperties,
         loading,
         error,
-        categories = [] // lấy từ context
-    } = useProperty();
+        categories = [],
+    } = useProperty(true);
 
     useEffect(() => {
-        if (categoryId) {
-            setSelectedCategory(Number(categoryId));
+        const keyword = queryParams.get("keyword");
+        const minPrice = queryParams.get("minPrice");
+        const maxPrice = queryParams.get("maxPrice");
+        const locationFilter = queryParams.get("location");
+
+        if (keyword || minPrice || maxPrice || locationFilter) {
+            // gọi search
+            refetchProperties(1, {
+                keyword,
+                minPrice,
+                maxPrice,
+                location: locationFilter,
+            }, true);
+        } else if (categoryId) {
+            refetchProperties(1, { categoryId: Number(categoryId) });
         } else {
-            setSelectedCategory(null); // hoặc 0
+            refetchProperties(1);
         }
-    }, [categoryId]);
+    }, [categoryId, location.search, refetchProperties]);
 
 
     const handlePageChange = (newPage) => {
-        refetchProperties(newPage - 1);
+        if (newPage >= 1 && newPage <= (pagination.totalPages || 1)) {
+            const keyword = queryParams.get("keyword");
+            const minPrice = queryParams.get("minPrice");
+            const maxPrice = queryParams.get("maxPrice");
+            const locationFilter = queryParams.get("location");
+
+            if (keyword || minPrice || maxPrice || locationFilter) {
+                // vẫn gọi search khi đang ở chế độ search
+                refetchProperties(newPage, {
+                    keyword,
+                    minPrice,
+                    maxPrice,
+                    location: locationFilter,
+                }, true);
+            } else if (categoryId) {
+                refetchProperties(newPage, { categoryId: Number(categoryId) });
+            } else {
+                refetchProperties(newPage);
+            }
+        }
     };
 
     const handleFilterChange = () => {
-        refetchProperties(1);
+        refetchProperties(0);
+    };
+
+    const handleClearFilter = () => {
+        setSearchQuery("");
+        refetchProperties(0);
     };
 
     const getCategoryTitle = () => {
-        const category = categories.find(c => c.id === selectedCategory);
+        const category = categories.find((c) => c.id === Number(categoryId));
         if (!category) {
             return {
                 title: "Bất động sản",
-                subtitle: "Khám phá bất động sản phù hợp nhu cầu của bạn"
+                subtitle: "Khám phá bất động sản phù hợp nhu cầu của bạn",
             };
         }
-
         if (category.name.toLowerCase().includes("bán")) {
             return {
                 title: "Nhà đất bán",
-                subtitle: "Khám phá các BĐS bán chất lượng cao từ chủ đầu tư uy tín"
+                subtitle: "Khám phá các BĐS bán chất lượng cao từ chủ đầu tư uy tín",
             };
         }
-
         if (category.name.toLowerCase().includes("thuê")) {
             return {
                 title: "Nhà đất cho thuê",
-                subtitle: "Khám phá các BĐS cho thuê phù hợp nhu cầu của bạn"
+                subtitle: "Khám phá các BĐS cho thuê phù hợp nhu cầu của bạn",
             };
         }
-
         return {
             title: category.name,
-            subtitle: "Danh sách bất động sản"
+            subtitle: "Danh sách bất động sản",
         };
     };
 
@@ -75,7 +113,7 @@ const Properties = () => {
 
     if (loading) {
         return (
-            <div style={{ paddingTop: '100px' }} className="container">
+            <div style={{ paddingTop: "100px" }} className="container">
                 <div className="text-center py-5">
                     <div className="spinner-border text-primary" role="status">
                         <span className="visually-hidden">Loading...</span>
@@ -88,20 +126,19 @@ const Properties = () => {
 
     if (error) {
         return (
-            <div style={{ paddingTop: '100px' }} className="container">
-                <div className="alert alert-danger text-center">
-                    {error}
-                </div>
+            <div style={{ paddingTop: "100px" }} className="container">
+                <div className="alert alert-danger text-center">{error}</div>
             </div>
         );
     }
 
-    const totalResults = pagination?.total || properties.length;
-    const currentPage = pagination?.page || 1;
+    const totalResults = pagination?.total || 0;
+    const currentPage = (pagination?.page ?? 1);
     const totalPages = pagination?.totalPages || 1;
 
+
     return (
-        <div style={{ paddingTop: '100px' }}>
+        <div style={{ paddingTop: "100px" }}>
             <div className="container">
                 <div className="text-center mb-5">
                     <h2 className="fw-bold text-dark mb-3">{title}</h2>
@@ -111,41 +148,20 @@ const Properties = () => {
                 <PropertyFilter
                     searchQuery={searchQuery}
                     setSearchQuery={setSearchQuery}
-                    selectedCategory={selectedCategory}
-                    setSelectedCategory={setSelectedCategory}
                     onFilterChange={handleFilterChange}
                 />
 
                 <div className="d-flex justify-content-between align-items-center mb-4">
                     <div>
                         <h4 className="fw-bold mb-1">Tìm thấy {totalResults} kết quả</h4>
-                        <p className="text-muted mb-0">Trang {currentPage} / {totalPages}</p>
-                    </div>
-
-                    <div className="d-flex align-items-center gap-3">
-                        <select className="form-select border-0 bg-light rounded-pill" style={{ width: 'auto' }}>
-                            <option>📅 Mới nhất</option>
-                            <option>💰 Giá thấp đến cao</option>
-                            <option>💰 Giá cao đến thấp</option>
-                            <option>📐 Diện tích lớn nhất</option>
-                            <option>👁️ Lượt xem nhiều nhất</option>
-                        </select>
-
-                        <div className="btn-group" role="group">
-                            <input type="radio" className="btn-check" name="viewType" id="gridView" defaultChecked />
-                            <label className="btn btn-outline-primary rounded-pill" htmlFor="gridView">
-                                <Building size={16} />
-                            </label>
-                            <input type="radio" className="btn-check" name="viewType" id="listView" />
-                            <label className="btn btn-outline-primary rounded-pill" htmlFor="listView">
-                                <Menu size={16} />
-                            </label>
-                        </div>
+                        <p className="text-muted mb-0">
+                            Trang {currentPage} / {totalPages}
+                        </p>
                     </div>
                 </div>
 
                 <div className="row">
-                    {properties.map(property => (
+                    {properties.map((property) => (
                         <PropertyCard
                             key={property.id}
                             property={property}
@@ -160,14 +176,15 @@ const Properties = () => {
                         <div className="bg-light rounded-circle p-4 d-inline-block mb-4">
                             <Search size={48} className="text-muted" />
                         </div>
-                        <h5 className="text-dark mb-3">Không tìm thấy bất động sản phù hợp</h5>
-                        <p className="text-muted mb-4">Thử điều chỉnh bộ lọc tìm kiếm để có kết quả tốt hơn</p>
+                        <h5 className="text-dark mb-3">
+                            Không tìm thấy bất động sản phù hợp
+                        </h5>
+                        <p className="text-muted mb-4">
+                            Thử điều chỉnh bộ lọc tìm kiếm để có kết quả tốt hơn
+                        </p>
                         <button
                             className="btn btn-primary px-4 py-2 rounded-pill"
-                            onClick={() => {
-                                setSearchQuery('');
-                                refetchProperties(1);
-                            }}
+                            onClick={handleClearFilter}
                         >
                             <X size={16} className="me-2" />
                             Xóa bộ lọc
@@ -179,25 +196,31 @@ const Properties = () => {
                     <div className="d-flex justify-content-center mt-5">
                         <nav>
                             <ul className="pagination pagination-lg">
-                                <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                                {/* Previous */}
+                                <li className={`page-item ${pagination.page === 1 ? "disabled" : ""}`}>
                                     <button
                                         className="page-link rounded-pill me-2"
-                                        onClick={() => handlePageChange(currentPage - 1)}
-                                        disabled={currentPage === 1}
+                                        onClick={() => handlePageChange(pagination.page - 1)}
+                                        disabled={pagination.page === 1}
                                     >
                                         <ChevronLeft size={16} />
                                     </button>
                                 </li>
 
+                                {/* Page numbers */}
                                 {[...Array(totalPages)].map((_, index) => {
-                                    const pageNumber = index + 1;
-                                    if (
+                                    const pageNumber = index + 1; // 1-based
+                                    const showPage =
                                         pageNumber === 1 ||
                                         pageNumber === totalPages ||
-                                        (pageNumber >= currentPage - 1 && pageNumber <= currentPage + 1)
-                                    ) {
+                                        Math.abs(pageNumber - pagination.page) <= 1;
+
+                                    if (showPage) {
                                         return (
-                                            <li key={pageNumber} className={`page-item ${currentPage === pageNumber ? 'active' : ''}`}>
+                                            <li
+                                                key={pageNumber}
+                                                className={`page-item ${pagination.page === pageNumber ? "active" : ""}`}
+                                            >
                                                 <button
                                                     className="page-link rounded-pill mx-1"
                                                     onClick={() => handlePageChange(pageNumber)}
@@ -207,8 +230,8 @@ const Properties = () => {
                                             </li>
                                         );
                                     } else if (
-                                        pageNumber === currentPage - 2 ||
-                                        pageNumber === currentPage + 2
+                                        (pageNumber === pagination.page - 2 && pagination.page > 3) ||
+                                        (pageNumber === pagination.page + 2 && pagination.page < totalPages - 2)
                                     ) {
                                         return (
                                             <li key={pageNumber} className="page-item disabled">
@@ -219,11 +242,12 @@ const Properties = () => {
                                     return null;
                                 })}
 
-                                <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                                {/* Next */}
+                                <li className={`page-item ${pagination.page === totalPages ? "disabled" : ""}`}>
                                     <button
                                         className="page-link rounded-pill ms-2"
-                                        onClick={() => handlePageChange(currentPage + 1)}
-                                        disabled={currentPage === totalPages}
+                                        onClick={() => handlePageChange(pagination.page + 1)}
+                                        disabled={pagination.page === totalPages}
                                     >
                                         <ChevronRight size={16} />
                                     </button>

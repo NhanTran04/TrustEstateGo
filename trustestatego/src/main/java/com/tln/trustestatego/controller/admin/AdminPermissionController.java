@@ -24,7 +24,10 @@ public class AdminPermissionController {
     PermissionService permissionService;
 
     @GetMapping
-    public ResponseEntity<List<PermissionResponse>> getPermissions(@RequestParam(defaultValue = "") String kw, Pageable pageable) {
+    public ResponseEntity<List<PermissionResponse>> getPermissions(
+            @RequestParam(defaultValue = "") String kw,
+            Pageable pageable) {
+
         PageResponse<PermissionResponse> permissions = permissionService.getPermissions(kw, pageable);
 
         int start = (int) pageable.getOffset();
@@ -34,7 +37,7 @@ public class AdminPermissionController {
         headers.add("Content-Range", "permissions " + start + "-" + end + "/" + permissions.getTotalElements());
         headers.add("Access-Control-Expose-Headers", "Content-Range");
 
-        return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
+        return ResponseEntity.ok()
                 .headers(headers)
                 .body(permissions.getContent());
     }

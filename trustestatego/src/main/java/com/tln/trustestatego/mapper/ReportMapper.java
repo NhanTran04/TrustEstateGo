@@ -10,6 +10,8 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface ReportMapper {
     Report toReport(ReportUserRequest reportUserRequest);
+    @Mapping(source = "user.id", target = "userId")
+    @Mapping(target = "name", expression = "java(report.getUser().getFirstName() + \" \" + report.getUser().getLastName())")
     @Mapping(source = "property.id", target = "propertyId")
     @Mapping(source = "property.title", target = "propertyTitle")
     @Mapping(target = "propertyImage",

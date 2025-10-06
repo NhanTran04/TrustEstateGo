@@ -28,40 +28,6 @@ import java.util.List;
 public class AdminReviewController {
     ReviewService reviewService;
 
-//    @GetMapping("/users/{buyerId}")
-//    public ResponseEntity<List<ReviewResponse>> getReviewByUserId(
-//            @PathVariable int buyerId, Pageable pageable) {
-//        PageResponse<ReviewResponse> pageResponse = reviewService.getReviewByUserId(buyerId, pageable);
-//
-//        int start = pageable.getPageNumber() * pageable.getPageSize();
-//        int end = start + pageResponse.getContent().size() - 1;
-//
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.add("Content-Range",
-//                "reviews " + start + "-" + end + "/" + pageResponse.getTotalElements());
-//        headers.add("Access-Control-Expose-Headers", "Content-Range");
-//
-//        return new ResponseEntity<>(pageResponse.getContent(), headers, HttpStatus.OK);
-//    }
-
-//    @GetMapping
-//    public ResponseEntity<List<ReviewResponse>> getSellers(
-//            @RequestParam(name = "filter", required = false) String filter,
-//            @RequestParam(name = "range", required = false) String range,
-//            @RequestParam(name = "sort", required = false) String sort) throws JsonProcessingException {
-//        PageResponse<ReviewResponse> pageResponse = reviewService.getReviewBySellerId(sellerId, pageable);
-//
-//        int start = pageable.getPageNumber() * pageable.getPageSize();
-//        int end = start + pageResponse.getContent().size() - 1;
-//
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.add("Content-Range",
-//                "reviews " + start + "-" + end + "/" + pageResponse.getTotalElements());
-//        headers.add("Access-Control-Expose-Headers", "Content-Range");
-//
-//        return new ResponseEntity<>(pageResponse.getContent(), headers, HttpStatus.OK);
-//    }
-
     @GetMapping("/sellers")
     public ResponseEntity<List<SellerReviewResponse>> getSellerReviews(
             @RequestParam(required = false) String keyword,

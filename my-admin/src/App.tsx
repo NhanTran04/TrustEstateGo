@@ -14,6 +14,7 @@ import {
   Person,
   PlaylistAddCheckSharp,
   PostAdd,
+  Report,
   Reviews,
   RollerShades,
   Security,
@@ -57,60 +58,37 @@ import { PermissionCreate } from "./components/permissions/PermissionCreate";
 import { authProvider } from "./AuthProvider";
 import LoginPage from "./LoginPage";
 import Dashboard from "./components/dashboard/Dashboard";
+import ReportList from "./components/report/ReportList";
+import ReportEdit from "./components/report/ReportEdit";
+import { usePermissions } from "react-admin";
 
 // 🌟 Custom Menu
-const MyMenu = () => (
-  <List sx={{ padding: 2 }}>
-    <MenuItemLink
-      to="/dashboard"
-      primaryText="Dashboard"
-      leftIcon={<DashboardCustomize />}
-      sx={{ mb: 2 }}
-    />
-    <MenuItemLink
-      to="/users"
-      primaryText="Người dùng"
-      leftIcon={<Person />}
-      sx={{ mb: 2 }}
-    />
-    <MenuItemLink
-      to="/categories"
-      primaryText="Danh mục"
-      leftIcon={<Category />}
-      sx={{ mb: 2 }}
-    />
-    <MenuItemLink
-      to="/packages"
-      primaryText="Gói"
-      leftIcon={<PlaylistAddCheckSharp />}
-      sx={{ mb: 2 }}
-    />
-    <MenuItemLink
-      to="/properties"
-      primaryText="Bài đăng"
-      leftIcon={<PostAdd />}
-      sx={{ mb: 2 }}
-    />
-    <MenuItemLink
-      to="/sellers"
-      primaryText="Đánh giá"
-      leftIcon={<Reviews />}
-      sx={{ mb: 2 }}
-    />
-    <MenuItemLink
-      to="/roles"
-      primaryText="Vai trò"
-      leftIcon={<RollerShades />}
-      sx={{ mb: 2 }}
-    />
-    <MenuItemLink
-      to="/permissions"
-      primaryText="Quyền"
-      leftIcon={<Security />}
-      sx={{ mb: 2 }}
-    />
-  </List>
-);
+const MyMenu = () => {
+  const { permissions } = usePermissions(); // lấy roles từ authProvider
+  const isAdmin = permissions?.includes("ADMIN");
+  const isSTAFF = permissions?.includes("STAFF");
+
+  return (
+    <List sx={{ padding: 2 }}>
+      {isAdmin && (
+        <>
+          <MenuItemLink to="/dashboard" primaryText="Dashboard" leftIcon={<DashboardCustomize />} sx={{ mb: 2 }} />
+          <MenuItemLink to="/users" primaryText="Người dùng" leftIcon={<Person />} sx={{ mb: 2 }} />
+          <MenuItemLink to="/categories" primaryText="Danh mục" leftIcon={<Category />} sx={{ mb: 2 }} />
+          <MenuItemLink to="/packages" primaryText="Gói" leftIcon={<PlaylistAddCheckSharp />} sx={{ mb: 2 }} />
+          <MenuItemLink to="/properties" primaryText="Bài đăng" leftIcon={<PostAdd />} sx={{ mb: 2 }} />
+          <MenuItemLink to="/sellers" primaryText="Đánh giá" leftIcon={<Reviews />} sx={{ mb: 2 }} />
+          <MenuItemLink to="/roles" primaryText="Vai trò" leftIcon={<RollerShades />} sx={{ mb: 2 }} />
+          <MenuItemLink to="/permissions" primaryText="Quyền" leftIcon={<Security />} sx={{ mb: 2 }} />
+        </>
+      )}
+
+      {isSTAFF && (
+        <MenuItemLink to="/reports" primaryText="Khiếu nại" leftIcon={<Report />} sx={{ mb: 2 }} />
+      )}
+    </List>
+  );
+};
 
 // 🌟 Custom Layout
 const MyLayout = (props: any) => <Layout {...props} menu={MyMenu} />;
@@ -145,79 +123,32 @@ export const App = () => (
     theme={theme}
     layout={MyLayout}
   >
-    <CustomRoutes>
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/user-properties/:userId" element={<UserPropertiesList />} />
-      <Route path="/sellers/:sellerId/reviews" element={<ReviewList />} />
-      <Route
-        path="/sellers/:sellerId/reviews/create"
-        element={<ReviewCreate />}
-      />
-      <Route
-        path="/sellers/:sellerId/reviews/:id/show"
-        element={<ReviewShow />}
-      />
-    </CustomRoutes>
+    {(permissions) => (
+      <>
+        <CustomRoutes>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/user-properties/:userId" element={<UserPropertiesList />} />
+          <Route path="/sellers/:sellerId/reviews" element={<ReviewList />} />
+          <Route path="/sellers/:sellerId/reviews/create" element={<ReviewCreate />} />
+          <Route path="/sellers/:sellerId/reviews/:id/show" element={<ReviewShow />} />
+        </CustomRoutes>
 
-    <Resource
-      name="users"
-      list={UserList}
-      edit={UserEdit}
-      show={UserShow}
-      create={UserCreate}
-      icon={Person}
-      options={{ label: "Người dùng" }}
-    />
+        {permissions?.includes("ADMIN") && (
+          <>
+            <Resource name="users" list={UserList} edit={UserEdit} show={UserShow} create={UserCreate} icon={Person} />
+            <Resource name="categories" list={CategoryList} edit={CategoryEdit} show={CategoryShow} create={CategoryCreate} icon={Category} />
+            <Resource name="packages" list={PackageList} edit={PackageEdit} show={PackageShow} create={PackageCreate} icon={PlaylistAddCheckSharp} />
+            <Resource name="properties" list={PropertyList} edit={PropertyEdit} create={PropertyCreate} show={PropertyShow} icon={PostAdd} />
+            <Resource name="sellers" list={SellerList} icon={Reviews} />
+            <Resource name="roles" list={RoleList} edit={RoleEdit} show={RoleShow} create={RoleCreate} icon={RollerShades} />
+            <Resource name="permissions" list={PermissionList} edit={PermissionEdit} create={PermissionCreate} icon={Security} />
+          </>
+        )}
 
-    <Resource
-      name="categories"
-      list={CategoryList}
-      edit={CategoryEdit}
-      show={CategoryShow}
-      create={CategoryCreate}
-      icon={Category}
-      options={{ label: "Danh mục" }}
-    />
-    <Resource
-      name="packages"
-      list={PackageList}
-      edit={PackageEdit}
-      show={PackageShow}
-      create={PackageCreate}
-      icon={PlaylistAddCheckSharp}
-      options={{ label: "Gói" }}
-    />
-    <Resource
-      name="properties"
-      list={PropertyList}
-      edit={PropertyEdit}
-      create={PropertyCreate}
-      show={PropertyShow}
-      options={{ label: "Bài đăng" }}
-      icon={PostAdd}
-    />
-    <Resource
-      name="sellers"
-      list={SellerList}
-      options={{ label: "Đánh giá" }}
-      icon={Reviews}
-    />
-    <Resource
-      name="roles"
-      list={RoleList}
-      edit={RoleEdit}
-      show={RoleShow}
-      create={RoleCreate}
-      options={{ label: "Vai trò" }}
-      icon={RollerShades}
-    />
-    <Resource
-      name="permissions"
-      list={PermissionList}
-      edit={PermissionEdit}
-      create={PermissionCreate}
-      options={{ label: "Quyền" }}
-      icon={Security}
-    />
+        {permissions?.includes("STAFF") && (
+          <Resource name="reports" list={ReportList} edit={ReportEdit} icon={Report} />
+        )}
+      </>
+    )}
   </Admin>
 );

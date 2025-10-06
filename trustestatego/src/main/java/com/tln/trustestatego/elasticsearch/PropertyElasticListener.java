@@ -3,32 +3,29 @@ package com.tln.trustestatego.elasticsearch;
 import com.tln.trustestatego.document.PropertyDocument;
 import com.tln.trustestatego.entity.Property;
 import com.tln.trustestatego.mapper.PropertyMapper;
-import com.tln.trustestatego.repository.PropertyRepository;
 import com.tln.trustestatego.repository.PropertySearchRepository;
-import jakarta.persistence.PostPersist;
-import jakarta.persistence.PostRemove;
-import jakarta.persistence.PostUpdate;
-import lombok.AccessLevel;
+import jakarta.persistence.*;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class PropertyElasticListener {
-    PropertyMapper propertyMapper;
-    PropertySearchRepository propertySearchRepository;
+
+    private final PropertySearchRepository repository;
+    private final PropertyMapper propertyMapper;
 
     @PostPersist
     @PostUpdate
-    public void syncToElasticsearch(Property property){
-        PropertyDocument propertyDocument = propertyMapper.toPropertyDocument(property);
-        propertySearchRepository.save(propertyDocument);
+    public void onSaveOrUpdate(Property property) {
+        PropertyDocument doc = propertyMapper.toPropertyDocument(property);
+        repository.save(doc);
     }
 
     @PostRemove
-    public void removeFromElasticsearch(Property property) {
-        propertySearchRepository.deleteById(property.getId());
+    public void onDelete(Property property) {
+        repository.deleteById(property.getId().toString());
     }
 }
