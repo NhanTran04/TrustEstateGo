@@ -234,7 +234,7 @@ export const dataProvider = {
 
       const query = new URLSearchParams({
         kw,
-        page: String(page - 1),
+        page: String(page),
         size: String(perPage),
         sort: `${field},${order.toLowerCase()}`,
       });

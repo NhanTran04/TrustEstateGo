@@ -1,4 +1,4 @@
-package com.tln.trustestatego.controller;
+package com.tln.trustestatego.controller.user;
 
 import com.tln.trustestatego.dto.response.PaymentResponse;
 import com.tln.trustestatego.service.PaymentService;
