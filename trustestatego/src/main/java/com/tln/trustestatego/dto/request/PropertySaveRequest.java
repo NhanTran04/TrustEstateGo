@@ -1,5 +1,7 @@
 package com.tln.trustestatego.dto.request;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -9,6 +11,7 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PropertySaveRequest {
-//    int userId;
+    @NotNull(message = "Property ID is required")
+    @Min(value = 1, message = "Property ID must be greater than 0")
     int propertyId;
 }

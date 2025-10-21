@@ -66,15 +66,19 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
 
 
     @Override
-    public PageResponse<PropertyResponse> getProperties(Integer categoryId,Pageable pageable){
+    public PageResponse<PropertyResponse> getProperties(Integer categoryId, Pageable pageable) {
+        LocalDateTime now = LocalDateTime.now();
         Page<PropertyResponse> property;
-        if(categoryId != null)
+
+        if (categoryId != null)
             property = propertyRepository
-                    .findByCategory_Id(categoryId, pageable)
+                    .findByCategory_IdAndIsActiveTrueAndExpireAtAfter(categoryId, now, pageable)
                     .map(propertyMapper::toPropertyResponse);
         else
             property = propertyRepository
-                .findAll(pageable).map(propertyMapper::toPropertyResponse);
+                    .findByIsActiveTrueAndExpireAtAfter(now, pageable)
+                    .map(propertyMapper::toPropertyResponse);
+
         return pageMapper.toPageResponse(property);
     }
 
