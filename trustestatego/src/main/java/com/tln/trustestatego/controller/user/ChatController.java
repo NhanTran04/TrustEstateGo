@@ -36,7 +36,6 @@ public class ChatController {
         return chatService.getMessages(roomId);
     }
 
-    // Gửi tin nhắn (WebSocket)
     @MessageMapping("/chat.sendMessage")
     public void sendMessage(ChatMessageRequest req) {
         ChatMessage saved = chatService.saveMessage(req.getRoomId(), req.getMessage(), req.getSenderId());

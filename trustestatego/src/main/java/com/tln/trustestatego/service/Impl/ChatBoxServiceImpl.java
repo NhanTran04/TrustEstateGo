@@ -141,29 +141,99 @@ public class ChatBoxServiceImpl implements ChatBoxService {
 
 
 
-    // --- Helper parse functions ---
-    private String extractLocation(String text) {
-        Pattern p = Pattern.compile("(Quận\\s*\\d+|Huyện\\s*\\w+|Thủ Đức|Hà Nội|HCM)", Pattern.CASE_INSENSITIVE);
-        Matcher m = p.matcher(text);
-        return m.find() ? m.group() : null;
-    }
+//    // --- Helper parse functions ---
+//    private String extractLocation(String text) {
+//        Pattern p = Pattern.compile("(Quận\\s*\\d+|Huyện\\s*\\w+|Thủ Đức|Hà Nội|HCM)", Pattern.CASE_INSENSITIVE);
+//        Matcher m = p.matcher(text);
+//        return m.find() ? m.group() : null;
+//    }'
+//
+//    private BigDecimal extractPrice(String text) {
+//        Pattern p = Pattern.compile("(\\d+(?:[.,]\\d+)?)(\\s*tr|\\s*triệu)", Pattern.CASE_INSENSITIVE);
+//        Matcher m = p.matcher(text);
+//        if (m.find()) {
+//            String num = m.group(1).replace(",", ".");
+//            return new BigDecimal(num).multiply(BigDecimal.valueOf(1_000_000));
+//        }
+//        return null;
+//    }
+//
+//    private Integer extractArea(String text) {
+//        Pattern p = Pattern.compile("(\\d+)(\\s*m2|\\s*m²)", Pattern.CASE_INSENSITIVE);
+//        Matcher m = p.matcher(text);
+//        if (m.find()) {
+//            return Integer.parseInt(m.group(1));
+//        }
+//        return null;
+//    }
+// --- Helper parse functions (được cải tiến) ---
+private String extractLocation(String text) {
+    if (text == null) return null;
+
+    // Bổ sung nhiều cách viết tên địa điểm phổ biến
+    Pattern p = Pattern.compile(
+            "(?i)(quận\\s*\\d+|q\\s*\\d+|huyện\\s*\\w+|thủ\\s*đức|bình\\s*thạnh|tân\\s*bình|"
+                    + "phú\\s*nhuận|gò\\s*vấp|hà\\s*nội|hồ\\s*chí\\s*minh|hcm|sài\\s*gòn|đà\\s*nẵng|cần\\s*thơ)"
+    );
+
+    Matcher m = p.matcher(text);
+    return m.find() ? capitalize(m.group().trim()) : null;
+}
 
     private BigDecimal extractPrice(String text) {
-        Pattern p = Pattern.compile("(\\d+(?:[.,]\\d+)?)(\\s*tr|\\s*triệu)", Pattern.CASE_INSENSITIVE);
+        if (text == null) return null;
+
+        // Bổ sung nhận diện triệu, tỷ, trieu, ty, vnđ, đồng,...
+        Pattern p = Pattern.compile(
+                "(\\d+(?:[.,]\\d+)?)(\\s*(tỷ|ty|tr|triệu|k|nghìn|ngàn|vnđ|đ|dong|đồng))",
+                Pattern.CASE_INSENSITIVE
+        );
+
         Matcher m = p.matcher(text);
         if (m.find()) {
-            String num = m.group(1).replace(",", ".");
-            return new BigDecimal(num).multiply(BigDecimal.valueOf(1_000_000));
+            String numStr = m.group(1).replace(",", ".").trim();
+            double num = Double.parseDouble(numStr);
+            String unit = m.group(2).toLowerCase();
+
+            if (unit.contains("tỷ") || unit.contains("ty")) {
+                return BigDecimal.valueOf(num * 1_000_000_000);
+            } else if (unit.contains("tr") || unit.contains("triệu")) {
+                return BigDecimal.valueOf(num * 1_000_000);
+            } else if (unit.contains("k") || unit.contains("nghìn") || unit.contains("ngàn")) {
+                return BigDecimal.valueOf(num * 1_000);
+            } else {
+                // Mặc định giả sử là đồng
+                return BigDecimal.valueOf(num);
+            }
         }
         return null;
     }
 
     private Integer extractArea(String text) {
-        Pattern p = Pattern.compile("(\\d+)(\\s*m2|\\s*m²)", Pattern.CASE_INSENSITIVE);
+        if (text == null) return null;
+
+        // Hỗ trợ cả "m2", "m²", "met vuong", "mét vuông"
+        Pattern p = Pattern.compile("(\\d+)(\\s*(m2|m²|mét vuông|met vuong))", Pattern.CASE_INSENSITIVE);
         Matcher m = p.matcher(text);
+
         if (m.find()) {
             return Integer.parseInt(m.group(1));
         }
+
+        // Thêm trường hợp có thể viết "phòng 20m" hoặc "20 mét"
+        Pattern p2 = Pattern.compile("(\\d+)(\\s*(m|mét))", Pattern.CASE_INSENSITIVE);
+        Matcher m2 = p2.matcher(text);
+        if (m2.find()) {
+            return Integer.parseInt(m2.group(1));
+        }
+
         return null;
     }
+
+    // --- Helper capitalize ---
+    private String capitalize(String str) {
+        if (str == null || str.isEmpty()) return str;
+        return str.substring(0, 1).toUpperCase() + str.substring(1);
+    }
+
 }
