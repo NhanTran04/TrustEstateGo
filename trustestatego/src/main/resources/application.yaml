@@ -20,6 +20,15 @@ spring:
     username: ${MYSQLUSER}
     password: ${MYSQLPASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 15        # số connection tối đa trong pool
+      minimum-idle: 3              # số connection idle tối thiểu
+      idle-timeout: 300000         # 5 phút
+      max-lifetime: 1800000        # 30 phút, < wait_timeout của MySQL
+      connection-timeout: 40000    # 30 giây chờ connection
+      validation-timeout: 5000
+      leak-detection-threshold: 10000
+      connection-test-query: SELECT 1
   jpa:
     hibernate:
       ddl-auto: update
@@ -35,17 +44,20 @@ spring:
       repositories:
         enabled: true
       client:
+        username:
+        password:
         rest:
-          uris: http://localhost:9200
+          uris: https://elasticsearch-production-2bfc.up.railway.app
+          connection-timeout: 10s
+          socket-timeout: 60s
+          use-ssl: true
+          ssl:
+            verify-hostnames: false
+
 #  elasticsearch:
 #    uris: http://localhost:9200
 #    connection-timeout: 5s
 #    socket-timeout: 60s
-
-
-
-
-
 
 app:
   api:
@@ -69,6 +81,8 @@ logging:
     org.springframework.http.converter: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    javax.net.ssl: DEBUG
+
 
 paypal:
   client:

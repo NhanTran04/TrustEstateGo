@@ -15,8 +15,6 @@ import com.tln.trustestatego.mapper.PageMapper;
 import com.tln.trustestatego.mapper.PropertyMapper;
 import com.tln.trustestatego.repository.CategoryRepository;
 import com.tln.trustestatego.repository.PropertyRepository;
-import com.tln.trustestatego.repository.PropertySearchRepository;
-import com.tln.trustestatego.repository.UserRepository;
 import com.tln.trustestatego.service.CurrentUserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +22,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
@@ -33,7 +32,9 @@ import org.springframework.data.elasticsearch.core.query.Criteria;
 import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -63,7 +64,6 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
     PageMapper pageMapper;
 
     CurrentUserService currentUserService;
-
 
     @Override
     public PageResponse<PropertyResponse> getProperties(Integer categoryId, Pageable pageable) {
@@ -155,10 +155,29 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
     }
 
     @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    @Async
     public void reindexAllProperties() {
-        List<Property> properties = propertyRepository.findAll();
-        List<PropertyDocument> docs = properties.stream().map(propertyMapper::toPropertyDocument).toList();
-        elasticsearchOperations.save(docs);
+        int batchSize = 50;
+        int page = 0;
+
+        Pageable pageable = PageRequest.of(page, batchSize);
+        Page<Property> batch;
+
+        do {
+            batch = propertyRepository.findAll(pageable); // lấy từng batch
+            List<PropertyDocument> docs = batch.getContent().stream()
+                    .map(propertyMapper::toPropertyDocument)
+                    .toList();
+
+            elasticsearchOperations.save(docs);
+
+            propertyRepository.flush();
+
+
+            page++;
+            pageable = PageRequest.of(page, batchSize);
+        } while (!batch.isEmpty());
     }
 
     @Override

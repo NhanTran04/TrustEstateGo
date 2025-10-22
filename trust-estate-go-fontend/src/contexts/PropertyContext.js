@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { api, authApi, endpoints } from "../services/api";
+import { api, authApi, endpoints } from "../services/api.js";
 import useAuth from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 
