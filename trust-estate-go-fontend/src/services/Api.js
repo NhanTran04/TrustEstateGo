@@ -18,7 +18,7 @@ export const endpoints = {
     chatRoom: (sellerId) => `/chat/room/${sellerId}`,
     chatRooms: "/chat/rooms",
     chatMessages: (roomId) => `/chat/messages/${roomId}`, // GET
-    ws: "http://localhost:8080/trustestatego/ws",
+    ws: "https://trustestatego.onrender.com/trustestatego/ws",
     chatBox: "/chat-box",
     sellerProperties: "/seller-properties"
     // stats: "/stats"
