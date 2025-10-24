@@ -1,16 +1,24 @@
 ## DEMO : https://trustestatego-frontend.onrender.com/
 
+---
+
 ## User Account
-- **username**: nhan1 
-- **username**: Admin123@
+- **Username**: nhan1 
+- **Password**: Admin123@
+
+---
 
 ## Seller Account
-- **username**: nguyenvanb 
-- **username**: Admin123@
+- **Username**: nguyenvanb 
+- **Password**: Admin123@
 
-## Sandbox Test Account
+  ---
+
+## PAYPAL Account
 - **Email**: sb-mcyl246179052@personal.example.com 
 - **Password**: qF+@C^1"
+
+  ---
 
 # 🏠 TrustEstateGo Web
 A personal real estate platform using Spring Boot + ReactJS
@@ -18,7 +26,7 @@ A personal real estate platform using Spring Boot + ReactJS
 ## Introduction
 TrustEstateGo Web is a real estate platform built with **Client–Server architecture**.  
 The backend is developed with **Spring Boot**, while the frontend includes **React Admin (TypeScript)** for administrators and **ReactJS** for end-users.  
-It supports property posting, advanced search, PayPal-based subscriptions, and real-time chat between buyers and sellers.
+It supports property posting, advanced search, PayPal-based subscriptions, real-time chat between buyers and sellers, and chatbox with Gemini API help for users.
 
 ---
 
@@ -29,13 +37,9 @@ It supports property posting, advanced search, PayPal-based subscriptions, and r
 - Property search functionality using **ElasticSearch**
 - Real-time chat between users and sellers with **WebSocket**
 - Property posting with images stored on **Cloudinary**
+- Chatbox with **Gemini API** help for users
 - API testing with **Postman**
-
----
-
-## Sandbox Test Account
-- **Email**: sb-mcyl246179052@personal.example.com 
-- **Password**: qF+@C^1"
+- Deploy on **Render**
 
 ---
 
@@ -46,7 +50,7 @@ It supports property posting, advanced search, PayPal-based subscriptions, and r
 - **Search**: ElasticSearch  
 - **Authentication**: OAuth2, JWT  
 - **Payment**: PayPal API  
-- **Chat**: WebSocket  
+- **Chat**: WebSocket, GeminiAPI 
 - **Others**: Docker, Postman, Cloudinary
 
 ---
