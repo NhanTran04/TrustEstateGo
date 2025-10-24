@@ -26,7 +26,7 @@ A personal real estate platform using Spring Boot + ReactJS
 ## Introduction
 TrustEstateGo Web is a real estate platform built with **Client–Server architecture**.  
 The backend is developed with **Spring Boot**, while the frontend includes **React Admin (TypeScript)** for administrators and **ReactJS** for end-users.  
-It supports property posting, advanced search, PayPal-based subscriptions, real-time chat between buyers and sellers, and chatbox with Gemini API help for users.
+It supports property posting, advanced search, PayPal-based subscriptions, real-time chat between buyers and sellers, and chatbox with Gemini API help for users. Deloy backend and frontend on Render, MySQL database and Elasticsearch on Railway.
 
 ---
 
@@ -39,7 +39,7 @@ It supports property posting, advanced search, PayPal-based subscriptions, real-
 - Property posting with images stored on **Cloudinary**
 - Chatbox with **Gemini API** help for users
 - API testing with **Postman**
-- Deploy on **Render**
+- Deploy UI on **Render**
 
 ---
 
@@ -51,6 +51,6 @@ It supports property posting, advanced search, PayPal-based subscriptions, real-
 - **Authentication**: OAuth2, JWT  
 - **Payment**: PayPal API  
 - **Chat**: WebSocket, GeminiAPI 
-- **Others**: Docker, Postman, Cloudinary
+- **Others**: Docker, Postman, Cloudinary, Deployment
 
 ---
