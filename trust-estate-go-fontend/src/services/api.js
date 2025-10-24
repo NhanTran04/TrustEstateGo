@@ -17,14 +17,14 @@ export const endpoints = {
     payments: "/payments",
     chatRoom: (sellerId) => `/chat/room/${sellerId}`,
     chatRooms: "/chat/rooms",
-    chatMessages: (roomId) => `/chat/messages/${roomId}`, // GET
+    chatMessages: (roomId) => `/chat/messages/${roomId}`,
     ws: "https://trustestatego.onrender.com/trustestatego/ws",
     chatBox: "/chat-box",
     sellerProperties: "/seller-properties"
     // stats: "/stats"
 };
 
-// Tạo instance của axios cho API không cần token
+
 export const api = axios.create({
     baseURL: BASE_URL,
     headers: {
@@ -32,7 +32,6 @@ export const api = axios.create({
     },
 });
 
-// API có token (user đã đăng nhập)
 export const authApi = () => {
     const token = localStorage.getItem("token");
     const instance = axios.create({
