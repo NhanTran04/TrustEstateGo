@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { User, Shield, Camera, CheckCircle, Star, MessageCircle, Bell, Award, Edit } from 'lucide-react';
 import useAuth from '../hooks/useAuth';
-import { authApi, endpoints } from '../services/api';
+import { authApi, endpoints } from '../services/api.js';
 import { Button, Col, Container, Form, Image, Row } from 'react-bootstrap';
 
 const Profile = () => {

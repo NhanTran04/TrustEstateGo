@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Heart, Search } from 'lucide-react';
 import PropertyCard from '../components/PropertyCard';
 import { useProperty } from '../contexts/PropertyContext';
-import { authApi, endpoints } from '../services/api';
+import { authApi, endpoints } from '../services/api.js';
 
 const Saved = () => {
     const navigate = useNavigate();

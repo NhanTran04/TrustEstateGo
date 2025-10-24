@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { User, Lock, Eye, EyeOff } from 'lucide-react';
 import useAuth from '../hooks/useAuth';
-import { api, endpoints } from '../services/api';
+import { api, endpoints } from '../services/api.js';
 
 const Login = () => {
     const [formData, setFormData] = useState({

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { User, Mail, Phone, Lock, Eye, EyeOff, Shield } from 'lucide-react';
 import useAuth from '../hooks/useAuth';
-import { api, endpoints } from '../services/api';
+import { api, endpoints } from '../services/api.js';
 import { BsGenderAmbiguous, BsGenderTrans } from 'react-icons/bs';
 import { TbAddressBook } from 'react-icons/tb';
 import { FaAddressCard, FaBirthdayCake } from 'react-icons/fa';

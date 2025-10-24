@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { authApi, endpoints, api } from '../services/api';
+import { authApi, endpoints, api } from '../services/api.js';
 import useAuth from '../hooks/useAuth';
 
 const CreateEditProperty = () => {

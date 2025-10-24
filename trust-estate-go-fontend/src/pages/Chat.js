@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { authApi, endpoints } from "../services/api";
+import { authApi, endpoints } from "../services/api.js";
 import useAuth from "../hooks/useAuth";
 
 const Chat = () => {

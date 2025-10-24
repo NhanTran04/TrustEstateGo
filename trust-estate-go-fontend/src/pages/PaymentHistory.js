@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Table, Spinner, Alert, Container } from "react-bootstrap";
 import dayjs from "dayjs";
-import { authApi, endpoints } from "../services/api";
+import { authApi, endpoints } from "../services/api.js";
 
 const PaymentHistory = () => {
     const [payments, setPayments] = useState([]);

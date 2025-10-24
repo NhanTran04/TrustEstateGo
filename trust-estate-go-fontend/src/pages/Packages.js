@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { authApi, endpoints } from "../services/api";
+import { authApi, endpoints } from "../services/api.js";
 
 const Packages = () => {
     const [packages, setPackages] = useState([]);

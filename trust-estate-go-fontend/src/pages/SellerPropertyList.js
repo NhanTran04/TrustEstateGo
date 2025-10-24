@@ -1,7 +1,7 @@
 // SellerPropertyList.js
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { authApi, endpoints } from '../services/api';
+import { authApi, endpoints } from '../services/api.js';
 import useAuth from '../hooks/useAuth';
 import PropertyCard from '../components/PropertyCard';
 

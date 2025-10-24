@@ -8,7 +8,7 @@ import {
 import useAuth from '../hooks/useAuth';
 import { useProperty } from '../contexts/PropertyContext';
 import { formatPrice } from '../utils/Formatter';
-import { authApi, endpoints } from '../services/api';
+import { authApi, endpoints } from '../services/api.js';
 
 const PropertyDetail = () => {
     const { id } = useParams();

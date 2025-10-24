@@ -89,6 +89,6 @@ paypal:
     id: ${PAYPAL_ID}
     secret: ${PAYPAL_SECRET}
   mode: sandbox
-  successUrl: http://localhost:3000/payment-success
-  cancelUrl: http://localhost:3000/payment-cancel
+  successUrl: https://trustestatego-frontend.onrender.com/payment-success
+  cancelUrl: https://trustestatego-frontend.onrender.com/payment-cancel
   currency: USD

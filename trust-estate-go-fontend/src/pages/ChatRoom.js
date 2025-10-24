@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
-import { authApi, endpoints } from "../services/api";
+import { authApi, endpoints } from "../services/api.js";
 import { Stomp } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import { Button, Form } from "react-bootstrap";
