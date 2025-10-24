@@ -1,4 +1,5 @@
 ## DEMO : https://trustestatego-frontend.onrender.com/
+- **Note**: The server may enter sleep mode occasionally on Render free tier, please wait a few seconds if the site takes time to load.
 
 ---
 
