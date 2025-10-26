@@ -42,17 +42,18 @@ spring:
         one-indexed-parameters: true  # page=1 sẽ là trang đầu (mặc định Spring là page=0)
     elasticsearch:
       repositories:
-        enabled: true
+        enabled:  ${app.elastic.enabled}
       client:
-        username:
-        password:
+#        username:
+#        password:
         rest:
-          uris: https://elasticsearch-production-2bfc.up.railway.app
+#          uris: https://elasticsearch-production-2bfc.up.railway.app
+          uris: http://localhost:9200
           connection-timeout: 10s
           socket-timeout: 60s
-          use-ssl: true
-          ssl:
-            verify-hostnames: false
+#          use-ssl: false
+#          ssl:
+#            verify-hostnames: false
 
 #  elasticsearch:
 #    uris: http://localhost:9200
@@ -65,6 +66,9 @@ app:
       api-key: ${GEMINI_KEY}            # set env var GEMINI_API_KEY
       base-url: https://generativelanguage.googleapis.com
       model: gemini-2.5-flash
+
+  elastic:
+    enabled: true
 
 cloudinary:
   cloud-name: ${CLOUDINARY_NAME}

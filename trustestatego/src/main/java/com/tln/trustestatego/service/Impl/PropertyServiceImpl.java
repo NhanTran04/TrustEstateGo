@@ -155,29 +155,10 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
     }
 
     @Override
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    @Async
     public void reindexAllProperties() {
-        int batchSize = 50;
-        int page = 0;
-
-        Pageable pageable = PageRequest.of(page, batchSize);
-        Page<Property> batch;
-
-        do {
-            batch = propertyRepository.findAll(pageable); // lấy từng batch
-            List<PropertyDocument> docs = batch.getContent().stream()
-                    .map(propertyMapper::toPropertyDocument)
-                    .toList();
-
-            elasticsearchOperations.save(docs);
-
-            propertyRepository.flush();
-
-
-            page++;
-            pageable = PageRequest.of(page, batchSize);
-        } while (!batch.isEmpty());
+        List<Property> properties = propertyRepository.findAll();
+        List<PropertyDocument> docs = properties.stream().map(propertyMapper::toPropertyDocument).toList();
+        elasticsearchOperations.save(docs);
     }
 
     @Override

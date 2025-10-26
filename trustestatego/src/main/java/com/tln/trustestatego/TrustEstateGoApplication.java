@@ -7,7 +7,6 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import java.util.TimeZone;
 
 @SpringBootApplication
-@EnableAsync
 public class TrustEstateGoApplication {
 
 	public static void main(String[] args) {
