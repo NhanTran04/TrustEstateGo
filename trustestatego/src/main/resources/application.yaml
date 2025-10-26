@@ -42,7 +42,7 @@ spring:
         one-indexed-parameters: true  # page=1 sẽ là trang đầu (mặc định Spring là page=0)
     elasticsearch:
       repositories:
-        enabled:  ${app.elastic.enabled}
+        enabled:  ${APP_ELASTIC_ENABLED:true}
       client:
 #        username:
 #        password:
@@ -66,9 +66,8 @@ app:
       api-key: ${GEMINI_KEY}            # set env var GEMINI_API_KEY
       base-url: https://generativelanguage.googleapis.com
       model: gemini-2.5-flash
-
   elastic:
-    enabled: true
+    enabled: ${APP_ELASTIC_ENABLED:true}
 
 cloudinary:
   cloud-name: ${CLOUDINARY_NAME}
