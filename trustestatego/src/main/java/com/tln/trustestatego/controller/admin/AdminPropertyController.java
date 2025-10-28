@@ -3,6 +3,7 @@ package com.tln.trustestatego.controller.admin;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tln.trustestatego.dto.request.PropertyAdminRequest;
 import com.tln.trustestatego.dto.request.PropertyRequest;
 import com.tln.trustestatego.dto.response.ApiResponse;
 import com.tln.trustestatego.dto.response.PageResponse;
@@ -102,8 +103,8 @@ public class AdminPropertyController {
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,
             MediaType.APPLICATION_FORM_URLENCODED_VALUE}
     )
-    public ResponseEntity<PropertyResponse> createProperty(@ModelAttribute PropertyRequest propertyRequest) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(propertyService.createProperty(propertyRequest));
+    public ResponseEntity<PropertyResponse> createProperty(@ModelAttribute PropertyAdminRequest propertyAdminRequest) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(propertyService.createPropertyByAdmin(propertyAdminRequest));
     }
 
 //    @PutMapping(path = "/{propertyId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,

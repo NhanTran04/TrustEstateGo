@@ -53,19 +53,49 @@ const Home = () => {
                 <div className="row g-4">
                     {[
                         { icon: Building, number: '10,000+', label: 'Bất động sản', color: 'primary', bg: 'primary' },
-                        { icon: Award, number: '5,000+', label: 'Giao dịch thành công', color: 'success', bg: 'success' },
+                        { icon: Award, number: '5,000+', label: 'Giao dịch thành công', color: 'rgb(72, 215, 149)', bg: 'success' },
                         { icon: Users, number: '500+', label: 'Đối tác uy tín', color: 'warning', bg: 'warning' },
                         { icon: Globe, number: '24/7', label: 'Hỗ trợ khách hàng', color: 'info', bg: 'info' }
                     ].map((stat, index) => {
                         const IconComponent = stat.icon;
+                        const isCustomColor = stat.color.startsWith('rgb'); // Kiểm tra có phải màu tùy chỉnh không
+
                         return (
                             <div key={index} className="col-md-3">
                                 <div className="card border-0 shadow-sm h-100 text-center hover-lift">
                                     <div className="card-body p-4">
-                                        <div className={`bg-${stat.bg} bg-opacity-10 rounded-circle d-inline-flex p-3 mb-3`}>
-                                            <IconComponent size={32} className={`text-${stat.color}`} />
+                                        {/* Nền icon */}
+                                        <div
+                                            className="rounded-circle d-inline-flex p-3 mb-3 justify-content-center align-items-center"
+                                            style={{
+                                                backgroundColor: isCustomColor
+                                                    ? 'rgba(72, 215, 149, 0.1)' // Nền nhạt cho màu RGB
+                                                    : `var(--bs-${stat.bg}-bg-subtle)`,
+                                            }}
+                                        >
+                                            <IconComponent
+                                                size={32}
+                                                style={{
+                                                    color: isCustomColor
+                                                        ? stat.color
+                                                        : `var(--bs-${stat.color})`,
+                                                }}
+                                            />
                                         </div>
-                                        <h3 className={`fw-bold text-${stat.color} mb-2`}>{stat.number}</h3>
+
+                                        {/* Số liệu */}
+                                        <h3
+                                            className="fw-bold mb-2"
+                                            style={{
+                                                color: isCustomColor
+                                                    ? stat.color
+                                                    : `var(--bs-${stat.color})`,
+                                            }}
+                                        >
+                                            {stat.number}
+                                        </h3>
+
+                                        {/* Nhãn */}
                                         <p className="text-muted mb-0 fw-semibold">{stat.label}</p>
                                     </div>
                                 </div>
@@ -74,6 +104,7 @@ const Home = () => {
                     })}
                 </div>
             </div>
+
 
             {/* Categories Section */}
             <PropertyTypeSection />

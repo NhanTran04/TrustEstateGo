@@ -21,6 +21,8 @@ import ChatRoom from './pages/ChatRoom';
 import ChatList from './pages/ChatList';
 import CreateEditProperty from './pages/CreateEditProperty';
 import SellerPropertyList from './pages/SellerPropertyList';
+import "./styles/index.css"
+import ScrollToTop from './components/ScrollToTop';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -62,7 +64,9 @@ const AppContent = () => {
   return (
     <div className="min-vh-100" style={{ backgroundColor: '#f8f9ff' }}>
       <Header />
+      <ScrollToTop />
       <Routes>
+
         <Route path="/" element={<Home />} />
         <Route path="/property/:id" element={<PropertyDetail />} />
         <Route path="/:slug" element={<Properties />} />

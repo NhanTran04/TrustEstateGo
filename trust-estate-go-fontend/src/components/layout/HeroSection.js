@@ -22,7 +22,7 @@ const HeroSection = () => {
     return (
         <section className="hero-section d-flex align-items-center p-3"
             style={{
-                background: "lightBlue",
+                background: "linear-gradient(135deg, rgb(37 113 178) 0%, rgb(79 228 235) 100%)",
                 minHeight: "400px"
             }}
         >
@@ -63,23 +63,16 @@ const HeroSection = () => {
                             <div className="row g-3">
                                 <div className="col-md-8">
                                     <div className="input-group input-group-lg">
-                                        <span className="input-group-text bg-white border-0 text-primary">
-                                            <Search size={20} />
+                                        <span className="fs-3 fw-bold text-white mb-4">
+                                            Bạn muốn căn nhà mơ ước?
+
                                         </span>
-                                        <input
-                                            type="text"
-                                            className="form-control border-0 shadow-none"
-                                            placeholder="Nhập tên dự án, địa điểm bạn muốn tìm..."
-                                            value={localSearchQuery}
-                                            onChange={(e) => setLocalSearchQuery(e.target.value)}
-                                            onKeyPress={handleKeyPress}
-                                            style={{ fontSize: '1rem' }}
-                                        />
                                     </div>
                                 </div>
                                 <div className="col-md-4">
                                     <button
-                                        className="btn btn-warning btn-lg w-100 fw-bold rounded-pill"
+                                        className="btn btn-lg w-100 fw-bold rounded-pill text-white"
+                                        style={{ background: "dodgerblue" }}
                                         onClick={handleSearch}
                                     >
                                         <Search size={18} className="me-2" />

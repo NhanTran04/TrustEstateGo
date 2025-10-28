@@ -40,7 +40,7 @@ export const PropertyList: React.FC = () => (
                 </div>
             )} label="Ảnh" />
             {/* <FunctionField render={() => <PropertyTypeChip />} label="Loại" /> */}
-            <TextField source="propertyType" label="Loại BĐS" />
+            <TextField source="propertyType.value" label="Loại BĐS" />
             <TextField source="categoryName" label="Thể loại" />
             <FunctionField render={() => <PriceField />} label="Giá" />
             <FunctionField render={() => <LocationField />} label="Địa chỉ" />

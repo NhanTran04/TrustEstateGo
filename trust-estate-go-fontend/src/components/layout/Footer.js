@@ -6,7 +6,7 @@ const Footer = () => {
   const navigate = useNavigate();
 
   return (
-    <footer className="bg-dark text-light py-5 mt-5">
+    <footer className="text-light py-5 mt-5" style={{ background: "linear-gradient(45deg, #14429b, #180b0b)" }}>
       <div className="container">
         <div className="row g-4">
           <div className="col-lg-4">
@@ -16,7 +16,7 @@ const Footer = () => {
               </div>
               <h4 className="text-primary fw-bold mb-0">TrustEstateGo</h4>
             </div>
-            <p className="mb-4 opacity-75">
+            <p className="mb-4">
               Nền tảng bất động sản hàng đầu Việt Nam, kết nối hàng triệu người với ngôi nhà mơ ước.
               Uy tín - Chất lượng - Minh bạch.
             </p>
@@ -42,7 +42,7 @@ const Footer = () => {
               ].map(item => (
                 <li key={item.path} className="mb-2">
                   <button
-                    className="btn btn-link text-light p-0 text-decoration-none opacity-75 hover-opacity-100"
+                    className="btn btn-link text-light p-0 text-decoration-none"
                     onClick={() => navigate(item.path)}
                   >
                     {item.label}
@@ -55,20 +55,20 @@ const Footer = () => {
           <div className="col-lg-2 col-md-3">
             <h6 className="text-warning fw-bold mb-3">Dành cho chủ nhà</h6>
             <ul className="list-unstyled">
-              <li className="mb-2"><a href="#" className="text-light text-decoration-none opacity-75 hover-opacity-100">Đăng tin</a></li>
-              <li className="mb-2"><a href="#" className="text-light text-decoration-none opacity-75 hover-opacity-100">Gói dịch vụ</a></li>
-              <li className="mb-2"><a href="#" className="text-light text-decoration-none opacity-75 hover-opacity-100">Quản lý tin</a></li>
-              <li className="mb-2"><a href="#" className="text-light text-decoration-none opacity-75 hover-opacity-100">Báo cáo</a></li>
+              <li className="mb-2"><a href="#" className="text-light text-decoration-none">Đăng tin</a></li>
+              <li className="mb-2"><a href="#" className="text-light text-decoration-none">Gói dịch vụ</a></li>
+              <li className="mb-2"><a href="#" className="text-light text-decoration-none">Quản lý tin</a></li>
+              <li className="mb-2"><a href="#" className="text-light text-decoration-none">Báo cáo</a></li>
             </ul>
           </div>
 
           <div className="col-lg-2 col-md-3">
             <h6 className="text-warning fw-bold mb-3">Hỗ trợ</h6>
             <ul className="list-unstyled">
-              <li className="mb-2"><a href="#" className="text-light text-decoration-none opacity-75 hover-opacity-100">Về chúng tôi</a></li>
-              <li className="mb-2"><a href="#" className="text-light text-decoration-none opacity-75 hover-opacity-100">Liên hệ</a></li>
-              <li className="mb-2"><a href="#" className="text-light text-decoration-none opacity-75 hover-opacity-100">Điều khoản</a></li>
-              <li className="mb-2"><a href="#" className="text-light text-decoration-none opacity-75 hover-opacity-100">Bảo mật</a></li>
+              <li className="mb-2"><a href="#" className="text-light text-decoration-none">Về chúng tôi</a></li>
+              <li className="mb-2"><a href="#" className="text-light text-decoration-none">Liên hệ</a></li>
+              <li className="mb-2"><a href="#" className="text-light text-decoration-none">Điều khoản</a></li>
+              <li className="mb-2"><a href="#" className="text-light text-decoration-none">Bảo mật</a></li>
             </ul>
           </div>
 

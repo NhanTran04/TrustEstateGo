@@ -1,6 +1,7 @@
 package com.tln.trustestatego.service;
 
 import com.tln.trustestatego.document.PropertyDocument;
+import com.tln.trustestatego.dto.request.PropertyAdminRequest;
 import com.tln.trustestatego.dto.request.PropertyRequest;
 import com.tln.trustestatego.dto.response.PageResponse;
 import com.tln.trustestatego.dto.response.PropertyResponse;
@@ -18,6 +19,7 @@ public interface PropertyService {
 //    PageResponse<PropertyResponse> getPropertyBySellerId(int userId, Pageable pageable);
     PropertyResponse getPropertyById(int propertyId);
     PropertyResponse createProperty(PropertyRequest propertyRequest);
+    PropertyResponse createPropertyByAdmin(PropertyAdminRequest propertyAdminRequest);
     PropertyResponse updateProperty(int propertyId,
                                            PropertyRequest propertyRequest);
     PageResponse<PropertyDocument> searchProperty(Map<String, String> params, Pageable pageable);

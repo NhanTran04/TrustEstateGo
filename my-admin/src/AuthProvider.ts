@@ -1,7 +1,8 @@
 // src/authProvider.ts
 import { AuthProvider } from 'react-admin';
 
-const apiUrl = "http://localhost:8080/trustestatego/api";
+// const apiUrl = "http://localhost:8080/trustestatego/api";
+const apiUrl = "https://trustestatego.onrender.com/trustestatego/api";
 
 export const authProvider: AuthProvider = {
     login: async ({ username, password }) => {

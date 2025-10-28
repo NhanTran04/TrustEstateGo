@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
 import { authApi, endpoints } from "../services/api";
-import "./index.css"
 
 export default function ChatBox() {
     const [messages, setMessages] = useState([
@@ -79,24 +78,24 @@ export default function ChatBox() {
                 style={{ zIndex: 1050 }}
             >
                 <button
-                    className="btn btn-primary rounded-circle shadow-lg"
+                    className="btn btn-primary rounded-circle shadow-lg d-flex align-items-center justify-content-center"
                     style={{
-                        width: '80px',
-                        height: '80px',
+                        width: '70px',
+                        height: '70px',
                         border: 'none',
-                        background: 'linear-gradient(135deg, #0e2899ff 0%, #4ba291ff 100%)',
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                         transition: 'transform 0.2s ease'
                     }}
                     onClick={() => setIsMinimized(false)}
                     onMouseEnter={(e) => e.target.style.transform = 'scale(1.1)'}
                     onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
                 >
-                    <i className="fas fa-comments text-white" style={{ fontSize: '24px' }}></i>
-                    ChatBox
+                    <i className="bi bi-robot text-white" style={{ fontSize: '28px' }}></i>
                 </button>
             </div>
         );
     }
+
 
     return (
         <div

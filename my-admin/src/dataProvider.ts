@@ -2,7 +2,8 @@ import simpleRestProvider from "ra-data-simple-rest";
 import { httpClient } from "./HttpClient";
 
 const apiUrl = import.meta.env.VITE_SIMPLE_REST_URL;
-const staffUrl = "http://localhost:8080/trustestatego/api/staff";
+// const staffUrl = "http://localhost:8080/trustestatego/api/staff";
+const staffUrl = "https://trustestatego.onrender.com/trustestatego/api/staff";
 const defaultDataProvider = simpleRestProvider(apiUrl, httpClient);
 
 export const dataProvider = {

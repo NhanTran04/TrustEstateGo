@@ -62,7 +62,6 @@ import ReportList from "./components/report/ReportList";
 import ReportEdit from "./components/report/ReportEdit";
 import { usePermissions } from "react-admin";
 
-// 🌟 Custom Menu
 const MyMenu = () => {
   const { permissions } = usePermissions(); // lấy roles từ authProvider
   const isAdmin = permissions?.includes("ADMIN");

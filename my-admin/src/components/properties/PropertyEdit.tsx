@@ -27,14 +27,13 @@ export const PropertyEdit: React.FC = () => (
                         source="propertyType"
                         label="Loại bất động sản"
                         choices={[
-                            { id: "apartment", name: "Căn hộ" },
-                            { id: "house", name: "Nhà phố" },
-                            { id: "villa", name: "Biệt thự" },
-                            { id: "office", name: "Văn phòng" },
-                            { id: "land", name: "Đất" },
+                            { id: "APARTMENT", name: "Căn hộ" },
+                            { id: "TOWNHOUSE", name: "Nhà phố" },
+                            { id: "VILLA", name: "Biệt thự" },
+                            { id: "RENTAL_ROOM", name: "Văn phòng" },
                         ]}
                         validate={required()}
-                        defaultValue="apartment"
+                        defaultValue="APARTMENT"
                     />
                 </Box>
 

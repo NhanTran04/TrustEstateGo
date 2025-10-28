@@ -3,6 +3,7 @@ package com.tln.trustestatego.service.Impl;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.tln.trustestatego.document.PropertyDocument;
+import com.tln.trustestatego.dto.request.PropertyAdminRequest;
 import com.tln.trustestatego.dto.request.PropertyRequest;
 import com.tln.trustestatego.dto.response.PageResponse;
 import com.tln.trustestatego.dto.response.PropertyResponse;
@@ -15,7 +16,9 @@ import com.tln.trustestatego.mapper.PageMapper;
 import com.tln.trustestatego.mapper.PropertyMapper;
 import com.tln.trustestatego.repository.CategoryRepository;
 import com.tln.trustestatego.repository.PropertyRepository;
+import com.tln.trustestatego.repository.UserRepository;
 import com.tln.trustestatego.service.CurrentUserService;
+import com.tln.trustestatego.service.UserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -64,6 +67,8 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
     PageMapper pageMapper;
 
     CurrentUserService currentUserService;
+
+    UserRepository userRepository;
 
     @Override
     public PageResponse<PropertyResponse> getProperties(Integer categoryId, Pageable pageable) {
@@ -181,6 +186,25 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
         Property property = propertyRepository.findById(propertyId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Property not found "));
         return propertyMapper.toPropertyResponse(property);
+    }
+
+    @Override
+    public PropertyResponse createPropertyByAdmin(PropertyAdminRequest propertyAdminRequest) {
+        Property property = propertyMapper.toPropertyAdmin(propertyAdminRequest);
+        User user = userRepository.findById(propertyAdminRequest.getUserId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        property.setCategory(categoryRepository.findById(propertyAdminRequest.getCategoryId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found")));
+        property.setUser(user);
+        property.setCreatedAt(LocalDateTime.now());
+
+        // Xử lý ảnh
+        if (propertyAdminRequest.getImages() != null && propertyAdminRequest.getImages().length > 0) {
+            Set<PropertyImage> propertyImages = uploadPropertyImages(propertyAdminRequest.getImages(), property);
+            property.setPropertyImages(propertyImages);
+        }
+
+        return propertyMapper.toPropertyResponse(propertyRepository.save(property));
     }
 
     @Override

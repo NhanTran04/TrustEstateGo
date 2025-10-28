@@ -2,6 +2,7 @@ package com.tln.trustestatego.mapper;
 
 
 import com.tln.trustestatego.document.PropertyDocument;
+import com.tln.trustestatego.dto.request.PropertyAdminRequest;
 import com.tln.trustestatego.dto.request.PropertyRequest;
 import com.tln.trustestatego.dto.response.PropertyResponse;
 import com.tln.trustestatego.dto.response.PropertyTypeResponse;
@@ -21,6 +22,8 @@ import java.time.LocalDateTime;
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface PropertyMapper {
+    Property toPropertyAdmin(PropertyAdminRequest propertyAdminRequest);
+
     Property toProperty(PropertyRequest propertyRequest);
     @Mapping(source = "category.name", target = "categoryName")
     @Mapping(source = "category.id", target = "categoryId")
