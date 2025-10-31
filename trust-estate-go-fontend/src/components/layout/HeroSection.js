@@ -72,7 +72,7 @@ const HeroSection = () => {
                                 <div className="col-md-4">
                                     <button
                                         className="btn btn-lg w-100 fw-bold rounded-pill text-white"
-                                        style={{ background: "dodgerblue" }}
+                                        style={{ background: "#0a0fb7" }}
                                         onClick={handleSearch}
                                     >
                                         <Search size={18} className="me-2" />

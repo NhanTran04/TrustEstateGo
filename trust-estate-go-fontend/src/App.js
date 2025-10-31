@@ -23,6 +23,7 @@ import CreateEditProperty from './pages/CreateEditProperty';
 import SellerPropertyList from './pages/SellerPropertyList';
 import "./styles/index.css"
 import ScrollToTop from './components/ScrollToTop';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -134,11 +135,13 @@ const AppContent = () => {
 
 function App() {
   return (
-    <Router>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
-    </Router>
+    <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
+      <Router>
+        <AuthProvider>
+          <AppContent />
+        </AuthProvider>
+      </Router>
+    </GoogleOAuthProvider>
   );
 }
 

@@ -48,4 +48,14 @@ public class AuthenticationController {
                             .build());
         }
     }
+
+    @PostMapping(path = "/google")
+    public ResponseEntity<AuthenticationResponse> loginWithGoogle(@RequestParam("idToken") String idToken) {
+        try {
+            AuthenticationResponse response = authenticationService.loginWithGoogle(idToken);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        }
+    }
 }

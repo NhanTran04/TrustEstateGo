@@ -94,17 +94,17 @@ const ChatList = () => {
         <Container className="chat-list-container">
             {/* Header */}
             <div className="chat-list-header">
-                <div className="header-content">
-
+                <div className="flex">
                     <div>
-                        <h1 className="page-title">Tin nhắn</h1>
-                        <p className="page-subtitle">
-                            {rooms.length} phòng chat
-                        </p>
+                        <div>
+                            <div className="d-flex flex-row">
+                                <h1 className="page-title">Tin nhắn</h1>
+                                <MessageCircle size={50} className=" ms-3 p-2 header-icon" />
+                            </div>
+                        </div>
                     </div>
-                    <div className="header-icon">
-                        <MessageCircle size={32} />
-                    </div>
+
+
                 </div>
             </div>
 

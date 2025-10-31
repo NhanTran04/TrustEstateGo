@@ -5,6 +5,7 @@ const BASE_URL = process.env.REACT_APP_BASE_URL;
 export const endpoints = {
     login: "/auth/login",
     register: "/auth/register",
+    google: "/auth/google",
     currentUser: "/users/current-user",
     users: "/users",
     properties: "/properties",
@@ -18,6 +19,7 @@ export const endpoints = {
     chatRoom: (sellerId) => `/chat/room/${sellerId}`,
     chatRooms: "/chat/rooms",
     chatMessages: (roomId) => `/chat/messages/${roomId}`,
+    // ws: "http://localhost:8080/trustestatego/ws",
     ws: "https://trustestatego.onrender.com/trustestatego/ws",
     chatBox: "/chat-box",
     sellerProperties: "/seller-properties"

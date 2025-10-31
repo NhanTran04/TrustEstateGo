@@ -5,4 +5,5 @@ import com.tln.trustestatego.dto.response.AuthenticationResponse;
 
 public interface AuthenticationService{
     AuthenticationResponse authenticate(AuthenticationRequest authenticationRequest);
+    AuthenticationResponse loginWithGoogle(String idTokenString);
 }

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { authApi, endpoints } from "../services/api";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function ChatBox() {
     const [messages, setMessages] = useState([
@@ -71,11 +72,22 @@ export default function ChatBox() {
         ]);
     };
 
-    if (isMinimized) {
-        return (
-            <div
+    <AnimatePresence mode="wait">
+        {isMinimized ? (
+            // Nút chat nhỏ
+            <motion.div
+                key="chat-button"
                 className="position-fixed bottom-0 end-0 m-3"
                 style={{ zIndex: 1050 }}
+                initial={{ opacity: 0, scale: 0.6, y: 80 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.6, y: 80 }}
+                transition={{
+                    duration: 0.6,
+                    type: "spring",
+                    stiffness: 120,
+                    damping: 10
+                }}
             >
                 <button
                     className="btn btn-primary rounded-circle shadow-lg d-flex align-items-center justify-content-center"
@@ -84,15 +96,77 @@ export default function ChatBox() {
                         height: '70px',
                         border: 'none',
                         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                        transition: 'transform 0.2s ease'
                     }}
                     onClick={() => setIsMinimized(false)}
-                    onMouseEnter={(e) => e.target.style.transform = 'scale(1.1)'}
-                    onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
                 >
                     <i className="bi bi-robot text-white" style={{ fontSize: '28px' }}></i>
                 </button>
-            </div>
+            </motion.div>
+        ) : (
+            // Chatbox lớn (thêm motion.div để có hiệu ứng phóng to)
+            <motion.div
+                key="chat-window"
+                className="position-fixed bottom-0 end-0 m-3 shadow-lg"
+                style={{
+                    width: '400px',
+                    maxWidth: '90vw',
+                    borderRadius: '20px',
+                    overflow: 'hidden',
+                    background: 'white',
+                    border: '1px solid #e9ecef',
+                    zIndex: 1050
+                }}
+                initial={{ opacity: 0, scale: 0.6, y: 100 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.6, y: 100 }}
+                transition={{
+                    duration: 0.5,
+                    type: "spring",
+                    stiffness: 150,
+                    damping: 12
+                }}
+            >
+                {/* Toàn bộ nội dung chatbox của bạn ở đây */}
+                {/* Header, Messages, Input... */}
+            </motion.div>
+        )}
+    </AnimatePresence>
+
+
+    if (isMinimized) {
+        return (
+            <AnimatePresence>
+                {isMinimized && (
+                    <motion.div
+                        className="position-fixed bottom-0 end-0 m-3"
+                        style={{ zIndex: 1050 }}
+                        initial={{ opacity: 0, scale: 0.6, y: 80 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.6, y: 80 }}
+                        transition={{
+                            duration: 0.6,
+                            ease: [0.25, 0.1, 0.25, 1], // cubic-bezier easing (mềm)
+                            type: "spring",
+                            stiffness: 120,
+                            damping: 12
+                        }}
+                    >
+                        <button
+                            className="btn btn-primary rounded-circle shadow-lg d-flex align-items-center justify-content-center"
+                            style={{
+                                width: '70px',
+                                height: '70px',
+                                border: 'none',
+                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                transition: 'transform 0.5s ease'
+                            }}
+                            onClick={() => setIsMinimized(false)}
+                        >
+                            <i className="bi bi-robot text-white" style={{ fontSize: '28px' }}></i>
+                        </button>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         );
     }
 
@@ -114,7 +188,7 @@ export default function ChatBox() {
             <div
                 className="d-flex align-items-center justify-content-between p-3 text-white"
                 style={{
-                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    background: 'linear-gradient(45deg, #1259e8ff, #8899ebff)',
                     borderRadius: '20px 20px 0 0'
                 }}
             >
@@ -184,7 +258,7 @@ export default function ChatBox() {
                                 style={{
                                     maxWidth: '280px',
                                     background: m.sender === "you"
-                                        ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                                        ? 'linear-gradient(45deg, #1259e8ff, #8899ebff)'
                                         : 'white',
                                     color: m.sender === "you" ? 'white' : '#333',
                                     border: m.sender === "bot" ? '1px solid #e9ecef' : 'none',
@@ -213,7 +287,7 @@ export default function ChatBox() {
                                     style={{
                                         width: '32px',
                                         height: '32px',
-                                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                        background: 'linear-gradient(45deg, #1259e8ff, #8899ebff)',
                                         color: 'white'
                                     }}
                                 >
@@ -232,7 +306,7 @@ export default function ChatBox() {
                                 style={{
                                     width: '32px',
                                     height: '32px',
-                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                    background: 'linear-gradient(45deg, #1259e8ff, #8899ebff)',
                                     color: 'white'
                                 }}
                             >

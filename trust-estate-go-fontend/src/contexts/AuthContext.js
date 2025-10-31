@@ -85,17 +85,22 @@ export const AuthProvider = ({ children }) => {
         return () => clearInterval(interval);
     }, []);
 
+    const loginGoogle = (token, userData) => {
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(userData));
+        setUser(userData);
+    };
 
-    // Thay thế hàm logout hiện tại bằng:
+
     const logout = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
         setUser(null);
-        navigate('/'); // Thêm điều hướng về trang chủ
+        navigate('/');
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, logout, loading }}>
+        <AuthContext.Provider value={{ user, login, logout, loading, loginGoogle }}>
             {children}
         </AuthContext.Provider>
     );

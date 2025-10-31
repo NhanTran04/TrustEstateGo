@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface ReviewRepository extends JpaRepository<Review, Integer> {
     Page<Review> findBySeller_Id(int sellerId, Pageable pageable);
     Page<Review> findByBuyer_Id(int buyerId, Pageable pageable);
@@ -34,4 +36,11 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
     @Query("SELECT COUNT(r) FROM Review r WHERE r.seller.id = :sellerId")
     Long countReviewBySeller(@Param("sellerId") Integer sellerId);
 
+    @Query("""
+    SELECT r.seller.id, AVG(r.rating), COUNT(r)
+    FROM Review r
+    WHERE r.seller.id IN :sellerIds
+    GROUP BY r.seller.id
+""")
+    List<Object[]> findAvgAndCountBySellerIds(@Param("sellerIds") List<Integer> sellerIds);
 }

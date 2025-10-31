@@ -42,6 +42,7 @@ public class SecurityConfig {
             "/api/auth/**",
             "/api/chat-box"
     };
+    private List<@org.jetbrains.annotations.NotNull String> origins;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -81,11 +82,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfig = new CorsConfiguration();
-        corsConfig.setAllowedOrigins(List.of(
-                "http://localhost:3000",
-                "http://localhost:5173",
-                "https://trustestatego-frontend.onrender.com"
-));
+        corsConfig.setAllowedOrigins(origins);
         corsConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH" , "OPTIONS"));
         corsConfig.setAllowedHeaders(List.of("*"));
         corsConfig.setExposedHeaders(List.of("Authorization", "Content-Range"));

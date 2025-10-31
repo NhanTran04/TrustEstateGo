@@ -1,5 +1,10 @@
 package com.tln.trustestatego.service.Impl;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jwt.JWTClaimsSet;
@@ -26,6 +31,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -43,6 +49,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Value("${jwt.signer-key}")
     protected String SIGNER_KEY;
     PasswordEncoder passwordEncoder;
+
+    @NonFinal
+    @Value("${google.client-id}")
+    private String googleClientId;
+
+    @NonFinal
+    GoogleIdTokenVerifier verifier;
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         var user = userRepository.findByUsername(request.getUsername())
@@ -84,4 +97,48 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new RuntimeException(e);
         }
     }
+
+    private void initGoogleVerifier() throws Exception {
+        if (verifier == null) {
+            verifier = new GoogleIdTokenVerifier.Builder(
+                    GoogleNetHttpTransport.newTrustedTransport(),
+                    GsonFactory.getDefaultInstance()
+            )
+                    .setAudience(Collections.singletonList(googleClientId))
+                    .build();
+        }
+    }
+
+    @Override
+    public AuthenticationResponse loginWithGoogle(String idTokenString) {
+        try {
+            initGoogleVerifier();
+
+            GoogleIdToken idToken = verifier.verify(idTokenString);
+            log.info("Google idToken verify result: {}", idToken);
+            if (idToken == null) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token Google không hợp lệ");
+            }
+
+            GoogleIdToken.Payload payload = idToken.getPayload();
+            String email = payload.getEmail();
+
+            var user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new ResponseStatusException(
+                            HttpStatus.BAD_REQUEST, "Tài khoản chưa được tạo trong hệ thống"
+                    ));
+
+            String token = generateToken(user);
+
+            return AuthenticationResponse.builder()
+                    .token(token)
+                    .user(userMapper.toUserResponse(user))
+                    .build();
+
+        } catch (Exception e) {
+            log.error("Lỗi khi xác thực Google: ", e);
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Đăng nhập Google thất bại");
+        }
+    }
+
 }

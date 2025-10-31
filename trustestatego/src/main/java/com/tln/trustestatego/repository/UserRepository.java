@@ -14,6 +14,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
     Optional<User> findByUsername(String Username);
+    Optional<User> findByEmail(String email);
     Page<User> findByUsernameContainingIgnoreCase(String username, Pageable pageable);
     @Query("""
         SELECT DISTINCT u 

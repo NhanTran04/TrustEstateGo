@@ -14,9 +14,7 @@ import com.tln.trustestatego.entity.User;
 import com.tln.trustestatego.enums.PropertyType;
 import com.tln.trustestatego.mapper.PageMapper;
 import com.tln.trustestatego.mapper.PropertyMapper;
-import com.tln.trustestatego.repository.CategoryRepository;
-import com.tln.trustestatego.repository.PropertyRepository;
-import com.tln.trustestatego.repository.UserRepository;
+import com.tln.trustestatego.repository.*;
 import com.tln.trustestatego.service.CurrentUserService;
 import com.tln.trustestatego.service.UserService;
 import lombok.AccessLevel;
@@ -53,6 +51,7 @@ import java.util.stream.Collectors;
 @Transactional
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PropertyServiceImpl implements com.tln.trustestatego.service.PropertyService {
+    private final PropertySearchRepository propertySearchRepository;
 
     PropertyMapper propertyMapper;
 
@@ -69,6 +68,8 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
     CurrentUserService currentUserService;
 
     UserRepository userRepository;
+
+    ReviewRepository reviewRepository;
 
     @Override
     public PageResponse<PropertyResponse> getProperties(Integer categoryId, Pageable pageable) {
@@ -160,11 +161,22 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
     }
 
     @Override
+    @Transactional(readOnly = true)
     public void reindexAllProperties() {
-        List<Property> properties = propertyRepository.findAll();
-        List<PropertyDocument> docs = properties.stream().map(propertyMapper::toPropertyDocument).toList();
+        // ✅ Dùng query fetch join — không còn lazy load leak
+        List<Property> properties = propertyRepository.findAllWithImages();
+
+        // Map thành document (mapper vẫn giữ nguyên)
+        List<PropertyDocument> docs = properties.stream()
+                .map(propertyMapper::toPropertyDocument)
+                .toList();
+
+        // Lưu vào Elasticsearch
         elasticsearchOperations.save(docs);
+
+        log.info("✅ Reindex {} properties vào Elasticsearch thành công.", docs.size());
     }
+
 
     @Override
     public PageResponse<PropertyResponse> getPropertyByUserId(Pageable pageable) {
@@ -185,7 +197,15 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
     public PropertyResponse getPropertyById(int propertyId){
         Property property = propertyRepository.findById(propertyId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Property not found "));
-        return propertyMapper.toPropertyResponse(property);
+        PropertyResponse response = propertyMapper.toPropertyResponse(property);
+
+        // 👉 Thêm ở đây
+        Double avg = reviewRepository.findAvgRatingBySeller(property.getUser().getId());
+        Long count = reviewRepository.countReviewBySeller(property.getUser().getId());
+        response.setAvgUserReview(avg != null ? Math.round(avg * 10.0) / 10.0 : 0.0);
+        response.setCountUserReview(count != null ? count : 0L);
+
+        return response;
     }
 
     @Override

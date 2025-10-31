@@ -31,8 +31,8 @@ public interface PropertyMapper {
     @Mapping(target = "userFullName", expression = "java(property.getUser().getFirstName() + \" \" + property.getUser().getLastName())")
     @Mapping(target = "images", expression = "java(mapImages(property.getPropertyImages()))")
     @Mapping(target = "propertyType", expression = "java(toPropertyTypeResponse(property.getPropertyType()))")
-    @Mapping(target = "avgUserReview", expression = "java(Math.round(calculateAvgReview(property.getUser()) * 10.0) / 10.0)")
-    @Mapping(target = "countUserReview", expression = "java(calculateCountReview(property.getUser()))")
+//    @Mapping(target = "avgUserReview", expression = "java(Math.round(calculateAvgReview(property.getUser()) * 10.0) / 10.0)")
+//    @Mapping(target = "countUserReview", expression = "java(calculateCountReview(property.getUser()))")
     @Mapping(target = "userAvatar", expression = "java(property.getUser().getAvatar())")
     PropertyResponse toPropertyResponse(Property property);
 
@@ -77,20 +77,20 @@ public interface PropertyMapper {
         }
     }
 
-    default double calculateAvgReview(User user) {
-        if (user == null || user.getReviewsAsSeller() == null || user.getReviewsAsSeller().isEmpty())
-            return 0;
-
-        return user.getReviewsAsSeller().stream()
-                .mapToInt(r -> r.getRating() != null ? r.getRating() : 0)
-                .average()
-                .orElse(0);
-    }
-
-    default long calculateCountReview(User user) {
-        if (user == null || user.getReviewsAsSeller() == null) return 0;
-        return user.getReviewsAsSeller().size();
-    }
+//    default double calculateAvgReview(User user) {
+//        if (user == null || user.getReviewsAsSeller() == null || user.getReviewsAsSeller().isEmpty())
+//            return 0;
+//
+//        return user.getReviewsAsSeller().stream()
+//                .mapToInt(r -> r.getRating() != null ? r.getRating() : 0)
+//                .average()
+//                .orElse(0);
+//    }
+//
+//    default long calculateCountReview(User user) {
+//        if (user == null || user.getReviewsAsSeller() == null) return 0;
+//        return user.getReviewsAsSeller().size();
+//    }
 
 //    default Double toDouble(java.math.BigDecimal value) {
 //        return value != null ? value.doubleValue() : null;
