@@ -51,7 +51,6 @@ import java.util.stream.Collectors;
 @Transactional
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PropertyServiceImpl implements com.tln.trustestatego.service.PropertyService {
-    private final PropertySearchRepository propertySearchRepository;
 
     PropertyMapper propertyMapper;
 
@@ -163,18 +162,14 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
     @Override
     @Transactional(readOnly = true)
     public void reindexAllProperties() {
-        // ✅ Dùng query fetch join — không còn lazy load leak
         List<Property> properties = propertyRepository.findAllWithImages();
 
-        // Map thành document (mapper vẫn giữ nguyên)
         List<PropertyDocument> docs = properties.stream()
                 .map(propertyMapper::toPropertyDocument)
                 .toList();
 
         // Lưu vào Elasticsearch
         elasticsearchOperations.save(docs);
-
-        log.info("✅ Reindex {} properties vào Elasticsearch thành công.", docs.size());
     }
 
 
