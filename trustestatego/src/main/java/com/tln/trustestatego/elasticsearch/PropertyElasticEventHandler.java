@@ -6,6 +6,7 @@ import com.tln.trustestatego.repository.PropertyRepository;
 import com.tln.trustestatego.repository.PropertySearchRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -14,6 +15,7 @@ import org.springframework.transaction.event.TransactionPhase;
 @Component
 @RequiredArgsConstructor
 @Slf4j
+@ConditionalOnProperty(prefix = "app.elastic", name = "enabled", havingValue = "true")
 public class PropertyElasticEventHandler {
 
     private final PropertyRepository propertyRepository;

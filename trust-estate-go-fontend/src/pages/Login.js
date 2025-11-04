@@ -42,12 +42,15 @@ const Login = () => {
         try {
             const idToken = credentialResponse.credential;
             const decoded = jwtDecode(idToken);
+            console.log("decode: ", decoded);
             const res = await api.post(`${endpoints.google}?idToken=${idToken}`);
+            // const res = await api.post(`${endpoints.google}?idToken=${encodeURIComponent(idToken)}`, {});
+            console.log("res: ", res);
             const { token, user } = res.data;
             loginGoogle(token, user);
             navigate("/");
         } catch (err) {
-            console.error("Lỗi đăng nhập Google:", err);
+            console.error("Lỗi đăng nhập Google:", err.response?.data || err.message);
             setError("Tài khoản chưa được tạo trong hệ thống hoặc token không hợp lệ.");
         }
     };

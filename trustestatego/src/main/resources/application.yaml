@@ -16,7 +16,12 @@ spring:
 #    username: ${DB_USER}
 #    password: ${DB_PASSWORD}
 #    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: "jdbc:mysql://tramway.proxy.rlwy.net:31429/railway"
+
+#    url: "jdbc:mysql://tramway.proxy.rlwy.net:31429/railway"
+#    username: ${MYSQLUSER}
+#    password: ${MYSQLPASSWORD}
+
+    url: "jdbc:mysql://trust-estate-mysql-real-estate-01.h.aivencloud.com:19944/trust_estate_go?useSSL=true&requireSSL=true&verifyServerCertificate=false"
     username: ${MYSQLUSER}
     password: ${MYSQLPASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -89,7 +94,6 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
     javax.net.ssl: DEBUG
 
-
 paypal:
   client:
     id: ${PAYPAL_ID}
@@ -98,3 +102,7 @@ paypal:
   successUrl: https://trustestatego-frontend.onrender.com/payment-success
   cancelUrl: https://trustestatego-frontend.onrender.com/payment-cancel
   currency: USD
+
+geoapify:
+  api-key: ${GEOAPIFY_API_KEY}
+  geocoding-url: https://api.geoapify.com/v1/geocode/search

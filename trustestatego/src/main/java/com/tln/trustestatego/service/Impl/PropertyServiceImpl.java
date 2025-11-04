@@ -70,6 +70,8 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
 
     ReviewRepository reviewRepository;
 
+    GeoapifyServiceImpl geoapifyService;
+
     @Override
     public PageResponse<PropertyResponse> getProperties(Integer categoryId, Pageable pageable) {
         LocalDateTime now = LocalDateTime.now();
@@ -213,6 +215,13 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
         property.setUser(user);
         property.setCreatedAt(LocalDateTime.now());
 
+        if (property.getLocation() != null && (property.getLatitude() == null || property.getLongitude() == null)) {
+            geoapifyService.geocode(property.getLocation()).ifPresent(coords -> {
+                property.setLatitude(coords[0]);
+                property.setLongitude(coords[1]);
+            });
+        }
+
         // Xử lý ảnh
         if (propertyAdminRequest.getImages() != null && propertyAdminRequest.getImages().length > 0) {
             Set<PropertyImage> propertyImages = uploadPropertyImages(propertyAdminRequest.getImages(), property);
@@ -230,6 +239,14 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found")));
         property.setUser(user);
         property.setCreatedAt(LocalDateTime.now());
+
+        if (property.getLocation() != null &&
+                (property.getLatitude() == null || property.getLongitude() == null)) {
+            geoapifyService.geocode(property.getLocation()).ifPresent(coords -> {
+                property.setLatitude(coords[0]);
+                property.setLongitude(coords[1]);
+            });
+        }
 
         // Xử lý ảnh
         if (propertyRequest.getImages() != null && propertyRequest.getImages().length > 0) {

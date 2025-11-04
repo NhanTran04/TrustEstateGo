@@ -70,6 +70,15 @@ public class Property {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Column(name = "latitude")
+    private Double latitude;
+
+    @Column(name = "longitude")
+    private Double longitude;
+
+    @Column(name = "blockchain_hash", length = 100)
+    private String blockchainHash;
+
 //    @OneToMany(mappedBy = "property")
 //    private Set<ChatRoom> chatRooms = new LinkedHashSet<>();
 
