@@ -1,6 +1,7 @@
 package com.tln.trustestatego.entity;
 
 //import com.tln.trustestatego.elasticsearch.PropertyElasticListener;
+import com.tln.trustestatego.enums.PropertyStatus;
 import com.tln.trustestatego.enums.PropertyType;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -78,6 +79,17 @@ public class Property {
 
     @Column(name = "blockchain_hash", length = 100)
     private String blockchainHash;
+
+    @Column(name = "blockchain_tx_hash", length = 100)
+    private String blockchainTxHash;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", length = 20)
+    private PropertyStatus status;
+
+    @Column(name = "approved_at")
+    private LocalDateTime approvedAt;
+
 
 //    @OneToMany(mappedBy = "property")
 //    private Set<ChatRoom> chatRooms = new LinkedHashSet<>();

@@ -11,10 +11,12 @@ import com.tln.trustestatego.dto.response.PropertyTypeResponse;
 import com.tln.trustestatego.entity.Property;
 import com.tln.trustestatego.entity.PropertyImage;
 import com.tln.trustestatego.entity.User;
+import com.tln.trustestatego.enums.PropertyStatus;
 import com.tln.trustestatego.enums.PropertyType;
 import com.tln.trustestatego.mapper.PageMapper;
 import com.tln.trustestatego.mapper.PropertyMapper;
 import com.tln.trustestatego.repository.*;
+import com.tln.trustestatego.service.BlockchainService;
 import com.tln.trustestatego.service.CurrentUserService;
 import com.tln.trustestatego.service.UserService;
 import lombok.AccessLevel;
@@ -41,6 +43,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -71,6 +74,8 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
     ReviewRepository reviewRepository;
 
     GeoapifyServiceImpl geoapifyService;
+
+    BlockchainService blockchainService;
 
     @Override
     public PageResponse<PropertyResponse> getProperties(Integer categoryId, Pageable pageable) {
@@ -239,6 +244,7 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found")));
         property.setUser(user);
         property.setCreatedAt(LocalDateTime.now());
+        property.setIsActive(true);
 
         if (property.getLocation() != null &&
                 (property.getLatitude() == null || property.getLongitude() == null)) {
@@ -272,6 +278,10 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
             Set<PropertyImage> newImages = uploadPropertyImages(propertyRequest.getImages(), property);
             property.getPropertyImages().addAll(newImages);
         }
+
+//        property.setStatus("PENDING");
+//        property.setBlockchainTxHash(null);
+//        property.setBlockchainHash(null);
 
         return propertyMapper.toPropertyResponse(propertyRepository.save(property));
     }
@@ -331,66 +341,6 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
         return pageMapper.toPageResponse(page);
     }
 
-
-//    @Override
-//    public PageResponse<PropertyDocument> searchProperty(Map<String,String> params, Pageable pageable) {
-//        Criteria criteria = new Criteria();
-//
-//        // Tìm kiếm keyword
-//        String keyword = params.get("keyword");
-//        if(keyword != null && !keyword.trim().isEmpty()) {
-//            // Sử dụng contains() thay vì matches() để tìm kiếm partial match
-////            criteria = criteria.and(new Criteria("title").contains(keyword.trim().toLowerCase()));
-//            criteria = criteria.and(new Criteria("title").contains(keyword.trim().toLowerCase()));
-//        }
-//        // Xử lý price range với exception handling
-//        try {
-//            String minPriceStr = params.get("minPrice");
-//            String maxPriceStr = params.get("maxPrice");
-//
-//            BigDecimal minPrice = null;
-//            BigDecimal maxPrice = null;
-//
-//            if(minPriceStr != null && !minPriceStr.trim().isEmpty()) {
-//                minPrice = new BigDecimal(minPriceStr.trim());
-//            }
-//
-//            if(maxPriceStr != null && !maxPriceStr.trim().isEmpty()) {
-//                maxPrice = new BigDecimal(maxPriceStr.trim());
-//            }
-//
-//            // Xử lý các trường hợp khác nhau
-//            if(minPrice != null && maxPrice != null) {
-//                criteria = criteria.and(new Criteria("price").between(minPrice, maxPrice));
-//            } else if(minPrice != null) {
-//                criteria = criteria.and(new Criteria("price").greaterThanEqual(minPrice));
-//            } else if(maxPrice != null) {
-//                criteria = criteria.and(new Criteria("price").lessThanEqual(maxPrice));
-//            }
-//
-//        } catch (NumberFormatException e) {
-//            // Log error hoặc throw custom exception
-//            throw new IllegalArgumentException("Invalid price format", e);
-//        }
-//
-//        // Property type
-//        String propertyType = params.get("propertyType");
-//        if (propertyType != null && !propertyType.trim().isEmpty()) {
-//            criteria = criteria.and(new Criteria("propertyType").is(propertyType.trim()));
-//        }
-//
-//        CriteriaQuery query = new CriteriaQuery(criteria).setPageable(pageable);
-//        SearchHits<PropertyDocument> hits = elasticsearchOperations.search(query, PropertyDocument.class);
-//
-//        List<PropertyDocument> docs = hits.getSearchHits().stream()
-//                .map(SearchHit::getContent)
-//                .toList();
-//
-//        Page<PropertyDocument> page = new PageImpl<>(docs, pageable, hits.getTotalHits());
-//        System.out.println(query.getCriteria().toString());
-//        return pageMapper.toPageResponse(page);
-//    }
-
     private Set<PropertyImage> uploadPropertyImages(MultipartFile[] images, Property property) {
         Set<PropertyImage> propertyImages = new HashSet<>();
         if (images != null && images.length > 0) {
@@ -411,6 +361,49 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
             }
         }
         return propertyImages;
+    }
+
+    @Override
+    public PropertyResponse approveProperty(int propertyId) {
+        Property property = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Property not found"));
+
+        if (property.getStatus() == PropertyStatus.APPROVED) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Property already approved");
+        }
+
+        // Ghép dữ liệu quan trọng của tin
+        String rawData = property.getTitle() + "|" + property.getPrice() + "|" + property.getLocation() + "|" + property.getUser().getId();
+
+        String hash = blockchainService.generateHash(rawData);
+
+        // Ghi lên blockchain (trả về transaction hash)
+        String txHash = blockchainService.verifyProperty(BigInteger.valueOf(propertyId), hash);
+
+        // Cập nhật lại DB
+        property.setStatus(PropertyStatus.APPROVED);
+        property.setApprovedAt(LocalDateTime.now());
+        property.setBlockchainHash(hash);
+        property.setBlockchainTxHash(txHash);
+        propertyRepository.save(property);
+
+        return propertyMapper.toPropertyResponse(property);
+    }
+
+    @Override
+    public PropertyResponse rejectProperty(int id) {
+        Property property = propertyRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Property not found"));
+
+        if (property.getStatus() == PropertyStatus.REJECTED) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Property already rejected");
+        }
+
+        property.setStatus(PropertyStatus.REJECTED);
+        property.setIsActive(false);
+        propertyRepository.save(property);
+
+        return propertyMapper.toPropertyResponse(property);
     }
 
     @Override

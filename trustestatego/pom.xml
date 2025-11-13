@@ -143,21 +143,11 @@
 			<artifactId>google-http-client-jackson2</artifactId>
 			<version>1.43.3</version>
 		</dependency>
-<!--		<dependency>-->
-<!--			<groupId>org.apache.httpcomponents.client5</groupId>-->
-<!--			<artifactId>httpclient5</artifactId>-->
-<!--			<version>5.3.1</version>-->
-<!--		</dependency>-->
-<!--		<dependency>-->
-<!--			<groupId>org.apache.httpcomponents.core5</groupId>-->
-<!--			<artifactId>httpcore5</artifactId>-->
-<!--			<version>5.3.1</version>-->
-<!--		</dependency>-->
-<!--		<dependency>-->
-<!--			<groupId>org.apache.httpcomponents.client5</groupId>-->
-<!--			<artifactId>httpclient5-fluent</artifactId>-->
-<!--			<version>5.3.1</version>-->
-<!--		</dependency>-->
+		<dependency>
+			<groupId>org.web3j</groupId>
+			<artifactId>core</artifactId>
+			<version>4.14.0</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -192,6 +182,44 @@
 							<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.web3j</groupId>
+				<artifactId>web3j-maven-plugin</artifactId>
+				<version>4.14.0</version>
+
+				<executions>
+					<execution>
+						<id>generate-web3j-sources</id>
+						<goals>
+							<goal>generate-sources</goal>
+						</goals>
+					</execution>
+				</executions>
+
+				<configuration>
+					<!-- Thêm build-helper-maven-plugin để đảm bảo source được compile -->
+					<addSourcesToProject>true</addSourcesToProject>
+
+					<!-- SỬ DỤNG CÚ PHÁP MỚI CHO THƯ MỤC NGUỒN (Khắc phục lỗi JSON) -->
+					<abiSourceFiles>
+						<directory>${project.basedir}/src/main/resources/blockchain/build</directory>
+						<includes>
+							<include>**/*.abi</include>
+							<include>**/*.json</include>
+						</includes>
+					</abiSourceFiles>
+					<binSourceFiles>
+						<directory>${project.basedir}/src/main/resources/blockchain/build</directory>
+						<includes>
+							<include>**/*.bin</include>
+						</includes>
+					</binSourceFiles>
+
+					<!-- SỬ DỤNG CÚ PHÁP MỚI CHO THƯ MỤC ĐẦU RA (Khắc phục lỗi 'outputDir' is unknown) -->
+					<packageName>com.tln.trustestatego.blockchain</packageName>
+					<javaOutputDir>${project.build.directory}/generated-sources/web3j</javaOutputDir>
 				</configuration>
 			</plugin>
 		</plugins>

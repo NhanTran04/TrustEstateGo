@@ -106,3 +106,8 @@ paypal:
 geoapify:
   api-key: ${GEOAPIFY_API_KEY}
   geocoding-url: https://api.geoapify.com/v1/geocode/search
+
+web3:
+  rpc-url: ${WEB3_RPC_URL}
+  private-key: ${BLCHAIN_KEY}
+  contract-address: ${CONTRACT_ADDRESS}

@@ -131,18 +131,19 @@ public class AdminPropertyController {
         return ResponseEntity.ok(propertyService.updateProperty(propertyId, propertyRequest));
     }
 
-//    @GetMapping("/search")
-//    public ResponseEntity<List<?>> searchProperties(@RequestParam Map<String, String> params, Pageable pageable) {
-//        var pageResponse = propertyService.searchProperty(params, pageable);
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.add("Content-Range", "properties 0-" + (pageResponse.getContent().size() - 1) + "/" + pageResponse.getTotalElements());
-//        headers.add("Access-Control-Expose-Headers", "Content-Range");
-//        return new ResponseEntity<>(pageResponse.getContent(), headers, HttpStatus.OK);
-//    }
-
     @DeleteMapping("/{propertyId}")
     public ResponseEntity<Void> deleteProperty(@PathVariable int propertyId) {
         propertyService.deleteProperty(propertyId);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{id}/approve")
+    public ResponseEntity<PropertyResponse> approve(@PathVariable int id) {
+        return ResponseEntity.ok(propertyService.approveProperty(id));
+    }
+
+    @PostMapping("/{id}/reject")
+    public ResponseEntity<PropertyResponse> rejectProperty(@PathVariable int id) {
+        return ResponseEntity.ok(propertyService.rejectProperty(id));
     }
 }

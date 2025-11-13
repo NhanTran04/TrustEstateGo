@@ -70,7 +70,7 @@ const Register = () => {
 
     return (
         <div
-            className="min-vh-100 d-flex align-items-center justify-content-center position-relative"
+            className="min-vh-100 d-flex align-items-center justify-content-center position-relative py-5"
             style={{
                 backgroundImage: `url(https://cloud.famproperties.com/fam/blog/1451-164339.jpeg)`,
                 backgroundSize: 'cover',
@@ -92,9 +92,19 @@ const Register = () => {
             <div className="container">
                 <div className="row justify-content-center">
                     <div className="col-md-8 col-lg-6 col-xl-5">
-                        <div className="card border-0 shadow-lg rounded-4 overflow-hidden">
+                        <div
+                            className="card border-0 shadow-lg rounded-4 overflow-hidden"
+                            style={{
+                                background: 'rgba(0, 0, 0, 0.45)',
+                                backdropFilter: 'blur(10px)',
+                                WebkitBackdropFilter: 'blur(12px)',
+                                borderRadius: '20px',
+                                border: '1px solid rgba(255, 255, 255, 0.2)',
+                                boxShadow: '0 4px 30px rgba(0, 0, 0, 0.4)',
+                            }}
+                        >
                             {/* Header với gradient */}
-                            <div className="card-header bg-transparent border-0 text-center pt-4 pb-3">
+                            <div className="card-header border-0 text-center pt-4 pb-3">
                                 <div className="d-inline-flex align-items-center justify-content-center mb-3">
                                     <div className="bg-white rounded-circle d-flex align-items-center justify-content-center p-3 shadow">
                                         <Home className="text-primary" size={32} />
@@ -103,7 +113,7 @@ const Register = () => {
 
                             </div>
 
-                            <div className="card-body p-4" style={{ backgroundColor: 'rgba(255,255,255,0.95)' }}>
+                            <div className="card-body p-4">
                                 {error && (
                                     <div className="alert alert-danger rounded-3 border-0 shadow-sm" role="alert">
                                         <i className="fas fa-exclamation-circle me-2"></i>
@@ -114,7 +124,7 @@ const Register = () => {
                                 <form onSubmit={handleSubmit}>
                                     <div className="row">
                                         <div className="col-md-6 mb-3">
-                                            <label className="form-label fw-semibold text-dark">Họ</label>
+                                            <label className="form-label fw-semibold text-white">Họ</label>
                                             <div className="input-group">
                                                 <span className="input-group-text bg-white border-end-0 ps-3">
                                                     <User size={18} className="text-primary" />
@@ -132,7 +142,7 @@ const Register = () => {
                                             </div>
                                         </div>
                                         <div className="col-md-6 mb-3">
-                                            <label className="form-label fw-semibold text-dark">Tên</label>
+                                            <label className="form-label fw-semibold text-white">Tên</label>
                                             <div className="input-group">
                                                 <span className="input-group-text bg-white border-end-0 ps-3">
                                                     <User size={18} className="text-primary" />
@@ -153,7 +163,7 @@ const Register = () => {
 
                                     <div className="row">
                                         <div className="col-md-6 mb-3">
-                                            <label className="form-label fw-semibold text-dark">Email</label>
+                                            <label className="form-label fw-semibold text-white">Email</label>
                                             <div className="input-group">
                                                 <span className="input-group-text bg-white border-end-0 ps-3">
                                                     <Mail size={18} className="text-primary" />
@@ -171,7 +181,7 @@ const Register = () => {
                                             </div>
                                         </div>
                                         <div className="col-md-6 mb-3">
-                                            <label className="form-label fw-semibold text-dark">Số điện thoại</label>
+                                            <label className="form-label fw-semibold text-white">Số điện thoại</label>
                                             <div className="input-group">
                                                 <span className="input-group-text bg-white border-end-0 ps-3">
                                                     <Phone size={18} className="text-primary" />
@@ -191,7 +201,7 @@ const Register = () => {
                                     </div>
 
                                     <div className="mb-3">
-                                        <label className="form-label fw-semibold text-dark">Địa chỉ</label>
+                                        <label className="form-label fw-semibold text-white">Địa chỉ</label>
                                         <div className="input-group">
                                             <span className="input-group-text bg-white border-end-0 ps-3">
                                                 <FaAddressCard size={18} className="text-primary" />
@@ -211,7 +221,7 @@ const Register = () => {
 
                                     <div className="row">
                                         <div className="col-md-6 mb-3">
-                                            <label className="form-label fw-semibold text-dark">Loại tài khoản</label>
+                                            <label className="form-label fw-semibold text-white">Loại tài khoản</label>
                                             <div className="input-group">
                                                 <span className="input-group-text bg-white border-end-0 ps-3">
                                                     <Shield size={18} className="text-primary" />
@@ -229,7 +239,7 @@ const Register = () => {
                                             </div>
                                         </div>
                                         <div className="col-md-6 mb-3">
-                                            <label className="form-label fw-semibold text-dark">Ảnh đại diện</label>
+                                            <label className="form-label fw-semibold text-white">Ảnh đại diện</label>
                                             <input
                                                 type="file"
                                                 name="avatar"
@@ -242,7 +252,7 @@ const Register = () => {
                                     </div>
 
                                     <div className="mb-3">
-                                        <label className="form-label fw-semibold text-dark">Tên đăng nhập</label>
+                                        <label className="form-label fw-semibold text-white">Tên đăng nhập</label>
                                         <div className="input-group">
                                             <span className="input-group-text bg-white border-end-0 ps-3">
                                                 <User size={18} className="text-primary" />
@@ -262,7 +272,7 @@ const Register = () => {
 
                                     <div className="row">
                                         <div className="col-md-6 mb-3">
-                                            <label className="form-label fw-semibold text-dark">Mật khẩu</label>
+                                            <label className="form-label fw-semibold text-white">Mật khẩu</label>
                                             <div className="input-group">
                                                 <span className="input-group-text bg-white border-end-0 ps-3">
                                                     <Lock size={18} className="text-primary" />
@@ -288,7 +298,7 @@ const Register = () => {
                                             </div>
                                         </div>
                                         <div className="col-md-6 mb-3">
-                                            <label className="form-label fw-semibold text-dark">Xác nhận mật khẩu</label>
+                                            <label className="form-label fw-semibold text-white">Xác nhận mật khẩu</label>
                                             <div className="input-group">
                                                 <span className="input-group-text bg-white border-end-0 ps-3">
                                                     <Lock size={18} className="text-primary" />
@@ -339,7 +349,7 @@ const Register = () => {
                                 </form>
 
                                 <div className="text-center mt-4">
-                                    <span className="text-muted">Đã có tài khoản? </span>
+                                    <span className="text-white small">Đã có tài khoản? </span>
                                     <Link to="/login" className="fw-bold text-primary text-decoration-none">
                                         Đăng nhập ngay
                                     </Link>

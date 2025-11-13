@@ -26,5 +26,6 @@ public interface PropertyService {
     void deleteProperty(int propertyId);
     List<PropertyTypeResponse> getAllPropertyTypes();
     void reindexAllProperties();
-
+    PropertyResponse approveProperty(int propertyId);
+    PropertyResponse rejectProperty(int id);
 }

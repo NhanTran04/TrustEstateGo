@@ -3,6 +3,7 @@ package com.tln.trustestatego.dto.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.tln.trustestatego.entity.Category;
 import com.tln.trustestatego.entity.User;
+import jakarta.persistence.Column;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -30,6 +31,8 @@ public class PropertyResponse {
     LocalDateTime expireAt;
     BigDecimal price;
     String location;
+    Double latitude; 
+    Double longitude;
     Boolean isActive;
     PropertyTypeResponse propertyType;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")

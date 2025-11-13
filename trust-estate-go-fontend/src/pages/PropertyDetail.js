@@ -9,6 +9,7 @@ import useAuth from '../hooks/useAuth';
 import { useProperty } from '../contexts/PropertyContext';
 import { formatPrice } from '../utils/Formatter';
 import { authApi, endpoints } from '../services/api.js';
+import MapView from '../components/MapView.js';
 
 const PropertyDetail = () => {
     const { id } = useParams();
@@ -101,7 +102,7 @@ const PropertyDetail = () => {
     }
 
     return (
-        <div style={{ paddingTop: '100px', backgroundColor: '#f8f9ff' }}>
+        <div style={{ paddingTop: '10px', backgroundColor: '#f8f9ff' }}>
             <div className="container">
                 {/* Navigation */}
                 <div className="mb-4">
@@ -284,7 +285,7 @@ const PropertyDetail = () => {
                     {/* Right Column - Contact & Seller Info */}
                     <div className="col-lg-4">
                         {/* Contact Card */}
-                        <div className="card border-0 shadow-sm rounded-4 mb-4 sticky-top" style={{ top: '120px' }}>
+                        <div className="card border-0 shadow-sm rounded-4 mb-4">
                             <div className="card-body">
                                 <h5 className="fw-bold mb-3">Liên hệ người bán</h5>
 
@@ -332,6 +333,20 @@ const PropertyDetail = () => {
                             </div>
                         </div>
 
+
+                        {/* Map Section */}
+                        <div className="card border-0 shadow-sm rounded-4 mb-4 mt-4">
+                            <div className="card-body">
+                                <h5 className="fw-bold mb-3">Vị trí trên bản đồ</h5>
+                                <MapView
+                                    latitude={property.latitude}
+                                    longitude={property.longitude}
+                                    title={property.title}
+                                    address={property.location}
+                                />
+                            </div>
+                        </div>
+
                         {/* Safety Tips */}
                         <div className="card border-0 shadow-sm rounded-4">
                             <div className="card-body">
@@ -344,6 +359,7 @@ const PropertyDetail = () => {
                                 </ul>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
