@@ -1,5 +1,5 @@
-# Sử dụng image Java 23
-FROM openjdk:23-jdk-slim
+# Sử dụng image Java 21
+FROM eclipse-temurin:21-jdk-jammy
 
 # Đặt thư mục làm việc
 WORKDIR /app
