@@ -36,7 +36,11 @@ const PropertyCard = ({ property, onSave, isSaved, showActions = false, onEdit, 
 
     return (
         <div className="col-md-6 col-lg-4 mb-4">
-            <div className="card h-100 border-0 shadow-sm hover-shadow-lg transition-all rounded-3 overflow-hidden">
+            <div
+                className="card h-100 border-0 shadow-sm hover-shadow-lg transition-all rounded-3 overflow-hidden"
+                onClick={handleViewDetails}
+                style={{ cursor: 'pointer' }}
+            >
                 <div className="position-relative overflow-hidden">
                     <img
                         src={mainImage}
@@ -49,8 +53,8 @@ const PropertyCard = ({ property, onSave, isSaved, showActions = false, onEdit, 
                     />
 
                     <div className="position-absolute top-0 start-0 m-3">
-                        <span className="badge fw-semibold px-3 py-2 rounded-pill shadow-sm"
-                            style={{ backgroundColor: 'rgba(13, 110, 253, 0.9)', backdropFilter: 'blur(10px)' }}>
+                        <span className="badge fw-semibold px-3 py-2 rounded-0 shadow-sm"
+                            style={{ backgroundColor: 'deepskyblue', backdropFilter: 'blur(10px)' }}>
                             {categoryName}
                         </span>
 
@@ -137,7 +141,7 @@ const PropertyCard = ({ property, onSave, isSaved, showActions = false, onEdit, 
 
                     <div className="border-top pt-3 mt-auto">
                         <div className="d-flex justify-content-between align-items-center">
-                            <span className="fw-bold text-primary h5 mb-0" style={{ fontSize: '1.25rem' }}>
+                            <span className="fw-bold text-dark h5 mb-0" style={{ fontSize: '1.25rem' }}>
                                 {formatPrice(property.price)}
                                 <small className="text-muted d-block fs-6">
                                     {property.propertyType?.label}
@@ -146,8 +150,8 @@ const PropertyCard = ({ property, onSave, isSaved, showActions = false, onEdit, 
                             <div className="d-flex align-items-center">
 
                                 <button
-                                    className="btn btn-primary btn-sm fw-semibold rounded-pill px-3"
-                                    onClick={handleViewDetails}
+                                    className="btn btn-dark btn-sm fw-semibold rounded-0 px-3"
+
                                 >
                                     Xem chi tiết
                                 </button>

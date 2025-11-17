@@ -10,7 +10,6 @@ const Register = () => {
         firstName: '',
         lastName: '',
         email: '',
-        address: '',
         phone: '',
         username: '',
         password: '',
@@ -91,7 +90,7 @@ const Register = () => {
             ></div>
             <div className="container">
                 <div className="row justify-content-center">
-                    <div className="col-md-8 col-lg-6 col-xl-5">
+                    <div className="col-md-8 col-lg-6 col-xl-4">
                         <div
                             className="card border-0 shadow-lg rounded-4 overflow-hidden"
                             style={{
@@ -123,7 +122,7 @@ const Register = () => {
 
                                 <form onSubmit={handleSubmit}>
                                     <div className="row">
-                                        <div className="col-md-6 mb-3">
+                                        <div className="col-md-7 mb-3">
                                             <label className="form-label fw-semibold text-white">Họ</label>
                                             <div className="input-group">
                                                 <span className="input-group-text bg-white border-end-0 ps-3">
@@ -141,7 +140,7 @@ const Register = () => {
                                                 />
                                             </div>
                                         </div>
-                                        <div className="col-md-6 mb-3">
+                                        <div className="col-md-5 mb-3">
                                             <label className="form-label fw-semibold text-white">Tên</label>
                                             <div className="input-group">
                                                 <span className="input-group-text bg-white border-end-0 ps-3">
@@ -161,57 +160,20 @@ const Register = () => {
                                         </div>
                                     </div>
 
-                                    <div className="row">
-                                        <div className="col-md-6 mb-3">
-                                            <label className="form-label fw-semibold text-white">Email</label>
-                                            <div className="input-group">
-                                                <span className="input-group-text bg-white border-end-0 ps-3">
-                                                    <Mail size={18} className="text-primary" />
-                                                </span>
-                                                <input
-                                                    type="email"
-                                                    name="email"
-                                                    className="form-control border-start-0 py-2"
-                                                    placeholder="example@email.com"
-                                                    value={formData.email}
-                                                    onChange={handleChange}
-                                                    required
-                                                    style={{ borderColor: '#e0e0e0' }}
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className="col-md-6 mb-3">
-                                            <label className="form-label fw-semibold text-white">Số điện thoại</label>
-                                            <div className="input-group">
-                                                <span className="input-group-text bg-white border-end-0 ps-3">
-                                                    <Phone size={18} className="text-primary" />
-                                                </span>
-                                                <input
-                                                    type="tel"
-                                                    name="phone"
-                                                    className="form-control border-start-0 py-2"
-                                                    placeholder="0901234567"
-                                                    value={formData.phone}
-                                                    onChange={handleChange}
-                                                    required
-                                                    style={{ borderColor: '#e0e0e0' }}
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
+
 
                                     <div className="mb-3">
-                                        <label className="form-label fw-semibold text-white">Địa chỉ</label>
+                                        <label className="form-label fw-semibold text-white">Số điện thoại</label>
                                         <div className="input-group">
                                             <span className="input-group-text bg-white border-end-0 ps-3">
-                                                <FaAddressCard size={18} className="text-primary" />
+                                                <Phone size={18} className="text-primary" />
                                             </span>
                                             <input
-                                                type="text"
-                                                name="address"
+                                                type="tel"
+                                                name="phone"
                                                 className="form-control border-start-0 py-2"
-                                                placeholder="Nhập địa chỉ"
-                                                value={formData.address}
+                                                placeholder="0901234567"
+                                                value={formData.phone}
                                                 onChange={handleChange}
                                                 required
                                                 style={{ borderColor: '#e0e0e0' }}
@@ -219,33 +181,20 @@ const Register = () => {
                                         </div>
                                     </div>
 
-                                    <div className="row">
-                                        <div className="col-md-6 mb-3">
-                                            <label className="form-label fw-semibold text-white">Loại tài khoản</label>
-                                            <div className="input-group">
-                                                <span className="input-group-text bg-white border-end-0 ps-3">
-                                                    <Shield size={18} className="text-primary" />
-                                                </span>
-                                                <select
-                                                    name="roleId"
-                                                    className="form-select border-start-0 py-2"
-                                                    value={formData.roleId}
-                                                    onChange={handleChange}
-                                                    style={{ borderColor: '#e0e0e0' }}
-                                                >
-                                                    <option value={2}>🏠 Người mua/thuê</option>
-                                                    <option value={3}>🏢 Chủ nhà/Môi giới</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div className="col-md-6 mb-3">
-                                            <label className="form-label fw-semibold text-white">Ảnh đại diện</label>
+                                    <div className="mb-3">
+                                        <label className="form-label fw-semibold text-white">Email</label>
+                                        <div className="input-group">
+                                            <span className="input-group-text bg-white border-end-0 ps-3">
+                                                <Mail size={18} className="text-primary" />
+                                            </span>
                                             <input
-                                                type="file"
-                                                name="avatar"
-                                                className="form-control py-2"
-                                                accept="image/*"
+                                                type="email"
+                                                name="email"
+                                                className="form-control border-start-0 py-2"
+                                                placeholder="example@email.com"
+                                                value={formData.email}
                                                 onChange={handleChange}
+                                                required
                                                 style={{ borderColor: '#e0e0e0' }}
                                             />
                                         </div>
@@ -269,6 +218,43 @@ const Register = () => {
                                             />
                                         </div>
                                     </div>
+
+
+                                    <div className="mb-3">
+                                        <label className="form-label fw-semibold text-white">Loại tài khoản</label>
+                                        <div className="input-group">
+                                            <span className="input-group-text bg-white border-end-0 ps-3">
+                                                <Shield size={18} className="text-primary" />
+                                            </span>
+                                            <select
+                                                name="roleId"
+                                                className="form-select border-start-0 py-2"
+                                                value={formData.roleId}
+                                                onChange={handleChange}
+                                                style={{ borderColor: '#e0e0e0' }}
+                                            >
+                                                <option value={2}>🏠 Người mua/thuê</option>
+                                                <option value={3}>🏢 Chủ nhà/Môi giới</option>
+                                            </select>
+                                        </div>
+
+
+                                        {/* <div className="col-md-6 mb-3">
+                                            <label className="form-label fw-semibold text-white">Ảnh đại diện</label>
+                                            <input
+                                                type="file"
+                                                name="avatar"
+                                                className="form-control py-2"
+                                                accept="image/*"
+                                                onChange={handleChange}
+                                                style={{ borderColor: '#e0e0e0' }}
+                                            />
+                                        </div> */}
+                                    </div>
+
+
+
+
 
                                     <div className="row">
                                         <div className="col-md-6 mb-3">
@@ -330,7 +316,7 @@ const Register = () => {
                                         className="btn btn-primary btn-lg w-100 fw-bold rounded-3 shadow-sm py-3 mt-2"
                                         disabled={loading}
                                         style={{
-                                            background: 'linear-gradient(70deg, rgb(30, 56, 203), rgb(119 190 227))',
+                                            background: 'linear-gradient(45deg, black, cornflowerblue)',
                                             border: 'none'
                                         }}
                                     >

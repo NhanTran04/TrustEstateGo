@@ -316,8 +316,8 @@ const PropertyDetail = () => {
                                 {/* Contact Buttons */}
                                 <div className="d-grid gap-2">
                                     <button
-                                        className="btn btn-primary rounded-pill py-2 fw-semibold"
-                                        onClick={handleContact}
+                                        className="btn btn-outline-primary rounded-pill py-2 fw-semibold"
+                                    // onClick={handleContact}
                                     >
                                         <Phone size={18} className="me-2" />
                                         Gọi ngay

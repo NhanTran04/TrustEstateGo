@@ -15,7 +15,8 @@
 }
 
 .chat-header-card {
-    background: linear-gradient(135deg, #aac0ed 0%, #e2e2f8 100%);
+    /* background: linear-gradient(135deg, #aac0ed 0%, #e2e2f8 100%); */
+    background-color: #cececf !important;
     color: white;
     border: none;
     padding: 25px 30px;
@@ -168,7 +169,7 @@
 }
 
 .my-message .message-bubble {
-    background: linear-gradient(135deg, #a299af 0%, #4063c3 100%);
+    background: #25D366;
     color: white;
     border-bottom-right-radius: 8px;
 }
@@ -234,7 +235,7 @@
     justify-content: center;
     margin-left: 10px;
     border: none;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #25D366 !important;
     transition: all 0.3s ease;
 }
 

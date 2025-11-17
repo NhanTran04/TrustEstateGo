@@ -202,6 +202,7 @@ const Properties = () => {
                                         className="page-link rounded-pill me-2"
                                         onClick={() => handlePageChange(pagination.page - 1)}
                                         disabled={pagination.page === 1}
+
                                     >
                                         <ChevronLeft size={16} />
                                     </button>
@@ -224,6 +225,11 @@ const Properties = () => {
                                                 <button
                                                     className="page-link rounded-pill mx-1"
                                                     onClick={() => handlePageChange(pageNumber)}
+                                                    style={pagination.page === pageNumber ? {
+                                                        background: "linear-gradient(45deg, black, cornflowerblue)",
+                                                        color: "white",
+                                                        border: "none"
+                                                    } : {}}
                                                 >
                                                     {pageNumber}
                                                 </button>

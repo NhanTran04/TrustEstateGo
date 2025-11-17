@@ -22,7 +22,7 @@ const HeroSection = () => {
     return (
         <section className="hero-section d-flex align-items-center p-3"
             style={{
-                background: "linear-gradient(135deg, rgb(37 113 178) 0%, rgb(79 228 235) 100%)",
+                background: "linear-gradient(45deg, black, cornflowerblue)",
                 minHeight: "400px"
             }}
         >
@@ -61,9 +61,9 @@ const HeroSection = () => {
 
                         <div className="search-hero animate-fade-in">
                             <div className="row g-3">
-                                <div className="col-md-8">
+                                <div className="col-md-7">
                                     <div className="input-group input-group-lg">
-                                        <span className="fs-3 fw-bold text-white mb-4">
+                                        <span className="fs-4 fw-bold text-white mb-4">
                                             Bạn muốn căn nhà mơ ước?
 
                                         </span>
@@ -71,7 +71,7 @@ const HeroSection = () => {
                                 </div>
                                 <div className="col-md-4">
                                     <button
-                                        className="btn btn-lg w-100 fw-bold rounded-pill text-white"
+                                        className="btn btn-lg w-100 fw-bold rounded-0 text-white"
                                         style={{ background: "#0a0fb7" }}
                                         onClick={handleSearch}
                                     >

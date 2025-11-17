@@ -12,6 +12,7 @@ const Home = () => {
     const navigate = useNavigate();
     const { handleSaveProperty, savedProperties, setSearchQuery, properties, refetchProperties } = useProperty();
     const [featuredProperties, setFeaturedProperties] = useState([]);
+    const [showButton, setShowButton] = useState(false);
     // const [stats, setStats] = useState({
     //     totalProperties: 0,
     //     successfulTransactions: 0,
@@ -29,6 +30,15 @@ const Home = () => {
 
     useEffect(() => {
         refetchProperties(1);
+    }, []);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setShowButton(window.scrollY > 1200);
+        };
+
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
     return (
@@ -127,7 +137,7 @@ const Home = () => {
                 </div>
                 <div className="text-center mt-5">
                     <button
-                        className="btn btn-primary btn-lg fw-semibold rounded-pill px-5"
+                        className="btn btn-dark btn-lg fw-semibold rounded-0 px-5"
                         onClick={() => navigate('/properties')}
                     >
                         Xem tất cả bất động sản
@@ -135,6 +145,31 @@ const Home = () => {
                 </div>
             </div>
             <ChatBox />
+            {showButton && (
+                <button
+                    onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                    style={{
+                        position: "fixed",
+                        bottom: "100px",
+                        right: "15px",
+                        backgroundColor: "cornflowerblue",
+                        color: "#fff",
+                        border: "none",
+                        borderRadius: "50%",
+                        width: "70px",
+                        height: "70px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        cursor: "pointer",
+                        zIndex: 9999,
+                        boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
+                        fontSize: '30px'
+                    }}
+                >
+                    <i class="bi bi-arrow-up-circle"></i>
+                </button>
+            )}
         </div>
     );
 };

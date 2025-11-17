@@ -94,12 +94,17 @@ const ChatList = () => {
         <Container className="chat-list-container">
             {/* Header */}
             <div className="chat-list-header">
-                <div className="flex">
+                <div className="flex  align-items-center">
                     <div>
                         <div>
                             <div className="d-flex flex-row">
                                 <h1 className="page-title">Tin nhắn</h1>
                                 <MessageCircle size={50} className=" ms-3 p-2 header-icon" />
+                            </div>
+                        </div>
+                        <div>
+                            <div >
+                                <small>Note: Vào trang chi tiết tin đăng và ấn vào mục nhắn tin để tạo phòng chat với seller</small>
                             </div>
                         </div>
                     </div>
@@ -202,7 +207,7 @@ const ChatList = () => {
 
                                         <div className="room-preview">
                                             <p className="last-message">
-                                                {room.lastMessage || "Chưa có tin nhắn nào"}
+                                                {room.lastMessage || ""}
                                             </p>
                                             {room.isOnline && (
                                                 <Badge bg="success" className="online-badge">

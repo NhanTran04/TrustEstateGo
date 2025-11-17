@@ -6,6 +6,7 @@ import SockJS from "sockjs-client";
 import { Button, Form, Card, Badge, Spinner, InputGroup } from "react-bootstrap";
 import { Send, Wifi, WifiOff, User, Clock, Users, MessageCircle } from "lucide-react";
 import "../styles/ChatRoom.css";
+import { useNavigate } from "react-router-dom";
 
 const ChatRoom = () => {
   const { roomId } = useParams();
@@ -14,20 +15,21 @@ const ChatRoom = () => {
   const [connected, setConnected] = useState(false);
   const [loading, setLoading] = useState(true);
   const [onlineUsers, setOnlineUsers] = useState(1);
+  const navigate = useNavigate();
 
   const stompClientRef = useRef(null);
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
   const user = JSON.parse(localStorage.getItem("user"));
 
-  // Auto scroll to bottom
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  // // Auto scroll to bottom
+  // const scrollToBottom = () => {
+  //   messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  // };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+  // useEffect(() => {
+  //   scrollToBottom();
+  // }, [messages]);
 
   // Format time
   const formatTime = (timestamp) => {
@@ -171,12 +173,32 @@ const ChatRoom = () => {
           <Card.Header className="chat-header-card">
             <div className="header-content">
               <div className="header-left">
-                <div className="room-info">
-                  <MessageCircle size={24} className="room-icon" />
+                <div className="room-info align-items-center d-flex gap-3">
+
+                  {/* Nút Quay Lại */}
+                  <Button
+                    variant="light"
+                    className="back-button px-3 py-1"
+                    onClick={() => navigate(-1)}
+                    style={{
+                      borderRadius: "6px",
+                      fontWeight: "500",
+                      height: "40px",
+
+                    }}
+                  >
+                    <i class="bi bi-box-arrow-left"></i>
+                  </Button>
+
+                  <i class="bi bi-wechat fs-2"></i>
+
                   <div>
                     <h4>Phòng Chat #{roomId}</h4>
-                    <p className="welcome-text">Xin chào, <strong>{user?.username}</strong>!</p>
+                    <p className="welcome-text">
+                      Xin chào, <strong>{user?.username}</strong>!
+                    </p>
                   </div>
+
                 </div>
               </div>
               <div className="header-right">
@@ -231,10 +253,10 @@ const ChatRoom = () => {
                             <div className="message-content">
                               {m.message}
                             </div>
-                            <div className="message-time">
+                            {/* <div className="message-time">
                               <Clock size={12} />
                               {formatTime(m.timestamp)}
-                            </div>
+                            </div> */}
                           </div>
                         </div>
                       ))}

@@ -7,7 +7,7 @@ export default function ChatBox() {
         { sender: "bot", text: "Xin chào! Tôi là AI Assistant. Tôi có thể giúp gì cho bạn?", timestamp: new Date() }
     ]);
     const [input, setInput] = useState("");
-    const [isMinimized, setIsMinimized] = useState(false);
+    const [isMinimized, setIsMinimized] = useState(true);
     const [isTyping, setIsTyping] = useState(false);
     const messagesEndRef = useRef(null);
     const inputRef = useRef(null);
@@ -157,7 +157,7 @@ export default function ChatBox() {
                                 width: '70px',
                                 height: '70px',
                                 border: 'none',
-                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                background: 'cornflowerblue',
                                 transition: 'transform 0.5s ease'
                             }}
                             onClick={() => setIsMinimized(false)}
@@ -188,7 +188,7 @@ export default function ChatBox() {
             <div
                 className="d-flex align-items-center justify-content-between p-3 text-white"
                 style={{
-                    background: 'linear-gradient(45deg, #1259e8ff, #8899ebff)',
+                    background: 'cornflowerblue',
                     borderRadius: '20px 20px 0 0'
                 }}
             >
@@ -372,7 +372,7 @@ export default function ChatBox() {
                             width: '40px',
                             height: '40px',
                             borderRadius: '50%',
-                            background: input.trim() ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#e9ecef',
+                            background: input.trim() ? 'cornflowerblue' : '#e9ecef',
                             border: 'none',
                             color: 'white',
                             display: 'flex',

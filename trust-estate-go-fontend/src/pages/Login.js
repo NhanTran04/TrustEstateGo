@@ -175,7 +175,7 @@ const Login = () => {
                                         className="btn btn-primary btn-lg w-100 fw-bold rounded-3 shadow-sm py-3 mb-3"
                                         disabled={loading}
                                         style={{
-                                            background: 'linear-gradient(70deg, rgb(30, 56, 203), rgb(119 190 227))',
+                                            background: 'linear-gradient(45deg, black, cornflowerblue)',
                                             border: 'none'
                                         }}
                                     >

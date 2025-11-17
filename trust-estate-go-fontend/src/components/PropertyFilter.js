@@ -127,6 +127,7 @@ const PropertyFilter = ({ searchQuery, setSearchQuery }) => {
                         <button
                             className="btn btn-primary w-100 rounded-pill d-flex align-items-center justify-content-center"
                             onClick={applyFilters}
+                            style={{ background: "linear-gradient(45deg, black, cornflowerblue)" }}
                         >
                             <Search size={18} className="me-2" />
                             Tìm kiếm

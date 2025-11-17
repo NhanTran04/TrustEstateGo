@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { authApi, endpoints, api } from '../services/api.js';
 import useAuth from '../hooks/useAuth';
+import AddressAutocomplete from '../components/AddressAutocomplete.js';
 
 const CreateEditProperty = () => {
     const { propertyId } = useParams();
@@ -19,6 +20,7 @@ const CreateEditProperty = () => {
         price: '',
         location: '',
         categoryId: '',
+        expireAt: '',
         // propertyType: '',
         area: '',
         bedroom: '',
@@ -41,6 +43,7 @@ const CreateEditProperty = () => {
 
                 setCategories(categoriesRes.data.result || []);
                 setPropertyTypes(propertyTypesRes.data.result || []);
+                console.log('property type: ', propertyTypesRes.data.result);
             } catch (error) {
                 console.error('Error loading data:', error);
                 alert('Không thể tải dữ liệu');
@@ -65,7 +68,8 @@ const CreateEditProperty = () => {
                         price: property.price || '',
                         location: property.location || '',
                         categoryId: property.categoryId || '',
-                        // propertyType: property.propertyType?.name || '',
+                        expireAt: property.expireAt || '',
+                        propertyType: property.propertyType?.name || '',
                         area: property.area || '',
                         bedroom: property.bedroom || '',
                         // interior: property.interior || '',
@@ -119,7 +123,18 @@ const CreateEditProperty = () => {
         setImagePreview(newPreviews);
     };
 
-    const validateForm = () => {
+    const validateAddressOSM = async (address) => {
+        try {
+            const response = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json`);
+            const data = await response.json();
+            return data.length > 0;
+        } catch (error) {
+            console.error('Error validating address:', error);
+            return false;
+        }
+    };
+
+    const validateForm = async () => {
         const newErrors = {};
 
         if (!formData.title) newErrors.title = 'Tiêu đề là bắt buộc';
@@ -127,7 +142,12 @@ const CreateEditProperty = () => {
         if (!formData.price || formData.price <= 0) newErrors.price = 'Giá phải lớn hơn 0';
         if (!formData.location) newErrors.location = 'Địa điểm là bắt buộc';
         if (!formData.categoryId) newErrors.categoryId = 'Vui lòng chọn danh mục';
-        // if (!formData.propertyType) newErrors.propertyType = 'Vui lòng chọn loại BDS';
+        if (!formData.propertyType) newErrors.propertyType = 'Vui lòng chọn loại BDS';
+
+        if (formData.location) {
+            const isValidAddress = await validateAddressOSM(formData.location);
+            if (!isValidAddress) newErrors.location = 'Địa chỉ không hợp lệ hoặc không tìm thấy';
+        }
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -136,9 +156,8 @@ const CreateEditProperty = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!validateForm()) {
-            return;
-        }
+        const isValid = await validateForm();
+        if (!isValid) return;
 
         try {
             setLoading(true);
@@ -223,7 +242,6 @@ const CreateEditProperty = () => {
                                                 name="title"
                                                 value={formData.title}
                                                 onChange={handleInputChange}
-                                                placeholder="Ví dụ: Căn hộ cao cấp 2PN view biển tại Vũng Tàu"
                                             />
                                             {errors.title && <div className="invalid-feedback">{errors.title}</div>}
                                         </div>
@@ -240,7 +258,7 @@ const CreateEditProperty = () => {
                                                 placeholder="Mô tả chi tiết về vị trí, thiết kế, tiện ích xung quanh..."
                                             />
                                             {errors.description && <div className="invalid-feedback">{errors.description}</div>}
-                                            <div className="form-text">Mô tả càng chi tiết sẽ thu hút được nhiều khách hàng hơn</div>
+
                                         </div>
 
                                         {/* Giá và Địa điểm */}
@@ -255,24 +273,23 @@ const CreateEditProperty = () => {
                                                             name="price"
                                                             value={formData.price}
                                                             onChange={handleInputChange}
-                                                            placeholder="5000000000"
+
+                                                            min={1000}
                                                         />
                                                         <span className="input-group-text bg-primary text-white">VNĐ</span>
                                                         {errors.price && <div className="invalid-feedback">{errors.price}</div>}
                                                     </div>
-                                                    <div className="form-text">Giá niêm yết công khai</div>
+
                                                 </div>
                                             </div>
                                             <div className="col-md-6">
                                                 <div className="mb-4">
                                                     <label className="form-label fw-semibold">Địa chỉ <span className="text-danger">*</span></label>
-                                                    <input
-                                                        type="text"
-                                                        className={`form-control form-control-lg ${errors.location ? 'is-invalid' : ''}`}
-                                                        name="location"
+                                                    <AddressAutocomplete
                                                         value={formData.location}
-                                                        onChange={handleInputChange}
-                                                        placeholder="Số 123, Đường ABC, Quận XYZ, TP.HCM"
+                                                        onChange={(value) =>
+                                                            setFormData((prev) => ({ ...prev, location: value }))
+                                                        }
                                                     />
                                                     {errors.location && <div className="invalid-feedback">{errors.location}</div>}
                                                 </div>
@@ -312,7 +329,7 @@ const CreateEditProperty = () => {
                                                     {errors.categoryId && <div className="invalid-feedback">{errors.categoryId}</div>}
                                                 </div>
                                             </div>
-                                            {/* <div className="col-md-6">
+                                            <div className="col-md-6">
                                                 <div className="mb-4">
                                                     <label className="form-label fw-semibold">Loại hình bất động sản <span className="text-danger">*</span></label>
                                                     <select
@@ -323,14 +340,14 @@ const CreateEditProperty = () => {
                                                     >
                                                         <option value="">-- Chọn loại hình --</option>
                                                         {propertyTypes.map(type => (
-                                                            <option key={type.name} value={type.name}>
-                                                                {type.displayName}
+                                                            <option key={type.value} value={type.value}>
+                                                                {type.label}
                                                             </option>
                                                         ))}
                                                     </select>
                                                     {errors.propertyType && <div className="invalid-feedback">{errors.propertyType}</div>}
                                                 </div>
-                                            </div> */}
+                                            </div>
                                         </div>
 
                                         {/* Property Specs */}
@@ -346,12 +363,13 @@ const CreateEditProperty = () => {
                                                             value={formData.area}
                                                             onChange={handleInputChange}
                                                             placeholder="80"
+                                                            min={1}
                                                         />
                                                         <span className="input-group-text">m²</span>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div className="col-md-4">
+                                            {/* <div className="col-md-4">
                                                 <div className="mb-4">
                                                     <label className="form-label fw-semibold">Số phòng ngủ</label>
                                                     <select
@@ -368,35 +386,30 @@ const CreateEditProperty = () => {
                                                         <option value="5">5+ phòng ngủ</option>
                                                     </select>
                                                 </div>
-                                            </div>
-                                            {/* <div className="col-md-4">
-                                                <div className="mb-4">
-                                                    <label className="form-label fw-semibold">Tình trạng nội thất</label>
-                                                    <select
-                                                        className="form-select"
-                                                        name="interior"
-                                                        value={formData.interior}
-                                                        onChange={handleInputChange}
-                                                    >
-                                                        <option value="">-- Chọn tình trạng --</option>
-                                                        <option value="Cao cấp">Nội thất cao cấp</option>
-                                                        <option value="Hoàn thiện">Hoàn thiện đầy đủ</option>
-                                                        <option value="Cơ bản">Nội thất cơ bản</option>
-                                                        <option value="Thô">Bàn giao thô</option>
-                                                    </select>
-                                                </div>
                                             </div> */}
+                                            <div className="col-md-4">
+                                                <div className="mb-4">
+                                                    <label className="form-label fw-semibold">Ngày hết hạn</label>
+                                                    <input
+                                                        type="datetime-local"
+                                                        className="form-control"
+                                                        name="expireAt"
+                                                        value={formData.expireAt}
+                                                        min={new Date().toISOString().slice(0, 16)} // yyyy-MM-ddTHH:mm
+                                                        onChange={handleInputChange}
+                                                    />
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
                                     {/* Images */}
                                     <div className="mb-5">
                                         <h5 className="text-primary mb-4 d-flex align-items-center">
-
                                             Hình ảnh bất động sản
                                         </h5>
 
-                                        <div className="border border-2 border-dashed rounded-3 p-4 text-center mb-3"
+                                        <div className="border border-2 border-dashed rounded-3 p-1 text-center mb-3"
                                             style={{ borderColor: '#e3f2fd' }}>
                                             <input
                                                 type="file"

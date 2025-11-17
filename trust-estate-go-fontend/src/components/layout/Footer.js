@@ -1,21 +1,20 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Home, Mail, Phone, MapPin } from 'lucide-react';
+import logo from '../../assets/logo_.png';
 
 const Footer = () => {
   const navigate = useNavigate();
 
   return (
-    <footer className="text-light py-5 mt-5" style={{ background: "linear-gradient(45deg, #14429b, #180b0b)" }}>
+    <footer className="text-light py-5 mt-5" style={{ background: "linear-gradient(45deg, black, midnightblue)" }}>
       <div className="container">
         <div className="row g-4">
           <div className="col-lg-4">
-            <div className="d-flex align-items-center mb-4">
-              <div className="bg-primary rounded-3 p-2 me-3">
-                <Home size={32} className="text-white" />
-              </div>
-              <h4 className="text-primary fw-bold mb-0">TrustEstateGo</h4>
+            <div style={{ padding: '10px' }}>
+              <img src={logo} alt="TrustEstateGo Logo" style={{ height: '80px', width: 'auto', display: 'block' }} />
             </div>
+
             <p className="mb-4">
               Nền tảng bất động sản hàng đầu Việt Nam, kết nối hàng triệu người với ngôi nhà mơ ước.
               Uy tín - Chất lượng - Minh bạch.
@@ -90,10 +89,7 @@ const Footer = () => {
             </div>
           </div>
         </div>
-
         <hr className="my-4 opacity-25" />
-
-
       </div>
     </footer>
   );

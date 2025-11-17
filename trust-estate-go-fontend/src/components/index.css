@@ -1,27 +1,9 @@
-.chat-bubble-btn {
-    position: relative;
-    background: linear-gradient(135deg, #1f88bd 0%, #a77a27 100%);
-    color: white;
-    padding: 10px 16px;
-    border: none;
-    border-radius: 18px;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+.button-hover-dark {
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
 }
 
-/* tam giác nhọn */
-.chat-bubble-btn::after {
-    content: "";
-    position: absolute;
-    bottom: -8px;
-    /* nhô ra dưới */
-    left: 20px;
-    /* vị trí đầu nhọn */
-    width: 0;
-    height: 0;
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    border-top: 8px solid #1f88bd;
-    /* màu trùng với nền */
+.button-hover-dark:hover {
+    background-color: #000 !important;
+    color: #fff !important;
+    border-color: #000 !important;
 }
