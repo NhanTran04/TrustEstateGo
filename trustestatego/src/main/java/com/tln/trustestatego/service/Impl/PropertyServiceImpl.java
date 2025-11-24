@@ -8,6 +8,7 @@ import com.tln.trustestatego.dto.request.PropertyRequest;
 import com.tln.trustestatego.dto.response.PageResponse;
 import com.tln.trustestatego.dto.response.PropertyResponse;
 import com.tln.trustestatego.dto.response.PropertyTypeResponse;
+import com.tln.trustestatego.entity.Payment;
 import com.tln.trustestatego.entity.Property;
 import com.tln.trustestatego.entity.PropertyImage;
 import com.tln.trustestatego.entity.User;
@@ -76,6 +77,8 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
     GeoapifyServiceImpl geoapifyService;
 
     BlockchainService blockchainService;
+
+    PaymentRepository paymentRepository;
 
     @Override
     public PageResponse<PropertyResponse> getProperties(Integer categoryId, Pageable pageable) {
@@ -227,11 +230,11 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
             });
         }
 
-        // Xử lý ảnh
-        if (propertyAdminRequest.getImages() != null && propertyAdminRequest.getImages().length > 0) {
-            Set<PropertyImage> propertyImages = uploadPropertyImages(propertyAdminRequest.getImages(), property);
-            property.setPropertyImages(propertyImages);
-        }
+//        // Xử lý ảnh
+//        if (propertyAdminRequest.getImages() != null && propertyAdminRequest.getImages().length > 0) {
+//            Set<PropertyImage> propertyImages = uploadPropertyImages(propertyAdminRequest.getImages(), property);
+//            property.setPropertyImages(propertyImages);
+//        }
 
         return propertyMapper.toPropertyResponse(propertyRepository.save(property));
     }
@@ -254,11 +257,15 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
             });
         }
 
-        // Xử lý ảnh
-        if (propertyRequest.getImages() != null && propertyRequest.getImages().length > 0) {
-            Set<PropertyImage> propertyImages = uploadPropertyImages(propertyRequest.getImages(), property);
-            property.setPropertyImages(propertyImages);
-        }
+//        // Xử lý ảnh
+//        if (propertyRequest.getImages() != null && propertyRequest.getImages().length > 0) {
+//            Set<PropertyImage> propertyImages = uploadPropertyImages(propertyRequest.getImages(), property);
+//            property.setPropertyImages(propertyImages);
+//        }
+
+        Payment activePayment = paymentRepository.findFirstByUserIdAndIsPayTrueAndExpiredAtAfterOrderByExpiredAtDesc(user.getId(), LocalDateTime.now())
+                .orElse(null);
+        property.setPayment(activePayment);
 
         return propertyMapper.toPropertyResponse(propertyRepository.save(property));
     }
@@ -270,14 +277,14 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
 
         propertyMapper.update(property, propertyRequest);
 
-        if (propertyRequest.getImages() != null && propertyRequest.getImages().length > 0) {
-            // Xóa ảnh cũ nếu muốn
-            property.getPropertyImages().clear();
-
-            // Thêm ảnh mới
-            Set<PropertyImage> newImages = uploadPropertyImages(propertyRequest.getImages(), property);
-            property.getPropertyImages().addAll(newImages);
-        }
+//        if (propertyRequest.getImages() != null && propertyRequest.getImages().length > 0) {
+//            // Xóa ảnh cũ nếu muốn
+//            property.getPropertyImages().clear();
+//
+//            // Thêm ảnh mới
+//            Set<PropertyImage> newImages = uploadPropertyImages(propertyRequest.getImages(), property);
+//            property.getPropertyImages().addAll(newImages);
+//        }
 
 //        property.setStatus("PENDING");
 //        property.setBlockchainTxHash(null);
@@ -285,6 +292,64 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
 
         return propertyMapper.toPropertyResponse(propertyRepository.save(property));
     }
+
+    @Override
+    public List<String> uploadPropertyImages(int propertyId, MultipartFile[] images) {
+        Property property = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Property not found"));
+
+        List<String> imageUrls = new ArrayList<>();
+
+        if (images != null) {
+            for (MultipartFile file : images) {
+                if (!file.isEmpty()) {
+                    try {
+                        Map res = cloudinary.uploader().upload(file.getBytes(),
+                                ObjectUtils.asMap("resource_type", "auto"));
+                        String imageUrl = res.get("secure_url").toString();
+
+                        PropertyImage propertyImage = new PropertyImage();
+                        propertyImage.setImageUrl(imageUrl);
+                        propertyImage.setProperty(property);
+                        property.getPropertyImages().add(propertyImage);
+
+                        imageUrls.add(imageUrl);
+                    } catch (Exception e) {
+                        throw new RuntimeException("Error uploading image: " + file.getOriginalFilename(), e);
+                    }
+                }
+            }
+            propertyRepository.save(property);
+        }
+
+        return imageUrls;
+    }
+
+
+//    private Set<PropertyImage> uploadPropertyImages(MultipartFile[] images, Property property) {
+//        Set<PropertyImage> propertyImages = new HashSet<>();
+//        if (images != null && images.length > 0) {
+//            for (MultipartFile file : images) {
+//                if (!file.isEmpty()) {
+//                    try {
+//                        Map res = cloudinary.uploader().upload(file.getBytes(),
+//                                ObjectUtils.asMap("resource_type", "auto"));
+//                        String imageUrl = res.get("secure_url").toString();
+//                        PropertyImage image = new PropertyImage();
+//                        image.setImageUrl(imageUrl);
+//                        image.setProperty(property);
+//                        propertyImages.add(image);
+//                    } catch (Exception ex) {
+//                        throw new RuntimeException("Error uploading image: " + file.getOriginalFilename(), ex);
+//                    }
+//                }
+//            }
+//        }
+//        return propertyImages;
+//    }
+
+
+
 
     @Override
     public PageResponse<PropertyDocument> searchProperty(Map<String, String> params, Pageable pageable) {
@@ -341,28 +406,6 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
         return pageMapper.toPageResponse(page);
     }
 
-    private Set<PropertyImage> uploadPropertyImages(MultipartFile[] images, Property property) {
-        Set<PropertyImage> propertyImages = new HashSet<>();
-        if (images != null && images.length > 0) {
-            for (MultipartFile file : images) {
-                if (!file.isEmpty()) {
-                    try {
-                        Map res = cloudinary.uploader().upload(file.getBytes(),
-                                ObjectUtils.asMap("resource_type", "auto"));
-                        String imageUrl = res.get("secure_url").toString();
-                        PropertyImage image = new PropertyImage();
-                        image.setImageUrl(imageUrl);
-                        image.setProperty(property);
-                        propertyImages.add(image);
-                    } catch (Exception ex) {
-                        throw new RuntimeException("Error uploading image: " + file.getOriginalFilename(), ex);
-                    }
-                }
-            }
-        }
-        return propertyImages;
-    }
-
     @Override
     public PropertyResponse approveProperty(int propertyId) {
         Property property = propertyRepository.findById(propertyId)
@@ -404,6 +447,15 @@ public class PropertyServiceImpl implements com.tln.trustestatego.service.Proper
         propertyRepository.save(property);
 
         return propertyMapper.toPropertyResponse(property);
+    }
+
+    @Override
+    public boolean allowPost() {
+        User user = currentUserService.getCurrentUser();
+        long countPost = propertyRepository.countByUserIdAndPaymentIsNull(user.getId());
+        if(countPost < 3)
+            return true;
+        return paymentRepository.existsByUserIdAndIsPayTrueAndExpiredAtAfter(user.getId(), LocalDateTime.now());
     }
 
     @Override

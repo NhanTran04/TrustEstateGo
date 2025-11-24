@@ -5,11 +5,9 @@ import com.tln.trustestatego.service.PaymentService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -37,5 +35,18 @@ public class PaymentController {
     @PostMapping("/history")
     public List<PaymentResponse> getPaymentsByUser(){
         return paymentService.getPaymentsByUser();
+    }
+
+    @PreAuthorize("hasRole('SELLER')")
+    @GetMapping("/allow-buy")
+    public boolean allowBuy() {
+        return paymentService.allowBuy();
+    }
+
+    @PreAuthorize("hasRole('SELLER')")
+    @DeleteMapping("/payments/cancel/{orderId}")
+    public ResponseEntity<Void> cancelPayment(@PathVariable String orderId) {
+        paymentService.deletePayment(orderId);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -8,6 +8,7 @@ import com.tln.trustestatego.dto.response.PropertyResponse;
 import com.tln.trustestatego.dto.response.PropertyTypeResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -22,10 +23,12 @@ public interface PropertyService {
     PropertyResponse createPropertyByAdmin(PropertyAdminRequest propertyAdminRequest);
     PropertyResponse updateProperty(int propertyId,
                                            PropertyRequest propertyRequest);
+    List<String> uploadPropertyImages(int propertyId, MultipartFile[] images);
     PageResponse<PropertyDocument> searchProperty(Map<String, String> params, Pageable pageable);
     void deleteProperty(int propertyId);
     List<PropertyTypeResponse> getAllPropertyTypes();
     void reindexAllProperties();
     PropertyResponse approveProperty(int propertyId);
     PropertyResponse rejectProperty(int id);
+    boolean allowPost();
 }

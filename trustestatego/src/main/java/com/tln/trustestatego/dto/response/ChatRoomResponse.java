@@ -16,4 +16,5 @@ public class ChatRoomResponse {
     private String partnerName;     // tên đối phương
     private String partnerAvatar;   // avatar đối phương
     private LocalDateTime lastMessageAt;
+    private String lastMessage;
 }

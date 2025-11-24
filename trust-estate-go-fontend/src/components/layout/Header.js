@@ -2,10 +2,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Home, Plus, User, Bell, LogOut, Building, X, Menu } from 'lucide-react';
 import useAuth from '../../hooks/useAuth';
-import { api, endpoints } from '../../services/api';
+import { api, authApi, endpoints } from '../../services/api';
 import { hasRole } from '../../utils/helper';
 import logo from '../../assets/logo_.png';
 import '../index.css';
+import { MdPayment, MdReportProblem } from 'react-icons/md';
 
 // Hàm sinh slug từ tên category
 const toSlug = (text) => {
@@ -63,6 +64,21 @@ const Header = () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, []);
+
+    const handleAllowPost = async () => {
+        try {
+            const res = await authApi().get(endpoints.properties + "/allow-post");
+
+            if (res.data?.result) {
+                return navigate('/properties/create');
+            }
+
+            alert("Bạn đã dùng hết 3 lần đăng tin miễn phí. Hãy mua gói để tiếp tục đăng!");
+        } catch (error) {
+            console.error(error);
+            alert("Đã xảy ra lỗi. Vui lòng thử lại sau!");
+        }
+    };
 
     return (
         <nav className="navbar navbar-expand-lg sticky-top shadow-lg" style={{ background: 'linear-gradient(45deg, #000, whitesmoke)', backdropFilter: 'blur(10px)' }}>
@@ -181,7 +197,7 @@ const Header = () => {
                                 {hasRole(user, "SELLER") && (
                                     <button
                                         className="btn btn-outline-primary fw-semibold rounded-0 px-4 shadow-sm button-hover-dark"
-                                        onClick={() => navigate('/properties/create')}
+                                        onClick={handleAllowPost}
                                     >
                                         <Plus size={16} className="me-2" />
                                         Đăng tin
@@ -233,11 +249,23 @@ const Header = () => {
                                                             setShowUserDropdown(false);
                                                         }}
                                                     >
-                                                        <Building size={16} className="me-3 text-success" />
+                                                        <MdPayment size={16} className="me-3" />
                                                         Lịch sử thanh toán
                                                     </button>
                                                 </li>
                                             )}
+                                            <li>
+                                                <button
+                                                    className="dropdown-item d-flex align-items-center py-2 rounded-2 m-1"
+                                                    onClick={() => {
+                                                        navigate('/reports');
+                                                        setShowUserDropdown(false);
+                                                    }}
+                                                >
+                                                    <MdReportProblem size={16} className="me-3 text-secondary" />
+                                                    Lịch sử khiếu nại
+                                                </button>
+                                            </li>
                                             <li>
                                                 <button
                                                     className="dropdown-item d-flex align-items-center py-2 rounded-2 m-1"

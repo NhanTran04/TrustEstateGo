@@ -64,6 +64,7 @@ public class ChatServiceImpl implements ChatService {
         message.setCreatedAt(LocalDateTime.now());
         message.setIsRead(false);
 
+        room.setLastMessage(text);
         room.setLastMessageAt(LocalDateTime.now());
         chatRoomRepo.save(room);
         return chatMessageRepo.save(message);
@@ -89,7 +90,7 @@ public class ChatServiceImpl implements ChatService {
                     : room.getUser();
 
             dto.setPartnerName(partner.getFirstName() + " " + partner.getLastName());
-            dto.setPartnerAvatar(partner.getAvatar()); // nhớ có trường avatar trong User
+            dto.setPartnerAvatar(partner.getAvatar());
             dto.setLastMessageAt(room.getLastMessageAt());
 
             return dto;

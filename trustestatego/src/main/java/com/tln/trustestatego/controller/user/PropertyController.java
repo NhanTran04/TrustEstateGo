@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -78,6 +79,24 @@ public class PropertyController {
         }
     }
 
+    @PreAuthorize("hasRole('SELLER')")
+    @GetMapping("/properties/allow-post")
+    public ResponseEntity<ApiResponse<Boolean>> allowPost() {
+        try {
+            return ResponseEntity.ok(
+                    ApiResponse.<Boolean>builder()
+                            .result(propertyService.allowPost())
+                            .build()
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.<Boolean>builder()
+                            .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .message(e.getMessage())
+                            .build());
+        }
+    }
+
 //    @GetMapping("/users/{sellerId}/properties")
 //    public ResponseEntity<ApiResponse<PageResponse<PropertyResponse>>> getPropertyBySellerId(
 //            @PathVariable("sellerId") int sellerId, Pageable pageable) {
@@ -116,8 +135,8 @@ public class PropertyController {
     }
 
     @PreAuthorize("hasRole('SELLER')")
-    @PostMapping(path = "/properties",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<PropertyResponse>> createProperty(@ModelAttribute PropertyRequest propertyRequest) {
+    @PostMapping(path = "/properties")
+    public ResponseEntity<ApiResponse<PropertyResponse>> createProperty(@RequestBody PropertyRequest propertyRequest) {
         try {
             System.out.println("📥 PropertyRequest nhận được: " + propertyRequest);
             return ResponseEntity.status(HttpStatus.CREATED)
@@ -135,10 +154,10 @@ public class PropertyController {
     }
 
     @PreAuthorize("hasRole('SELLER')")
-    @PutMapping(path = "/properties/{propertyId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(path = "/properties/{propertyId}")
     public ResponseEntity<ApiResponse<PropertyResponse>> updateProperty(
             @PathVariable int propertyId,
-            @ModelAttribute PropertyRequest propertyRequest) {
+            @RequestBody PropertyRequest propertyRequest) {
         try {
             return ResponseEntity.ok(
                     ApiResponse.<PropertyResponse>builder()
@@ -151,6 +170,19 @@ public class PropertyController {
                             .message(e.getMessage())
                             .build());
         }
+    }
+
+    @PreAuthorize("hasRole('SELLER')")
+    @PostMapping(path = "/properties/{propertyId}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<List<String>>> uploadImages(
+            @PathVariable int propertyId,
+            @RequestParam("images") MultipartFile[] images) {
+
+        List<String> uploadedUrls = propertyService.uploadPropertyImages(propertyId, images);
+
+        return ResponseEntity.ok(ApiResponse.<List<String>>builder()
+                .result(uploadedUrls)
+                .build());
     }
 
     @GetMapping("/properties/search")

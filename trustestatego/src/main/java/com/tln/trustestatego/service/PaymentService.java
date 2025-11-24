@@ -9,4 +9,6 @@ public interface PaymentService {
     PaymentResponse createOrder(Integer packageId) throws IOException;
     PaymentResponse captureOrder(String orderId) throws IOException;
     List<PaymentResponse> getPaymentsByUser();
+    void deletePayment(String orderId);
+    boolean allowBuy();
 }

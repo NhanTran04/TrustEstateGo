@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,4 +17,6 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer> {
             "WHERE p.isPay = true AND YEAR(p.paidAt) = :year " +
             "GROUP BY MONTH(p.paidAt) ORDER BY MONTH(p.paidAt)")
     List<Object[]> getRevenueByMonthRaw(int year);
+    boolean existsByUserIdAndIsPayTrueAndExpiredAtAfter(int user, LocalDateTime dateTime);
+    Optional<Payment> findFirstByUserIdAndIsPayTrueAndExpiredAtAfterOrderByExpiredAtDesc(int userId, LocalDateTime dateTime);
 }

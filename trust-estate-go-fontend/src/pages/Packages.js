@@ -4,7 +4,7 @@ import '../styles/Package.css'
 
 const Packages = () => {
     const [packages, setPackages] = useState([]);
-
+    const [allowBuy, setAllowBuy] = useState();
     useEffect(() => {
         const fetchPackages = async () => {
             try {
@@ -30,12 +30,32 @@ const Packages = () => {
         }
     };
 
+    useEffect(() => {
+        const fetchAllowBuy = async () => {
+            try {
+                const res = await authApi().get(endpoints.payments + "/allow-buy");
+                setAllowBuy(res.data);
+            } catch (error) {
+                console.error("Error fetching properties allowpost:", error);
+            }
+        };
+        fetchAllowBuy();
+    }, []);
+
     return (
         <div className="container py-5">
             {/* Header Section */}
             <div className="text-center mb-5">
                 <h1 className="display-4 fw-bold text-gradient">Gói Dịch Vụ</h1>
                 <p className="lead text-muted">Lựa chọn gói dịch vụ phù hợp với nhu cầu của bạn</p>
+                {!allowBuy && (
+                    <div className="mb-4 fs-5" >
+                        <span className='p-1' style={{ background: "gold" }}>
+                            <span style={{ color: "red", fontWeight: "bold" }}>Note: </span>
+                            Gói tin bạn mua hết hạn mới được mua tiếp
+                        </span>
+                    </div>
+                )}
             </div>
 
             {/* Packages Grid */}
@@ -79,6 +99,7 @@ const Packages = () => {
                                 <button
                                     className="btn btn-light btn-lg w-100 fw-bold text-dark rounded-pill py-3"
                                     onClick={() => handleBuy(pkg.id)}
+                                    disabled={!allowBuy}
                                 >
                                     Mua Ngay <i className="bi bi-arrow-right ms-2"></i>
                                 </button>

@@ -41,6 +41,9 @@ public class ChatRoom {
     @Column(name = "last_message_at")
     private LocalDateTime lastMessageAt;
 
+    @Column(name = "last_message")
+    private String lastMessage;
+
     @Lob
     @Column(name = "status")
     private String status;

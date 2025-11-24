@@ -61,4 +61,7 @@ public class Payment {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+//    @OneToMany(mappedBy = "payment")
+//    private Set<Property> properties = new LinkedHashSet<>();
+
 }

@@ -90,6 +90,9 @@ public class Property {
     @Column(name = "approved_at")
     private LocalDateTime approvedAt;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_id")
+    private Payment payment;
 
 //    @OneToMany(mappedBy = "property")
 //    private Set<ChatRoom> chatRooms = new LinkedHashSet<>();

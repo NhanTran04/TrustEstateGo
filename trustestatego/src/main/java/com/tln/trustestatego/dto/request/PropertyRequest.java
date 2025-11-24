@@ -35,7 +35,7 @@ public class PropertyRequest {
     String location;
     Boolean isActive;
     PropertyType propertyType;
-    MultipartFile[] images;
+//    MultipartFile[] images;
     Integer area;
     Integer bedroom;
     String interior;

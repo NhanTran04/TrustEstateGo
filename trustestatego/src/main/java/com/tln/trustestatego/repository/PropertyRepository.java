@@ -1,6 +1,7 @@
 package com.tln.trustestatego.repository;
 
 import com.tln.trustestatego.entity.Property;
+import com.tln.trustestatego.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -39,5 +40,5 @@ public interface PropertyRepository extends JpaRepository<Property, Integer>, Jp
     Optional<Property> findByIdForIndexing(@Param("id") Integer id);
     @Query("SELECT DISTINCT p FROM Property p LEFT JOIN FETCH p.propertyImages")
     List<Property> findAllWithImages();
-
+    long countByUserIdAndPaymentIsNull(int userId);
 }

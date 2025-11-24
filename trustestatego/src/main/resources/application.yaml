@@ -101,6 +101,8 @@ paypal:
   mode: sandbox
   successUrl: https://trustestatego-frontend.onrender.com/payment-success
   cancelUrl: https://trustestatego-frontend.onrender.com/payment-cancel
+#  successUrl: http://localhost:3000/payment-success
+#  cancelUrl: http://localhost:3000/payment-cancel
   currency: USD
 
 geoapify:

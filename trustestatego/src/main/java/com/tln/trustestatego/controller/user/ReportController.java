@@ -21,9 +21,9 @@ import org.springframework.web.bind.annotation.*;
 public class ReportController {
     ReportService reportService;
 
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','SELLER')")
     @GetMapping("/reports")
-    public ResponseEntity<ApiResponse<PageResponse<ReportResponse>>> getReportByUserId(@PathVariable int userId, Pageable pageable){
+    public ResponseEntity<ApiResponse<PageResponse<ReportResponse>>> getReportByUserId(Pageable pageable){
         try{
             return ResponseEntity.ok()
                     .body(ApiResponse.<PageResponse<ReportResponse>>builder()
@@ -38,7 +38,7 @@ public class ReportController {
         }
     }
 
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','SELLER')")
     @PostMapping("/properties/{propertyId}/reports")
     public ResponseEntity<ApiResponse<ReportResponse>> createReport(
             @RequestBody ReportUserRequest reportUserRequest,

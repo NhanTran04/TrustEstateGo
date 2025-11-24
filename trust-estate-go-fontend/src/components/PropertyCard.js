@@ -1,15 +1,28 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MapPin, Home, Building, Eye, Calendar, Star, Heart, Share2, Edit, Trash2, Bed } from 'lucide-react';
 import useAuth from '../hooks/useAuth';
 import { formatPrice, formatDate, formatArea, getPropertyTypeLabel } from '../utils/Formatter';
+import { MdReportGmailerrorred } from 'react-icons/md';
+import { authApi, endpoints } from '../services/api';
+import { Modal, Form, Button, Card } from 'react-bootstrap';
 
 const PropertyCard = ({ property, onSave, isSaved, showActions = false, onEdit, onDelete }) => {
     const { user } = useAuth();
     const navigate = useNavigate();
     const [localSaved, setLocalSaved] = useState(isSaved);
+    const [showReportModal, setShowReportModal] = useState(false);
+    const [reportReason, setReportReason] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const handleSave = async () => {
+    useEffect(() => {
+        if (localSaved !== isSaved) {
+            setLocalSaved(isSaved);
+        }
+    }, [isSaved, localSaved]);
+
+    const handleSave = async (e) => {
+        e.stopPropagation();
         if (!user) {
             alert('Vui lòng đăng nhập để lưu bất động sản');
             navigate('/login');
@@ -21,6 +34,48 @@ const PropertyCard = ({ property, onSave, isSaved, showActions = false, onEdit, 
         } catch (err) {
             console.error('Error saving property:', err);
         }
+    };
+
+    const handleReportSubmit = async (e) => {
+        e.preventDefault(); // Ngăn form submit mặc định
+
+        if (!user) {
+            alert('Vui lòng đăng nhập để khiếu nại bất động sản');
+            navigate('/login');
+            return;
+        }
+
+        if (!reportReason.trim()) {
+            alert('Vui lòng nhập lý do khiếu nại.');
+            return;
+        }
+
+        setIsSubmitting(true);
+        try {
+            const res = await authApi().post(endpoints.properties + `/${property.id}` + "/reports", {
+                reason: reportReason.trim(),
+            });
+
+            console.log('Report submitted successfully:', res.data);
+            alert('Khiếu nại của bạn đã được gửi thành công. Cảm ơn phản hồi của bạn!');
+            setShowReportModal(false);
+            setReportReason('');
+        } catch (err) {
+            console.error('Lỗi khiếu nại bất động sản:', err);
+            alert('Đã xảy ra lỗi khi gửi khiếu nại. Vui lòng thử lại.');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleShowReportModal = (e) => {
+        e.stopPropagation();
+        setShowReportModal(true);
+    };
+
+    const handleCloseReportModal = () => {
+        setShowReportModal(false);
+        setReportReason('');
     };
 
     const handleViewDetails = () => {
@@ -63,16 +118,17 @@ const PropertyCard = ({ property, onSave, isSaved, showActions = false, onEdit, 
                     <div className="position-absolute top-0 end-0 m-3 d-flex flex-column gap-2">
                         <button
                             className={`btn btn-sm rounded-circle shadow-sm ${localSaved ? 'btn-danger' : 'btn-light'}`}
-                            onClick={handleSave}
+                            onClick={(e) => handleSave(e)}
                             style={{ width: '40px', height: '40px', backdropFilter: 'blur(10px)' }}
                         >
                             <Heart size={16} fill={localSaved ? 'currentColor' : 'none'} />
                         </button>
                         <button
                             className="btn btn-sm btn-light rounded-circle shadow-sm"
+                            onClick={handleShowReportModal}
                             style={{ width: '40px', height: '40px', backdropFilter: 'blur(10px)' }}
                         >
-                            <Share2 size={16} />
+                            <MdReportGmailerrorred size={16} />
                         </button>
                     </div>
 
@@ -151,7 +207,7 @@ const PropertyCard = ({ property, onSave, isSaved, showActions = false, onEdit, 
 
                                 <button
                                     className="btn btn-dark btn-sm fw-semibold rounded-0 px-3"
-
+                                    style={{ background: "linear-gradient(45deg, black, cornflowerblue)" }}
                                 >
                                     Xem chi tiết
                                 </button>
@@ -160,6 +216,46 @@ const PropertyCard = ({ property, onSave, isSaved, showActions = false, onEdit, 
                     </div>
                 </div>
             </div>
+            <Modal show={showReportModal} onHide={handleCloseReportModal} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title className="fw-bold text-danger">
+                        <MdReportGmailerrorred size={20} className="me-2" />
+                        Khiếu nại Bất động sản
+                    </Modal.Title>
+                </Modal.Header>
+                <Form onSubmit={handleReportSubmit}>
+                    <Modal.Body>
+                        <p className="text-muted small">
+                            Vui lòng cho biết lý do bạn khiếu nại bài đăng này ({property.title}).
+                            Thông tin của bạn sẽ được giữ kín.
+                        </p>
+                        <Form.Group controlId="reportReason">
+                            <Form.Label className="fw-semibold">Lý do khiếu nại:</Form.Label>
+                            <Form.Control
+                                as="textarea"
+                                rows={4}
+                                value={reportReason}
+                                onChange={(e) => setReportReason(e.target.value)}
+                                placeholder="Ví dụ: Nội dung sai sự thật, lừa đảo, hình ảnh không đúng..."
+                                required
+                                disabled={isSubmitting}
+                            />
+                        </Form.Group>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={handleCloseReportModal} disabled={isSubmitting}>
+                            Hủy
+                        </Button>
+                        <Button
+                            variant="danger"
+                            type="submit"
+                            disabled={isSubmitting || !reportReason.trim()}
+                        >
+                            {isSubmitting ? 'Đang gửi...' : 'Gửi Khiếu nại'}
+                        </Button>
+                    </Modal.Footer>
+                </Form>
+            </Modal>
         </div>
     );
 };

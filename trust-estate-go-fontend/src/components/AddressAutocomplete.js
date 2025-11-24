@@ -20,7 +20,7 @@ const AddressAutocomplete = ({ value, onChange }) => {
     };
 
     const fetchSuggestions = async (text) => {
-        if (text.length < 3) {
+        if (text.length < 2) {
             setSuggestions([]);
             return;
         }

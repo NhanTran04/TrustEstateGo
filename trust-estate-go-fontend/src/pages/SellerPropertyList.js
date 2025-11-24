@@ -17,6 +17,7 @@ const SellerPropertyList = () => {
         totalElements: 0
     });
     const navigate = useNavigate();
+    const [allowPost, setAllowPost] = useState(true);
 
     // Load properties
     useEffect(() => {
@@ -52,6 +53,18 @@ const SellerPropertyList = () => {
         fetchProperties();
     }, [searchTerm, statusFilter, pagination.page]);
 
+    useEffect(() => {
+        const fetchAllowPost = async () => {
+            try {
+                const res = await authApi().get(endpoints.properties + "/allow-post");
+                setAllowPost(res.data.result);
+            } catch (error) {
+                console.error("Error fetching properties allowpost:", error);
+            }
+        };
+        fetchAllowPost();
+    }, []);
+
 
     // Edit property
     const handleEdit = (propertyId) => {
@@ -62,7 +75,7 @@ const SellerPropertyList = () => {
         <div className="min-vh-100 bg-light py-4">
             <div className="container">
                 {/* Header */}
-                <div className="row align-items-center mb-5">
+                <div className="row align-items-center mb-2">
                     <div className="col-lg-6">
                         <h1 className="h2 fw-bold text-dark mb-1">Quản lý bài đăng</h1>
                         <p className="text-muted mb-0">
@@ -72,12 +85,40 @@ const SellerPropertyList = () => {
                             bài đăng đã tạo
                         </p>
                     </div>
+
                     <div className="col-lg-6 text-lg-end">
-                        <Link to="/properties/create" className="btn btn-primary btn-lg shadow-sm">
+                        {/* <Link to="/properties/create" className="btn btn-primary btn-lg shadow-sm">
+                            + Tạo bài đăng mới
+                        </Link> */}
+                        <Link
+                            to={allowPost ? "/properties/create" : "#"}
+                            className={`btn btn-primary btn-lg shadow-sm ${allowPost ? "" : "opacity-50 cursor-not-allowed"
+                                }`}
+                            onClick={(e) => {
+                                if (!allowPost) e.preventDefault();
+                            }}
+                        >
                             + Tạo bài đăng mới
                         </Link>
+
                     </div>
+
                 </div>
+                {allowPost ? (
+                    <div className="text-end mb-4" >
+                        <span className='p-1'>
+                            <span style={{ color: "red", fontWeight: "bold" }}>Note: </span>
+                            Bạn được miễn phí 3 bài đăng nếu bạn chưa đăng tin nào
+                        </span>
+                    </div>
+                ) : (<div className="text-end mb-4" >
+                    <span style={{ background: "gold" }} className='p-1'>
+                        <span style={{ color: "red", fontWeight: "bold" }}>Note: </span>
+                        Bạn đã hết lượt đăng tin miễn phí và phải mua gói để đăng tin
+                    </span>
+                </div>)}
+
+
 
                 {/* Search & Filter */}
                 {/* <div className="row g-3 mb-4">
@@ -148,7 +189,7 @@ const SellerPropertyList = () => {
                     </div>
                 )}
             </div>
-        </div>
+        </div >
     );
 };
 

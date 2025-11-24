@@ -157,7 +157,7 @@ export default function ChatBox() {
                                 width: '70px',
                                 height: '70px',
                                 border: 'none',
-                                background: 'cornflowerblue',
+                                background: 'deepskyblue',
                                 transition: 'transform 0.5s ease'
                             }}
                             onClick={() => setIsMinimized(false)}

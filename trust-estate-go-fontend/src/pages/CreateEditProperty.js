@@ -153,6 +153,12 @@ const CreateEditProperty = () => {
         return Object.keys(newErrors).length === 0;
     };
 
+    const toBackendDateTime = (value) => {
+        if (!value) return null;
+        if (value.length === 16) value += ":00";
+        return value.replace("T", " ");
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -162,30 +168,49 @@ const CreateEditProperty = () => {
         try {
             setLoading(true);
 
-            const submitData = new FormData();
+            const submitData = {
+                ...formData,
+                expireAt: toBackendDateTime(formData.expireAt)
+            };
+            let createdPropertyId = propertyId;
 
-            // Append form fields
-            Object.keys(formData).forEach(key => {
-                if (formData[key] !== null && formData[key] !== undefined && formData[key] !== '') {
-                    submitData.append(key, formData[key]);
-                }
-            });
-
-            // Append images
-            selectedImages.forEach(image => {
-                submitData.append('images', image);
-            });
 
             if (isEditMode) {
-                await authApi().put(`${endpoints.properties}/${propertyId}`, submitData, {
-                    headers: { 'Content-Type': 'multipart/form-data' },
-                });
-                alert('Cập nhật bài đăng thành công!');
+                const res = await authApi().put(
+                    `${endpoints.properties}/${propertyId}`,
+                    submitData
+                );
+
+                // Nếu có hình ảnh -> upload
+                if (selectedImages.length > 0) {
+                    const imagesForm = new FormData();
+                    selectedImages.forEach(img => imagesForm.append("images", img));
+
+                    await authApi().post(
+                        `${endpoints.properties}/${propertyId}/images`,
+                        imagesForm,
+                        { headers: { "Content-Type": "multipart/form-data" } }
+                    );
+                }
+
+                alert("Cập nhật bài đăng thành công!");
             } else {
-                await authApi().post(endpoints.properties, submitData, {
-                    headers: { 'Content-Type': 'multipart/form-data' },
-                });
-                alert('Tạo bài đăng thành công!');
+                const res = await authApi().post(endpoints.properties, submitData);
+
+                createdPropertyId = res.data.result.id;
+
+                if (selectedImages.length > 0) {
+                    const imagesForm = new FormData();
+                    selectedImages.forEach(img => imagesForm.append("images", img));
+
+                    await authApi().post(
+                        `${endpoints.properties}/${createdPropertyId}/images`,
+                        imagesForm,
+                        { headers: { "Content-Type": "multipart/form-data" } }
+                    );
+                }
+
+                alert("Tạo bài đăng thành công!");
             }
 
             navigate('/my-properties');
@@ -396,6 +421,7 @@ const CreateEditProperty = () => {
                                                         name="expireAt"
                                                         value={formData.expireAt}
                                                         min={new Date().toISOString().slice(0, 16)} // yyyy-MM-ddTHH:mm
+                                                        step="1"
                                                         onChange={handleInputChange}
                                                     />
                                                 </div>

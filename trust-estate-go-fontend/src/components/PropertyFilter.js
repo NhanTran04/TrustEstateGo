@@ -20,25 +20,33 @@ const PropertyFilter = ({ searchQuery, setSearchQuery }) => {
     };
 
     const applyFilters = async () => {
-        try {
-            await searchProperties(1, {
-                keyword: searchQuery,
-                minPrice: filters.minPrice,
-                maxPrice: filters.maxPrice,
-                location: filters.location,
-            });
-
-            // Cập nhật query trên URL
-            const params = new URLSearchParams();
-            if (searchQuery) params.set("keyword", searchQuery);
-            if (filters.minPrice) params.set("minPrice", filters.minPrice);
-            if (filters.maxPrice) params.set("maxPrice", filters.maxPrice);
-            if (filters.location) params.set("location", filters.location);
-
-            navigate(`/properties?${params.toString()}`);
-        } catch (err) {
-            console.error("Error applying filters:", err);
+        const BASE_URL = process.env.REACT_APP_BASE_URL;
+        if (BASE_URL.includes("trustestatego.onrender.com")) {
+            alert("Tìm kiếm nâng cao bằng Elasticsearch không được triển khai lên internet");
+            return;
         }
+        else {
+            try {
+                await searchProperties(1, {
+                    keyword: searchQuery,
+                    minPrice: filters.minPrice,
+                    maxPrice: filters.maxPrice,
+                    location: filters.location,
+                });
+
+                // Cập nhật query trên URL
+                const params = new URLSearchParams();
+                if (searchQuery) params.set("keyword", searchQuery);
+                if (filters.minPrice) params.set("minPrice", filters.minPrice);
+                if (filters.maxPrice) params.set("maxPrice", filters.maxPrice);
+                if (filters.location) params.set("location", filters.location);
+
+                navigate(`/properties?${params.toString()}`);
+            } catch (err) {
+                console.error("Error applying filters:", err);
+            }
+        }
+
     };
 
     const handleKeyDown = (e) => {

@@ -139,6 +139,7 @@ const Home = () => {
                     <button
                         className="btn btn-dark btn-lg fw-semibold rounded-0 px-5"
                         onClick={() => navigate('/properties')}
+                        style={{ background: "linear-gradient(45deg, black, transparent)" }}
                     >
                         Xem tất cả bất động sản
                     </button>
@@ -152,7 +153,7 @@ const Home = () => {
                         position: "fixed",
                         bottom: "100px",
                         right: "15px",
-                        backgroundColor: "cornflowerblue",
+                        backgroundColor: "deepskyblue",
                         color: "#fff",
                         border: "none",
                         borderRadius: "50%",

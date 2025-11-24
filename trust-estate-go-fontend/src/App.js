@@ -24,6 +24,7 @@ import SellerPropertyList from './pages/SellerPropertyList';
 import "./styles/index.css"
 import ScrollToTop from './components/ScrollToTop';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import Reports from './pages/Reports';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -124,6 +125,11 @@ const AppContent = () => {
         <Route path="/payments/history" element={
           <ProtectedRoute>
             <PaymentHistory />
+          </ProtectedRoute>
+        } />
+        <Route path="/reports" element={
+          <ProtectedRoute>
+            <Reports />
           </ProtectedRoute>
         } />
         <Route path="*" element={<Navigate to="/" />} />

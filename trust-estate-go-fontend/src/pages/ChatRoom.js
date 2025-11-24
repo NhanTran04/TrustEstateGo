@@ -22,14 +22,13 @@ const ChatRoom = () => {
   const messagesContainerRef = useRef(null);
   const user = JSON.parse(localStorage.getItem("user"));
 
-  // // Auto scroll to bottom
-  // const scrollToBottom = () => {
-  //   messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  // };
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
-  // useEffect(() => {
-  //   scrollToBottom();
-  // }, [messages]);
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   // Format time
   const formatTime = (timestamp) => {
@@ -168,135 +167,134 @@ const ChatRoom = () => {
   return (
     <div className="chat-room-container">
       {/* Header */}
-      <div className="chat-header">
-        <Card className="chat-main-card">
-          <Card.Header className="chat-header-card">
-            <div className="header-content">
-              <div className="header-left">
-                <div className="room-info align-items-center d-flex gap-3">
 
-                  {/* Nút Quay Lại */}
-                  <Button
-                    variant="light"
-                    className="back-button px-3 py-1"
-                    onClick={() => navigate(-1)}
-                    style={{
-                      borderRadius: "6px",
-                      fontWeight: "500",
-                      height: "40px",
+      <Card className="chat-main-card">
+        <Card.Header className="chat-header-card">
+          <div className="header-content">
+            <div className="header-left">
+              <div className="room-info align-items-center d-flex gap-3">
 
-                    }}
-                  >
-                    <i class="bi bi-box-arrow-left"></i>
-                  </Button>
+                {/* Nút Quay Lại */}
+                <Button
+                  variant="light"
+                  className="back-button px-3 py-1"
+                  onClick={() => navigate(-1)}
+                  style={{
+                    borderRadius: "6px",
+                    fontWeight: "500",
+                    height: "40px",
 
-                  <i class="bi bi-wechat fs-2"></i>
+                  }}
+                >
+                  <i class="bi bi-box-arrow-left"></i>
+                </Button>
 
-                  <div>
-                    <h4>Phòng Chat #{roomId}</h4>
-                    <p className="welcome-text">
-                      Xin chào, <strong>{user?.username}</strong>!
-                    </p>
-                  </div>
+                <i class="bi bi-wechat fs-2"></i>
 
+                <div>
+                  <h4>Phòng Chat #{roomId}</h4>
+                  <p className="welcome-text">
+                    Xin chào, <strong>{user?.username}</strong>!
+                  </p>
                 </div>
-              </div>
-              <div className="header-right">
-                <div className="status-indicators">
-                  <Badge bg="light" text="dark" className="status-badge">
-                    <User size={14} />
-                    <span>{onlineUsers} online</span>
-                  </Badge>
-                  <Badge bg={connected ? "success" : "danger"} className="status-badge connection-badge">
-                    {connected ? <Wifi size={14} /> : <WifiOff size={14} />}
-                    <span>{connected ? "Đã kết nối" : "Mất kết nối"}</span>
-                  </Badge>
-                </div>
+
               </div>
             </div>
-          </Card.Header>
+            <div className="header-right">
+              <div className="status-indicators">
+                <Badge bg="light" text="dark" className="status-badge">
+                  <User size={14} />
+                  <span>{onlineUsers} online</span>
+                </Badge>
+                <Badge bg={connected ? "success" : "danger"} className="status-badge connection-badge">
+                  {connected ? <Wifi size={14} /> : <WifiOff size={14} />}
+                  <span>{connected ? "Đã kết nối" : "Mất kết nối"}</span>
+                </Badge>
+              </div>
+            </div>
+          </div>
+        </Card.Header>
 
-          {/* Messages Area */}
-          <Card.Body className="chat-body">
-            <div className="messages-wrapper">
-              {/* Messages Container */}
-              <div
-                ref={messagesContainerRef}
-                className="messages-container"
-              >
-                {loading ? (
-                  <div className="loading-state">
-                    <Spinner animation="border" variant="primary" />
-                    <p>Đang tải tin nhắn...</p>
-                  </div>
-                ) : messages.length === 0 ? (
-                  <div className="empty-state">
-                    <div className="empty-icon">💬</div>
-                    <h4>Chưa có tin nhắn nào</h4>
-                    <p>Hãy là người đầu tiên bắt đầu cuộc trò chuyện!</p>
-                  </div>
-                ) : (
-                  Object.entries(messageGroups).map(([date, dateMessages]) => (
-                    <div key={date} className="date-group">
-                      <div className="date-divider">
-                        <span>{date}</span>
-                      </div>
-                      {dateMessages.map((m, idx) => (
-                        <div
-                          key={idx}
-                          className={`message-wrapper ${isMyMessage(m) ? "my-message" : "other-message"}`}
-                        >
-                          <div className="message-bubble">
-                            {!isMyMessage(m) && (
-                              <div className="sender-name">{m.senderName || "User"}</div>
-                            )}
-                            <div className="message-content">
-                              {m.message}
-                            </div>
-                            {/* <div className="message-time">
+        {/* Messages Area */}
+        <Card.Body className="chat-body">
+          <div className="messages-wrapper">
+            {/* Messages Container */}
+            <div
+              ref={messagesContainerRef}
+              className="messages-container"
+            >
+              {loading ? (
+                <div className="loading-state">
+                  <Spinner animation="border" variant="primary" />
+                  <p>Đang tải tin nhắn...</p>
+                </div>
+              ) : messages.length === 0 ? (
+                <div className="empty-state">
+                  <div className="empty-icon">💬</div>
+                  <h4>Chưa có tin nhắn nào</h4>
+                  <p>Hãy là người đầu tiên bắt đầu cuộc trò chuyện!</p>
+                </div>
+              ) : (
+                Object.entries(messageGroups).map(([date, dateMessages]) => (
+                  <div key={date} className="date-group">
+                    <div className="date-divider">
+                      <span>{date}</span>
+                    </div>
+                    {dateMessages.map((m, idx) => (
+                      <div
+                        key={idx}
+                        className={`message-wrapper ${isMyMessage(m) ? "my-message" : "other-message"}`}
+                      >
+                        <div className="message-bubble">
+                          {!isMyMessage(m) && (
+                            <div className="sender-name">{m.senderName || "User"}</div>
+                          )}
+                          <div className="message-content">
+                            {m.message}
+                          </div>
+                          {/* <div className="message-time">
                               <Clock size={12} />
                               {formatTime(m.timestamp)}
                             </div> */}
-                          </div>
                         </div>
-                      ))}
-                    </div>
-                  ))
-                )}
-                <div ref={messagesEndRef} />
-              </div>
+                      </div>
+                    ))}
+                  </div>
+                ))
+              )}
+              <div ref={messagesEndRef} />
+            </div>
 
-              {/* Input Area */}
-              <div className="input-section">
-                <InputGroup className="message-input-group">
-                  <Form.Control
-                    type="text"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    placeholder={
-                      connected ? "Nhập tin nhắn của bạn..." : "Đang kết nối..."
-                    }
-                    disabled={!connected}
-                    className="message-input"
-                  />
-                  <Button
-                    variant="primary"
-                    onClick={send}
-                    disabled={!connected || !input.trim()}
-                    className="send-button"
-                  >
-                    <Send size={20} />
-                  </Button>
-                </InputGroup>
-                <div className="input-hint">
-                  <small>Nhấn Enter để gửi tin nhắn</small>
-                </div>
+            {/* Input Area */}
+            <div className="input-section">
+              <InputGroup className="message-input-group">
+                <Form.Control
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder={
+                    connected ? "Nhập tin nhắn của bạn..." : "Đang kết nối..."
+                  }
+                  disabled={!connected}
+                  className="message-input"
+                />
+                <Button
+                  variant="primary"
+                  onClick={send}
+                  disabled={!connected || !input.trim()}
+                  className="send-button"
+                >
+                  <Send size={20} />
+                </Button>
+              </InputGroup>
+              <div className="input-hint">
+                <small>Nhấn Enter để gửi tin nhắn</small>
               </div>
             </div>
-          </Card.Body>
-        </Card>
-      </div>
+          </div>
+        </Card.Body>
+      </Card>
     </div>
   );
 };
